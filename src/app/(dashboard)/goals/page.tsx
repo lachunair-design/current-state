@@ -19,6 +19,7 @@ export default function GoalsPage() {
   const [title, setTitle] = useState('')
   const [category, setCategory] = useState<GoalCategory>('career')
   const [description, setDescription] = useState('')
+  const [successMetric, setSuccessMetric] = useState('')
   const [incomeStream, setIncomeStream] = useState('')
   const [targetDate, setTargetDate] = useState('')
 
@@ -45,6 +46,7 @@ export default function GoalsPage() {
     setTitle('')
     setCategory('career')
     setDescription('')
+    setSuccessMetric('')
     setIncomeStream('')
     setTargetDate('')
     setShowForm(false)
@@ -56,6 +58,7 @@ export default function GoalsPage() {
     setTitle(goal.title)
     setCategory(goal.category)
     setDescription(goal.description || '')
+    setSuccessMetric(goal.success_metric || '')
     setIncomeStream(goal.income_stream_name || '')
     setTargetDate(goal.target_date || '')
     setShowForm(true)
@@ -74,6 +77,7 @@ export default function GoalsPage() {
         title: title.trim(),
         category,
         description: description.trim() || undefined,
+        success_metric: successMetric.trim() || undefined,
         income_stream_name: incomeStream.trim() || undefined,
         target_date: targetDate || undefined,
       }
@@ -172,6 +176,18 @@ export default function GoalsPage() {
               </div>
 
               <div>
+                <label className="label">How will you measure success?</label>
+                <input
+                  type="text"
+                  value={successMetric}
+                  onChange={e => setSuccessMetric(e.target.value)}
+                  className="input"
+                  placeholder="e.g., Get promoted, Earn $50k, Lose 20 lbs"
+                />
+                <p className="text-xs text-gray-500 mt-1">What does "done" look like?</p>
+              </div>
+
+              <div>
                 <label className="label">Why does this matter? (optional)</label>
                 <input
                   type="text"
@@ -243,6 +259,11 @@ export default function GoalsPage() {
                   </div>
                   {goal.description && (
                     <p className="text-sm text-gray-500 mt-1">{goal.description}</p>
+                  )}
+                  {goal.success_metric && (
+                    <p className="text-sm text-purple-700 mt-1">
+                      <span className="font-medium">Success:</span> {goal.success_metric}
+                    </p>
                   )}
                 </div>
                 <div className="relative">

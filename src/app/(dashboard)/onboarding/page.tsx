@@ -30,6 +30,7 @@ export default function OnboardingPage() {
   const [goalTitle, setGoalTitle] = useState('')
   const [goalCategory, setGoalCategory] = useState<GoalCategory>('career')
   const [goalDescription, setGoalDescription] = useState('')
+  const [goalSuccessMetric, setGoalSuccessMetric] = useState('')
   const [incomeStream, setIncomeStream] = useState('')
   const [goalTargetDate, setGoalTargetDate] = useState('')
 
@@ -41,6 +42,7 @@ export default function OnboardingPage() {
       title: goalTitle.trim(),
       category: goalCategory,
       description: goalDescription.trim() || undefined,
+      success_metric: goalSuccessMetric.trim() || undefined,
       income_stream_name: incomeStream.trim() || undefined,
       target_date: goalTargetDate || undefined,
       display_order: goals.length,
@@ -58,6 +60,7 @@ export default function OnboardingPage() {
     setGoalTitle('')
     setGoalCategory('career')
     setGoalDescription('')
+    setGoalSuccessMetric('')
     setIncomeStream('')
     setGoalTargetDate('')
     setShowGoalForm(false)
@@ -233,9 +236,38 @@ export default function OnboardingPage() {
               {/* Add goal form */}
               {showGoalForm ? (
                 <div className="border border-gray-200 rounded-xl p-4 mb-6">
+                  {/* SMART Goals Guide */}
+                  <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-4 mb-4">
+                    <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                      <span className="text-purple-600">🎯</span> SMART Goals Framework
+                    </h4>
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+                      <div className={clsx('p-2 rounded', goalTitle.trim() ? 'bg-green-100 text-green-800' : 'bg-white text-gray-500')}>
+                        <div className="font-medium">S - Specific</div>
+                        <div className="text-[10px]">Clear title ✓</div>
+                      </div>
+                      <div className={clsx('p-2 rounded', goalSuccessMetric.trim() ? 'bg-green-100 text-green-800' : 'bg-white text-gray-500')}>
+                        <div className="font-medium">M - Measurable</div>
+                        <div className="text-[10px]">How to measure?</div>
+                      </div>
+                      <div className={clsx('p-2 rounded', goalCategory ? 'bg-green-100 text-green-800' : 'bg-white text-gray-500')}>
+                        <div className="font-medium">A - Achievable</div>
+                        <div className="text-[10px]">Realistic ✓</div>
+                      </div>
+                      <div className={clsx('p-2 rounded', goalDescription.trim() || incomeStream.trim() ? 'bg-green-100 text-green-800' : 'bg-white text-gray-500')}>
+                        <div className="font-medium">R - Relevant</div>
+                        <div className="text-[10px]">Why it matters?</div>
+                      </div>
+                      <div className={clsx('p-2 rounded', goalTargetDate ? 'bg-green-100 text-green-800' : 'bg-white text-gray-500')}>
+                        <div className="font-medium">T - Time-bound</div>
+                        <div className="text-[10px]">By when?</div>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="space-y-4">
                     <div>
-                      <label className="label">Goal title</label>
+                      <label className="label">Goal title <span className="text-red-500">*</span></label>
                       <input
                         type="text"
                         value={goalTitle}
@@ -244,6 +276,7 @@ export default function OnboardingPage() {
                         placeholder="e.g., Land a new job, Launch my business"
                         autoFocus
                       />
+                      <p className="text-xs text-gray-500 mt-1">✓ Specific: Be clear and concrete</p>
                     </div>
 
                     <div>
@@ -269,17 +302,33 @@ export default function OnboardingPage() {
                           )
                         })}
                       </div>
+                      <p className="text-xs text-gray-500 mt-1">✓ Achievable & Relevant: Choose the domain this goal belongs to</p>
                     </div>
 
                     <div>
-                      <label className="label">Why does this matter? (optional)</label>
+                      <label className="label">How will you know you succeeded? <span className="text-purple-600">(SMART: Measurable)</span></label>
+                      <input
+                        type="text"
+                        value={goalSuccessMetric}
+                        onChange={(e) => setGoalSuccessMetric(e.target.value)}
+                        className="input"
+                        placeholder="e.g., Receive job offer, First $1000 revenue, Publish 10 blog posts"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        💡 Examples: "Get promoted to Senior", "Save $10k", "Launch MVP to 100 users"
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="label">Why does this matter to you? <span className="text-purple-600">(SMART: Relevant)</span></label>
                       <input
                         type="text"
                         value={goalDescription}
                         onChange={(e) => setGoalDescription(e.target.value)}
                         className="input"
-                        placeholder="e.g., Financial freedom, career growth"
+                        placeholder="e.g., Financial freedom, career growth, health"
                       />
+                      <p className="text-xs text-gray-500 mt-1">Connect to your deeper values</p>
                     </div>
 
                     <div>
@@ -297,7 +346,7 @@ export default function OnboardingPage() {
                     </div>
 
                     <div>
-                      <label className="label">Target date (optional)</label>
+                      <label className="label">Target date <span className="text-purple-600">(SMART: Time-bound)</span></label>
                       <input
                         type="date"
                         value={goalTargetDate}
@@ -305,9 +354,19 @@ export default function OnboardingPage() {
                         className="input"
                       />
                       <p className="text-xs text-gray-500 mt-1">
-                        When do you want to achieve this goal?
+                        ⏰ Setting a deadline increases follow-through by 3x
                       </p>
                     </div>
+
+                    {/* Large Goal Warning */}
+                    {goalTitle.length > 30 && (
+                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm">
+                        <div className="font-medium text-amber-900 mb-1">💡 Pro tip: Break it down</div>
+                        <p className="text-amber-700 text-xs">
+                          This seems like a big goal! After adding it, consider breaking it into smaller sub-goals or creating specific tasks for the first steps.
+                        </p>
+                      </div>
+                    )}
 
                     <div className="flex gap-2">
                       <button
