@@ -81,9 +81,13 @@ export function Sidebar({ user }: SidebarProps) {
 
       {/* User section */}
       <div className="border-t border-gray-200 p-4">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-            <UserIcon className="w-4 h-4 text-gray-600" />
+        <Link
+          href="/profile"
+          onClick={() => setMobileOpen(false)}
+          className="flex items-center gap-3 mb-4 p-2 rounded-lg hover:bg-gray-50 transition-colors group"
+        >
+          <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center group-hover:bg-primary-100 transition-colors">
+            <UserIcon className="w-4 h-4 text-gray-600 group-hover:text-primary-600 transition-colors" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-gray-900 truncate">
@@ -91,10 +95,10 @@ export function Sidebar({ user }: SidebarProps) {
             </p>
             <p className="text-xs text-gray-500 truncate">{user.email}</p>
           </div>
-        </div>
+        </Link>
         <button
           onClick={handleSignOut}
-          className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 w-full px-2 py-1 rounded hover:bg-gray-100"
+          className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 w-full px-2 py-1 rounded hover:bg-gray-100 transition-colors"
         >
           <LogOut className="w-4 h-4" />
           Sign out

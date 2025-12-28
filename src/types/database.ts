@@ -42,6 +42,8 @@ export interface Profile {
   id: string;
   email: string;
   full_name: string | null;
+  country: string | null;
+  avatar_url: string | null;
   onboarding_completed: boolean;
   onboarding_step: number;
   timezone: string;

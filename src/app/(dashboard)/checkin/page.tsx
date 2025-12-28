@@ -14,6 +14,7 @@ import {
   PRIORITY_CONFIG,
   Database
 } from '@/types/database'
+import { useCelebration } from '@/components/Celebration'
 import clsx from 'clsx'
 
 interface TaskWithGoal extends Task {
@@ -35,6 +36,7 @@ export default function CheckinPage() {
   const [submitting, setSubmitting] = useState<string | null>(null)
   const router = useRouter()
   const supabase = createClient()
+  const { celebrate, CelebrationComponent } = useCelebration()
 
   const question = QUESTIONNAIRE_QUESTIONS[currentQuestion]
   const isLastQuestion = currentQuestion === QUESTIONNAIRE_QUESTIONS.length - 1
@@ -165,8 +167,15 @@ export default function CheckinPage() {
   const handleTaskAction = async (taskId: string, action: 'completed' | 'deferred') => {
     setSubmitting(taskId)
     try {
+      const matchedTask = matchedTasks.find(m => m.task.id === taskId)
+
       if (action === 'completed') {
         await supabase.from('tasks').update({ status: 'completed', completed_at: new Date().toISOString() } as never).eq('id', taskId)
+
+        // Celebrate completion!
+        if (matchedTask) {
+          celebrate(`You completed "${matchedTask.task.title}"! Keep building momentum! 💪`)
+        }
       } else {
         const tomorrow = new Date()
         tomorrow.setDate(tomorrow.getDate() + 1)
@@ -483,6 +492,9 @@ export default function CheckinPage() {
       <div className="mt-8 text-center">
         <button onClick={() => router.push('/dashboard')} className="text-gray-500 hover:text-gray-700">Back to dashboard</button>
       </div>
+
+      {/* Celebration Component */}
+      {CelebrationComponent}
     </div>
   )
 }

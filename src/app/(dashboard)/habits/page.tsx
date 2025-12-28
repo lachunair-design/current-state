@@ -16,6 +16,7 @@ import {
   Goal,
   GOAL_CATEGORY_CONFIG
 } from '@/types/database'
+import { useCelebration } from '@/components/Celebration'
 import clsx from 'clsx'
 
 export default function HabitsPage() {
@@ -29,6 +30,7 @@ export default function HabitsPage() {
   const [completingHabit, setCompletingHabit] = useState<string | null>(null)
   const [selectedVersion, setSelectedVersion] = useState<HabitVersion>('full')
   const supabase = createClient()
+  const { celebrate, CelebrationComponent } = useCelebration()
 
   // Form state
   const [title, setTitle] = useState('')
@@ -156,6 +158,8 @@ export default function HabitsPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
+      const habit = habits.find(h => h.id === habitId)
+
       await supabase
         .from('habit_completions')
         .insert({
@@ -163,6 +167,12 @@ export default function HabitsPage() {
           user_id: user.id,
           version_completed: version,
         } as never)
+
+      // Celebrate completion!
+      if (habit) {
+        const versionText = version === 'full' ? 'full version' : version === 'scaled' ? 'scaled version' : 'minimal version'
+        celebrate(`You completed the ${versionText} of "${habit.title}"! ${habit.why_this_helps ? habit.why_this_helps + ' 💚' : 'Keep it up! 💪'}`)
+      }
 
       // Optionally refresh to show updated stats
       await fetchHabits()
@@ -543,6 +553,9 @@ export default function HabitsPage() {
           </button>
         </div>
       )}
+
+      {/* Celebration Component */}
+      {CelebrationComponent}
     </div>
   )
 }
