@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { User, Loader2, Camera, Save, Mail, MapPin, Globe, Bell } from 'lucide-react'
+import { COUNTRIES, TIMEZONES, getTimezoneForCountry } from '@/lib/countries'
 import clsx from 'clsx'
 
 export default function ProfilePage() {
@@ -20,6 +21,15 @@ export default function ProfilePage() {
     daily_checkin: true,
     gentle_reminders: true,
   })
+
+  const handleCountryChange = (countryCode: string) => {
+    setCountry(countryCode)
+    // Auto-update timezone based on country
+    if (countryCode) {
+      const detectedTimezone = getTimezoneForCountry(countryCode)
+      setTimezone(detectedTimezone)
+    }
+  }
 
   useEffect(() => {
     fetchProfile()
@@ -163,13 +173,21 @@ export default function ProfilePage() {
                 <MapPin className="w-4 h-4 text-gray-500" />
                 Country
               </label>
-              <input
-                type="text"
+              <select
                 value={country}
-                onChange={e => setCountry(e.target.value)}
+                onChange={e => handleCountryChange(e.target.value)}
                 className="input"
-                placeholder="e.g., United States, Canada, UK"
-              />
+              >
+                <option value="">Select a country...</option>
+                {COUNTRIES.map(c => (
+                  <option key={c.code} value={c.code}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-500 mt-1">
+                🌍 Timezone will auto-update based on your country
+              </p>
             </div>
 
             <div>
@@ -182,17 +200,15 @@ export default function ProfilePage() {
                 onChange={e => setTimezone(e.target.value)}
                 className="input"
               >
-                <option value="UTC">UTC (GMT+0)</option>
-                <option value="America/New_York">Eastern Time (ET)</option>
-                <option value="America/Chicago">Central Time (CT)</option>
-                <option value="America/Denver">Mountain Time (MT)</option>
-                <option value="America/Los_Angeles">Pacific Time (PT)</option>
-                <option value="Europe/London">London (GMT)</option>
-                <option value="Europe/Paris">Paris (CET)</option>
-                <option value="Asia/Tokyo">Tokyo (JST)</option>
-                <option value="Asia/Shanghai">Shanghai (CST)</option>
-                <option value="Australia/Sydney">Sydney (AEDT)</option>
+                {TIMEZONES.map(tz => (
+                  <option key={tz.value} value={tz.value}>
+                    {tz.label}
+                  </option>
+                ))}
               </select>
+              <p className="text-xs text-gray-500 mt-1">
+                Auto-detected from country, or select manually
+              </p>
             </div>
           </div>
         </div>
