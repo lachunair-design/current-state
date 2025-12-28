@@ -6,7 +6,6 @@ import { createClient } from '@/lib/supabase/client'
 import { ArrowRight, ArrowLeft, Check, Loader2, Sparkles, RotateCcw } from 'lucide-react'
 import { 
   QUESTIONNAIRE_QUESTIONS, 
-  CreateDailyResponseInput,
   Task,
   Goal,
   ENERGY_LEVEL_CONFIG,
@@ -131,15 +130,14 @@ export default function CheckinPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('Not authenticated')
 
-      const responseData: CreateDailyResponseInput = {
-        energy_level: responses.energy_level,
-        mental_clarity: responses.mental_clarity,
-        emotional_state: responses.emotional_state,
-        available_time: responses.available_time,
-        environment_quality: responses.environment_quality,
-      }
-
-      await supabase.from('daily_responses').insert({ user_id: user.id, ...responseData })
+      await supabase.from('daily_responses').insert({
+        user_id: user.id,
+        energy_level: responses.energy_level as number,
+        mental_clarity: responses.mental_clarity as number,
+        emotional_state: responses.emotional_state as number,
+        available_time: responses.available_time as number,
+        environment_quality: responses.environment_quality as number,
+      } as any)
 
       const { data: tasks } = await supabase
         .from('tasks')
