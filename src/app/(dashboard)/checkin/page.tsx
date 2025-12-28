@@ -148,7 +148,7 @@ export default function CheckinPage() {
       const matched = matchTasks(tasks || [], responses)
       setMatchedTasks(matched)
 
-      await supabase.from('profiles').update({ last_active_at: new Date().toISOString() }).eq('id', user.id)
+      await supabase.from('profiles').update({ last_active_at: new Date().toISOString() } as any).eq('id', user.id)
       setStep(1)
     } catch (err) {
       console.error('Check-in error:', err)
