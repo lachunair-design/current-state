@@ -4,12 +4,13 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { 
-  Zap, 
-  LayoutDashboard, 
-  Target, 
-  CheckSquare, 
+import {
+  Zap,
+  LayoutDashboard,
+  Target,
+  CheckSquare,
   Sparkles,
+  Heart,
   LogOut,
   Menu,
   X,
@@ -27,6 +28,7 @@ const navigation = [
   { name: 'Check In', href: '/checkin', icon: Sparkles },
   { name: 'Goals', href: '/goals', icon: Target },
   { name: 'Tasks', href: '/tasks', icon: CheckSquare },
+  { name: 'Habits', href: '/habits', icon: Heart },
 ]
 
 export function Sidebar({ user }: SidebarProps) {

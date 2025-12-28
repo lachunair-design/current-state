@@ -29,6 +29,14 @@ export type TaskStatus = 'active' | 'in_progress' | 'completed' | 'deferred' | '
 
 export type UserAction = 'accepted' | 'declined' | 'deferred' | 'completed' | 'ignored';
 
+export type HabitType = 'performance' | 'foundational' | 'restorative';
+
+export type HabitVersion = 'full' | 'scaled' | 'minimal';
+
+export type FrequencyType = 'daily' | '3x/week' | '5x/week' | 'when_needed';
+
+export type TimeOfDay = 'morning' | 'afternoon' | 'evening' | 'night' | 'anytime';
+
 // Core Tables
 export interface Profile {
   id: string;
@@ -140,6 +148,37 @@ export interface DailySummary {
   created_at: string;
 }
 
+export interface Habit {
+  id: string;
+  user_id: string;
+  title: string;
+  habit_type: HabitType;
+  full_version: string;
+  scaled_version: string | null;
+  minimal_version: string | null;
+  target_frequency: FrequencyType;
+  target_days: string[] | null;
+  linked_goal_id: string | null;
+  why_this_helps: string | null;
+  best_time_of_day: TimeOfDay | null;
+  is_active: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface HabitCompletion {
+  id: string;
+  habit_id: string;
+  user_id: string;
+  completed_at: string;
+  version_completed: HabitVersion;
+  energy_level_before: number | null;
+  energy_level_after: number | null;
+  notes: string | null;
+  created_at: string;
+}
+
 // Extended types with relations
 export interface TaskWithGoal extends Task {
   goal?: Goal | null;
@@ -147,6 +186,14 @@ export interface TaskWithGoal extends Task {
 
 export interface GoalWithTasks extends Goal {
   tasks?: Task[];
+}
+
+export interface HabitWithGoal extends Habit {
+  goal?: Goal | null;
+}
+
+export interface HabitWithCompletions extends Habit {
+  completions?: HabitCompletion[];
 }
 
 // Input types
@@ -179,6 +226,27 @@ export interface CreateDailyResponseInput {
   emotional_state: number;
   available_time: number;
   environment_quality: number;
+  notes?: string;
+}
+
+export interface CreateHabitInput {
+  title: string;
+  habit_type: HabitType;
+  full_version: string;
+  scaled_version?: string;
+  minimal_version?: string;
+  target_frequency?: FrequencyType;
+  target_days?: string[];
+  linked_goal_id?: string;
+  why_this_helps?: string;
+  best_time_of_day?: TimeOfDay;
+}
+
+export interface CreateHabitCompletionInput {
+  habit_id: string;
+  version_completed: HabitVersion;
+  energy_level_before?: number;
+  energy_level_after?: number;
   notes?: string;
 }
 
@@ -220,6 +288,42 @@ export const PRIORITY_CONFIG: Record<PriorityLevel, { label: string; color: stri
   should_do: { label: 'Should Do', color: 'bg-orange-100 text-orange-800' },
   could_do: { label: 'Could Do', color: 'bg-blue-100 text-blue-800' },
   someday: { label: 'Someday', color: 'bg-gray-100 text-gray-600' },
+};
+
+export const HABIT_TYPE_CONFIG: Record<HabitType, { label: string; icon: string; color: string; description: string }> = {
+  performance: {
+    label: 'Performance',
+    icon: '⚡',
+    color: 'bg-purple-100 text-purple-800 border-purple-200',
+    description: 'Needs high energy - do when feeling great'
+  },
+  foundational: {
+    label: 'Foundational',
+    icon: '🌱',
+    color: 'bg-blue-100 text-blue-800 border-blue-200',
+    description: 'Do regardless of energy - your daily anchors'
+  },
+  restorative: {
+    label: 'Restorative',
+    icon: '💆',
+    color: 'bg-green-100 text-green-800 border-green-200',
+    description: 'Helps when energy is low - improves your state'
+  },
+};
+
+export const FREQUENCY_CONFIG: Record<FrequencyType, { label: string; description: string }> = {
+  daily: { label: 'Daily', description: 'Every day' },
+  '3x/week': { label: '3x per week', description: 'Three times weekly' },
+  '5x/week': { label: '5x per week', description: 'Five times weekly (weekdays)' },
+  when_needed: { label: 'When needed', description: 'As needed, no fixed schedule' },
+};
+
+export const TIME_OF_DAY_CONFIG: Record<TimeOfDay, { label: string; icon: string }> = {
+  morning: { label: 'Morning', icon: '🌅' },
+  afternoon: { label: 'Afternoon', icon: '☀️' },
+  evening: { label: 'Evening', icon: '🌆' },
+  night: { label: 'Night', icon: '🌙' },
+  anytime: { label: 'Anytime', icon: '🕐' },
 };
 
 // Questionnaire config
@@ -294,6 +398,16 @@ export interface Database {
         Row: DailySummary;
         Insert: Omit<DailySummary, 'id' | 'created_at'>;
         Update: Partial<DailySummary>;
+      };
+      habits: {
+        Row: Habit;
+        Insert: Omit<Habit, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Habit>;
+      };
+      habit_completions: {
+        Row: HabitCompletion;
+        Insert: Omit<HabitCompletion, 'id' | 'created_at' | 'completed_at'>;
+        Update: Partial<HabitCompletion>;
       };
     };
   };
