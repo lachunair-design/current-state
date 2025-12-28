@@ -13,8 +13,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-gray-50 antialiased">
-        {children}
+      <body className="min-h-screen page-gradient antialiased relative overflow-x-hidden">
+        {/* Floating background shapes */}
+        <div className="fixed inset-0 pointer-events-none z-0">
+          <div className="floating-shape" />
+          <div className="floating-shape" />
+          <div className="floating-shape" />
+        </div>
+
+        {/* Main content */}
+        <div className="relative z-10">
+          {children}
+        </div>
       </body>
     </html>
   )
