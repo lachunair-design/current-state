@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Sparkles, PartyPopper } from 'lucide-react'
+import { PartyPopper } from 'lucide-react'
 
 interface CelebrationProps {
   message: string
@@ -54,32 +54,6 @@ export function Celebration({ message, onClose, duration = 3000 }: CelebrationPr
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        .confetti-container {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          overflow: hidden;
-        }
-
-        .confetti {
-          position: absolute;
-          width: 10px;
-          height: 10px;
-          top: -10px;
-          animation: confetti-fall 3s linear forwards;
-        }
-
-        @keyframes confetti-fall {
-          to {
-            transform: translateY(100vh) rotate(360deg);
-            opacity: 0;
-          }
-        }
-      `}</style>
     </>
   )
 }
