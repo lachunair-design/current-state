@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Plus, Target, Loader2, X, MoreVertical, Trash2, Edit2, Sparkles, CheckSquare } from 'lucide-react'
-import { Goal, GoalCategory, GOAL_CATEGORY_CONFIG, CreateGoalInput } from '@/types/database'
+import { Plus, Target, Loader2, X, MoreVertical, Trash2, Edit2, Sparkles, CheckSquare, ChevronDown, ChevronRight, Check } from 'lucide-react'
+import { Goal, GoalCategory, GOAL_CATEGORY_CONFIG, CreateGoalInput, Task, ENERGY_LEVEL_CONFIG, PRIORITY_CONFIG } from '@/types/database'
 import { getSmartTaskSuggestions, TaskSuggestion } from '@/lib/goalTaskSuggestions'
 import clsx from 'clsx'
 
@@ -18,6 +18,9 @@ export default function GoalsPage() {
   const [suggestedTasks, setSuggestedTasks] = useState<TaskSuggestion[]>([])
   const [newGoalId, setNewGoalId] = useState<string | null>(null)
   const [addingTask, setAddingTask] = useState<string | null>(null)
+  const [expandedGoals, setExpandedGoals] = useState<Set<string>>(new Set())
+  const [goalTasks, setGoalTasks] = useState<Record<string, Task[]>>({})
+  const [loadingTasks, setLoadingTasks] = useState<Set<string>>(new Set())
   const supabase = createClient()
 
   // Form state
@@ -154,6 +157,47 @@ export default function GoalsPage() {
     await supabase.from('goals').update({ is_active: false } as never).eq('id', goalId)
     setGoals(goals.filter(g => g.id !== goalId))
     setMenuOpen(null)
+  }
+
+  const toggleGoalExpansion = async (goalId: string) => {
+    const newExpanded = new Set(expandedGoals)
+
+    if (expandedGoals.has(goalId)) {
+      // Collapse
+      newExpanded.delete(goalId)
+      setExpandedGoals(newExpanded)
+    } else {
+      // Expand and fetch tasks if not already loaded
+      newExpanded.add(goalId)
+      setExpandedGoals(newExpanded)
+
+      if (!goalTasks[goalId]) {
+        await fetchGoalTasks(goalId)
+      }
+    }
+  }
+
+  const fetchGoalTasks = async (goalId: string) => {
+    setLoadingTasks(new Set(loadingTasks).add(goalId))
+
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    const { data } = await supabase
+      .from('tasks')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('goal_id', goalId)
+      .in('status', ['active', 'completed'])
+      .order('status')
+      .order('created_at', { ascending: false })
+
+    setGoalTasks(prev => ({ ...prev, [goalId]: data || [] }))
+    setLoadingTasks(prev => {
+      const newSet = new Set(prev)
+      newSet.delete(goalId)
+      return newSet
+    })
   }
 
   if (loading) {
@@ -379,65 +423,173 @@ export default function GoalsPage() {
         <div className="space-y-4">
           {goals.map((goal, index) => {
             const config = GOAL_CATEGORY_CONFIG[goal.category]
+            const isExpanded = expandedGoals.has(goal.id)
+            const tasks = goalTasks[goal.id] || []
+            const activeTasks = tasks.filter(t => t.status === 'active')
+            const completedTasks = tasks.filter(t => t.status === 'completed')
+
             return (
               <div
                 key={goal.id}
-                className="card p-6 flex items-center gap-5 group hover:shadow-lg transition-all animate-slide-in"
+                className="card overflow-hidden hover:shadow-lg transition-all animate-slide-in"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${config.color} group-hover:scale-110 transition-transform shadow-sm`}>
-                  <span className="text-3xl">{config.icon}</span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-gray-900 text-lg mb-1">{goal.title}</h3>
-                  <div className="flex items-center gap-2 mt-2 flex-wrap">
-                    <span className="text-sm font-medium text-gray-500">{config.label}</span>
-                    {goal.income_stream_name && (
-                      <span className="text-xs bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">
-                        💰 {goal.income_stream_name}
-                      </span>
+                {/* Goal Header */}
+                <div className="p-6 flex items-center gap-5 group">
+                  <button
+                    onClick={() => toggleGoalExpansion(goal.id)}
+                    className="flex-shrink-0 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    title={isExpanded ? "Collapse tasks" : "Expand to see tasks"}
+                  >
+                    {isExpanded ? (
+                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                    ) : (
+                      <ChevronRight className="w-5 h-5 text-gray-600" />
                     )}
-                    {goal.target_date && (
-                      <span className="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">
-                        🎯 {new Date(goal.target_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                      </span>
+                  </button>
+
+                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${config.color} group-hover:scale-110 transition-transform shadow-sm`}>
+                    <span className="text-3xl">{config.icon}</span>
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-gray-900 text-lg mb-1">{goal.title}</h3>
+                    <div className="flex items-center gap-2 mt-2 flex-wrap">
+                      <span className="text-sm font-medium text-gray-500">{config.label}</span>
+                      {goal.income_stream_name && (
+                        <span className="text-xs bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">
+                          💰 {goal.income_stream_name}
+                        </span>
+                      )}
+                      {goal.target_date && (
+                        <span className="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">
+                          🎯 {new Date(goal.target_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </span>
+                      )}
+                      {tasks.length > 0 && (
+                        <span className="text-xs bg-gray-100 text-gray-700 px-3 py-1 rounded-full font-medium">
+                          {activeTasks.length} active / {completedTasks.length} done
+                        </span>
+                      )}
+                    </div>
+                    {goal.description && (
+                      <p className="text-sm text-gray-600 mt-2 italic">{goal.description}</p>
+                    )}
+                    {goal.success_metric && (
+                      <div className="mt-2 inline-block">
+                        <p className="text-sm text-purple-700 bg-purple-50 px-3 py-1 rounded-lg">
+                          <span className="font-bold">Success:</span> {goal.success_metric}
+                        </p>
+                      </div>
                     )}
                   </div>
-                  {goal.description && (
-                    <p className="text-sm text-gray-600 mt-2 italic">{goal.description}</p>
-                  )}
-                  {goal.success_metric && (
-                    <div className="mt-2 inline-block">
-                      <p className="text-sm text-purple-700 bg-purple-50 px-3 py-1 rounded-lg">
-                        <span className="font-bold">Success:</span> {goal.success_metric}
-                      </p>
-                    </div>
-                  )}
+
+                  <div className="relative">
+                    <button
+                      onClick={() => setMenuOpen(menuOpen === goal.id ? null : goal.id)}
+                      className="p-2 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <MoreVertical className="w-6 h-6" />
+                    </button>
+                    {menuOpen === goal.id && (
+                      <div className="absolute right-0 top-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl py-1 z-10 w-36 animate-scale-in">
+                        <button
+                          onClick={() => openEditForm(goal)}
+                          className="w-full px-4 py-2.5 text-left text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
+                        >
+                          <Edit2 className="w-4 h-4" /> Edit
+                        </button>
+                        <button
+                          onClick={() => deleteGoal(goal.id)}
+                          className="w-full px-4 py-2.5 text-left text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" /> Delete
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <div className="relative">
-                  <button
-                    onClick={() => setMenuOpen(menuOpen === goal.id ? null : goal.id)}
-                    className="p-2 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
-                  >
-                    <MoreVertical className="w-6 h-6" />
-                  </button>
-                  {menuOpen === goal.id && (
-                    <div className="absolute right-0 top-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl py-1 z-10 w-36 animate-scale-in">
-                      <button
-                        onClick={() => openEditForm(goal)}
-                        className="w-full px-4 py-2.5 text-left text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
-                      >
-                        <Edit2 className="w-4 h-4" /> Edit
-                      </button>
-                      <button
-                        onClick={() => deleteGoal(goal.id)}
-                        className="w-full px-4 py-2.5 text-left text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" /> Delete
-                      </button>
-                    </div>
-                  )}
-                </div>
+
+                {/* Expanded Tasks Section */}
+                {isExpanded && (
+                  <div className="border-t border-gray-100 bg-gray-50 p-6 animate-fade-in">
+                    {loadingTasks.has(goal.id) ? (
+                      <div className="flex items-center justify-center py-8">
+                        <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
+                      </div>
+                    ) : tasks.length > 0 ? (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between mb-3">
+                          <h4 className="font-semibold text-gray-900">Linked Tasks ({tasks.length})</h4>
+                          <a
+                            href="/tasks"
+                            className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                          >
+                            View all tasks →
+                          </a>
+                        </div>
+
+                        {/* Active Tasks */}
+                        {activeTasks.length > 0 && (
+                          <div>
+                            <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                              Active ({activeTasks.length})
+                            </h5>
+                            {activeTasks.map(task => (
+                              <div key={task.id} className="bg-white rounded-lg p-3 mb-2 flex items-start gap-3">
+                                <div className="w-5 h-5 rounded-full border-2 border-gray-300 flex-shrink-0 mt-0.5" />
+                                <div className="flex-1 min-w-0">
+                                  <p className="font-medium text-gray-900 text-sm">{task.title}</p>
+                                  <div className="flex items-center gap-2 mt-1 flex-wrap">
+                                    <span className={`text-xs px-2 py-0.5 rounded-full ${ENERGY_LEVEL_CONFIG[task.energy_required].color}`}>
+                                      {ENERGY_LEVEL_CONFIG[task.energy_required].label}
+                                    </span>
+                                    <span className={`text-xs px-2 py-0.5 rounded-full ${PRIORITY_CONFIG[task.priority].color}`}>
+                                      {PRIORITY_CONFIG[task.priority].label}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Completed Tasks */}
+                        {completedTasks.length > 0 && (
+                          <div>
+                            <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 mt-4">
+                              Completed ({completedTasks.length})
+                            </h5>
+                            {completedTasks.slice(0, 3).map(task => (
+                              <div key={task.id} className="bg-white rounded-lg p-3 mb-2 flex items-start gap-3 opacity-60">
+                                <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                  <Check className="w-3 h-3 text-green-600" />
+                                </div>
+                                <p className="font-medium text-gray-600 text-sm line-through">{task.title}</p>
+                              </div>
+                            ))}
+                            {completedTasks.length > 3 && (
+                              <p className="text-xs text-gray-500 text-center mt-2">
+                                + {completedTasks.length - 3} more completed
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <CheckSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                        <p className="text-gray-600 font-medium mb-1">No tasks linked to this goal yet</p>
+                        <p className="text-sm text-gray-500">
+                          <a href="/tasks" className="text-primary-600 hover:text-primary-700">
+                            Add tasks
+                          </a>{' '}
+                          to start making progress
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )
           })}
