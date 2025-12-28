@@ -15,7 +15,7 @@ export default async function DashboardPage() {
     .from('profiles')
     .select('*')
     .eq('id', user.id)
-    .single()
+    .single() as { data: { onboarding_completed?: boolean; full_name?: string | null } | null }
 
   if (!profile?.onboarding_completed) {
     redirect('/onboarding')
@@ -27,7 +27,7 @@ export default async function DashboardPage() {
     .select('*')
     .eq('user_id', user.id)
     .eq('is_active', true)
-    .order('display_order')
+    .order('display_order') as { data: any[] | null }
 
   // Fetch active tasks count
   const { count: activeTasks } = await supabase

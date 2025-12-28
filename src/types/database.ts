@@ -282,7 +282,7 @@ export interface Database {
       };
       daily_responses: {
         Row: DailyResponse;
-        Insert: Omit<DailyResponse, 'id' | 'responded_at' | 'composite_score'>;
+        Insert: Omit<DailyResponse, 'id' | 'responded_at' | 'composite_score' | 'notes' | 'suggested_task_ids'> & Partial<Pick<DailyResponse, 'notes' | 'suggested_task_ids'>>;
         Update: Partial<DailyResponse>;
       };
       task_suggestions: {

@@ -4,14 +4,15 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { ArrowRight, ArrowLeft, Check, Loader2, Sparkles, RotateCcw } from 'lucide-react'
-import { 
-  QUESTIONNAIRE_QUESTIONS, 
+import {
+  QUESTIONNAIRE_QUESTIONS,
   Task,
   Goal,
   ENERGY_LEVEL_CONFIG,
   WORK_TYPE_CONFIG,
   TIME_ESTIMATE_CONFIG,
-  PRIORITY_CONFIG
+  PRIORITY_CONFIG,
+  Database
 } from '@/types/database'
 import clsx from 'clsx'
 
@@ -130,14 +131,15 @@ export default function CheckinPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('Not authenticated')
 
+      // Type assertion needed due to Supabase type inference issue
       await supabase.from('daily_responses').insert({
         user_id: user.id,
-        energy_level: responses.energy_level as number,
-        mental_clarity: responses.mental_clarity as number,
-        emotional_state: responses.emotional_state as number,
-        available_time: responses.available_time as number,
-        environment_quality: responses.environment_quality as number,
-      } as any)
+        energy_level: responses.energy_level,
+        mental_clarity: responses.mental_clarity,
+        emotional_state: responses.emotional_state,
+        available_time: responses.available_time,
+        environment_quality: responses.environment_quality,
+      } as never)
 
       const { data: tasks } = await supabase
         .from('tasks')
@@ -148,7 +150,10 @@ export default function CheckinPage() {
       const matched = matchTasks(tasks || [], responses)
       setMatchedTasks(matched)
 
-      await supabase.from('profiles').update({ last_active_at: new Date().toISOString() } as any).eq('id', user.id)
+      // Type assertion needed due to Supabase type inference issue
+      await supabase.from('profiles').update({
+        last_active_at: new Date().toISOString()
+      } as never).eq('id', user.id)
       setStep(1)
     } catch (err) {
       console.error('Check-in error:', err)
@@ -161,11 +166,11 @@ export default function CheckinPage() {
     setSubmitting(taskId)
     try {
       if (action === 'completed') {
-        await supabase.from('tasks').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', taskId)
+        await supabase.from('tasks').update({ status: 'completed', completed_at: new Date().toISOString() } as never).eq('id', taskId)
       } else {
         const tomorrow = new Date()
         tomorrow.setDate(tomorrow.getDate() + 1)
-        await supabase.from('tasks').update({ deferred_until: tomorrow.toISOString().split('T')[0] }).eq('id', taskId)
+        await supabase.from('tasks').update({ deferred_until: tomorrow.toISOString().split('T')[0] } as never).eq('id', taskId)
       }
       setMatchedTasks(matchedTasks.filter(m => m.task.id !== taskId))
     } finally {

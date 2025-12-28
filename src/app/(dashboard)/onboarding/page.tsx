@@ -77,7 +77,7 @@ export default function OnboardingPage() {
 
         const { error: goalsError } = await supabase
           .from('goals')
-          .insert(goalsToInsert)
+          .insert(goalsToInsert as never[])
 
         if (goalsError) throw goalsError
       }
@@ -85,10 +85,10 @@ export default function OnboardingPage() {
       // Mark onboarding complete
       const { error: profileError } = await supabase
         .from('profiles')
-        .update({ 
+        .update({
           onboarding_completed: true,
           onboarding_step: 3,
-        })
+        } as never)
         .eq('id', user.id)
 
       if (profileError) throw profileError

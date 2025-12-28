@@ -77,12 +77,12 @@ export default function GoalsPage() {
       if (editingGoal) {
         await supabase
           .from('goals')
-          .update(goalData)
+          .update(goalData as never)
           .eq('id', editingGoal.id)
       } else {
         await supabase
           .from('goals')
-          .insert({ ...goalData, user_id: user.id, display_order: goals.length })
+          .insert({ ...goalData, user_id: user.id, display_order: goals.length } as never)
       }
 
       await fetchGoals()
@@ -95,7 +95,7 @@ export default function GoalsPage() {
   const deleteGoal = async (goalId: string) => {
     if (!confirm('Delete this goal? Tasks linked to it will become unlinked.')) return
 
-    await supabase.from('goals').update({ is_active: false }).eq('id', goalId)
+    await supabase.from('goals').update({ is_active: false } as never).eq('id', goalId)
     setGoals(goals.filter(g => g.id !== goalId))
     setMenuOpen(null)
   }

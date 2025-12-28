@@ -104,9 +104,9 @@ export default function TasksPage() {
       }
 
       if (editingTask) {
-        await supabase.from('tasks').update(taskData).eq('id', editingTask.id)
+        await supabase.from('tasks').update(taskData as never).eq('id', editingTask.id)
       } else {
-        await supabase.from('tasks').insert({ ...taskData, user_id: user.id })
+        await supabase.from('tasks').insert({ ...taskData, user_id: user.id } as never)
       }
 
       await fetchData()
@@ -117,14 +117,14 @@ export default function TasksPage() {
   }
 
   const completeTask = async (taskId: string) => {
-    await supabase.from('tasks').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', taskId)
+    await supabase.from('tasks').update({ status: 'completed', completed_at: new Date().toISOString() } as never).eq('id', taskId)
     setTasks(tasks.filter(t => t.id !== taskId))
     setMenuOpen(null)
   }
 
   const deleteTask = async (taskId: string) => {
     if (!confirm('Delete this task?')) return
-    await supabase.from('tasks').update({ status: 'archived' }).eq('id', taskId)
+    await supabase.from('tasks').update({ status: 'archived' } as never).eq('id', taskId)
     setTasks(tasks.filter(t => t.id !== taskId))
     setMenuOpen(null)
   }
