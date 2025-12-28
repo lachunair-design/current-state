@@ -26,26 +26,30 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="container mx-auto px-4 py-20 text-center">
-        <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-          Work with your energy,
-          <br />
-          <span className="text-primary-600">not against it</span>
-        </h1>
-        <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-          The productivity app for humans with fluctuating everything.
-          Match tasks to your actual capacity, see which work pays, and stop feeling guilty.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/signup" className="btn-primary text-lg px-8 py-4 inline-flex items-center justify-center gap-2">
-            Start for free <Zap className="w-5 h-5" />
-          </Link>
-          <a href="#how-it-works" className="btn-secondary text-lg px-8 py-4 inline-flex items-center justify-center">
-            See how it works
-          </a>
+        <div className="animate-fade-in">
+          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            Work with your energy,
+            <br />
+            <span className="text-primary-600 bg-gradient-to-r from-primary-600 to-primary-700 bg-clip-text text-transparent">
+              not against it
+            </span>
+          </h1>
+          <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            The productivity app for humans with fluctuating everything.
+            Match tasks to your actual capacity, see which work pays, and stop feeling guilty.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/signup" className="btn-primary text-lg px-8 py-4 inline-flex items-center justify-center gap-2 shadow-lg shadow-primary-500/30 hover:shadow-xl hover:shadow-primary-500/40 hover:-translate-y-0.5 transition-all">
+              Start for free <Zap className="w-5 h-5" />
+            </Link>
+            <a href="#how-it-works" className="btn-secondary text-lg px-8 py-4 inline-flex items-center justify-center hover:-translate-y-0.5 transition-all">
+              See how it works
+            </a>
+          </div>
+          <p className="text-sm text-gray-500 mt-4">
+            No credit card required • Free forever
+          </p>
         </div>
-        <p className="text-sm text-gray-500 mt-4">
-          No credit card required • Free forever
-        </p>
       </section>
 
       {/* Features */}
@@ -61,8 +65,8 @@ export default function LandingPage() {
 
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {/* Feature 1 */}
-          <div className="card p-8">
-            <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-4">
+          <div className="card p-8 hover:shadow-lg hover:border-primary-200 transition-all group">
+            <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
               <Battery className="w-6 h-6 text-primary-600" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">Daily Check-in</h3>
@@ -73,8 +77,8 @@ export default function LandingPage() {
           </div>
 
           {/* Feature 2 */}
-          <div className="card p-8">
-            <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-4">
+          <div className="card p-8 hover:shadow-lg hover:border-primary-200 transition-all group">
+            <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
               <Target className="w-6 h-6 text-primary-600" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">Energy Matching</h3>
@@ -85,8 +89,8 @@ export default function LandingPage() {
           </div>
 
           {/* Feature 3 */}
-          <div className="card p-8">
-            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4">
+          <div className="card p-8 hover:shadow-lg hover:border-green-200 transition-all group">
+            <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
               <TrendingUp className="w-6 h-6 text-green-600" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">Financial ROI</h3>

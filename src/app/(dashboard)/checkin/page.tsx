@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { ArrowRight, ArrowLeft, Check, Loader2, Sparkles, RotateCcw, Clock, Timer, Calendar } from 'lucide-react'
+import { ArrowRight, ArrowLeft, Check, Loader2, Sparkles, RotateCcw, Clock, Timer, Calendar, CheckSquare } from 'lucide-react'
 import {
   QUESTIONNAIRE_QUESTIONS,
   Task,
@@ -188,42 +188,47 @@ export default function CheckinPage() {
   if (step === 0) {
     return (
       <div className="max-w-xl mx-auto">
-        <div className="text-center mb-8">
-          <div className="w-12 h-12 bg-primary-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Sparkles className="w-6 h-6 text-primary-600" />
+        <div className="text-center mb-8 animate-fade-in">
+          <div className="w-16 h-16 bg-gradient-to-br from-primary-100 to-primary-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <Sparkles className="w-8 h-8 text-primary-600" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">How are you right now?</h1>
-          <p className="text-gray-600 mt-1">Quick check-in to find your perfect tasks</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">How are you right now?</h1>
+          <p className="text-lg text-gray-600">Quick check-in to find your perfect tasks</p>
         </div>
 
-        <div className="flex gap-1 mb-8">
+        <div className="flex gap-2 mb-8 px-4">
           {QUESTIONNAIRE_QUESTIONS.map((_, i) => (
-            <div key={i} className={clsx('h-1 flex-1 rounded-full transition-colors',
-              i < currentQuestion ? 'bg-primary-600' : i === currentQuestion ? 'bg-primary-400' : 'bg-gray-200'
-            )} />
+            <div
+              key={i}
+              className={clsx('h-2 flex-1 rounded-full transition-all duration-300',
+                i < currentQuestion ? 'bg-gradient-to-r from-primary-600 to-primary-500' :
+                i === currentQuestion ? 'bg-primary-400 scale-110' :
+                'bg-gray-200'
+              )}
+            />
           ))}
         </div>
 
-        <div className="card p-8">
-          <div className="text-center mb-8">
-            <span className="text-4xl mb-4 block">{question.icon}</span>
-            <h2 className="text-xl font-semibold text-gray-900">{question.question}</h2>
+        <div className="card p-8 md:p-10 shadow-lg animate-scale-in">
+          <div className="text-center mb-10">
+            <span className="text-6xl mb-6 block animate-scale-in">{question.icon}</span>
+            <h2 className="text-2xl font-bold text-gray-900 leading-tight">{question.question}</h2>
           </div>
 
-          <div className="space-y-4">
-            <div className="flex justify-between text-sm text-gray-500 px-2">
+          <div className="space-y-6">
+            <div className="flex justify-between text-sm font-medium text-gray-500 px-2">
               <span>{question.lowLabel}</span>
               <span>{question.highLabel}</span>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               {[1, 2, 3, 4, 5].map((value) => (
                 <button
                   key={value}
                   onClick={() => handleResponse(value)}
-                  className={clsx('flex-1 py-4 rounded-xl text-lg font-semibold transition-all',
+                  className={clsx('flex-1 py-5 rounded-2xl text-xl font-bold transition-all duration-200 shadow-sm',
                     responses[question.id] === value
-                      ? 'bg-primary-600 text-white scale-105'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      ? 'bg-gradient-to-br from-primary-600 to-primary-700 text-white scale-110 shadow-lg shadow-primary-500/50'
+                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100 hover:scale-105 hover:shadow-md'
                   )}
                 >
                   {value}
@@ -232,24 +237,38 @@ export default function CheckinPage() {
             </div>
           </div>
 
-          <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
+          <div className="flex justify-between mt-10 pt-6 border-t border-gray-100">
             <button
               onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
               disabled={currentQuestion === 0}
-              className="btn-secondary inline-flex items-center gap-2 disabled:opacity-50"
+              className="btn-secondary inline-flex items-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <ArrowLeft className="w-4 h-4" /> Back
             </button>
-            
+
             {isLastQuestion && allAnswered && (
-              <button onClick={submitCheckin} disabled={loading} className="btn-primary inline-flex items-center gap-2">
-                {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Finding tasks...</> : <>See my tasks <ArrowRight className="w-4 h-4" /></>}
+              <button
+                onClick={submitCheckin}
+                disabled={loading}
+                className="btn-primary inline-flex items-center gap-2 shadow-lg hover:shadow-xl"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Finding tasks...
+                  </>
+                ) : (
+                  <>
+                    See my tasks
+                    <ArrowRight className="w-5 h-5" />
+                  </>
+                )}
               </button>
             )}
           </div>
         </div>
 
-        <p className="text-center text-sm text-gray-500 mt-4">
+        <p className="text-center text-sm font-medium text-gray-500 mt-6">
           Question {currentQuestion + 1} of {QUESTIONNAIRE_QUESTIONS.length}
         </p>
       </div>
@@ -258,72 +277,120 @@ export default function CheckinPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="text-center mb-8">
-        <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <Check className="w-6 h-6 text-green-600" />
+      <div className="text-center mb-8 animate-fade-in">
+        <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-green-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+          <Check className="w-8 h-8 text-green-600" />
         </div>
-        <h1 className="text-2xl font-bold text-gray-900">Here's what matches your state</h1>
-        <p className="text-gray-600 mt-1">Based on your check-in, these tasks fit your current energy and time.</p>
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Here's what matches your state</h1>
+        <p className="text-lg text-gray-600">Based on your check-in, these tasks fit your current energy and time.</p>
       </div>
 
-      <div className="card p-4 mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="text-2xl">
+      <div className="card p-6 mb-8 flex items-center justify-between shadow-md hover:shadow-lg transition-all animate-slide-in">
+        <div className="flex items-center gap-5">
+          <div className="text-4xl">
             {responses.energy_level <= 2 ? '😴' : responses.energy_level <= 4 ? '😊' : '⚡'}
           </div>
           <div>
-            <div className="text-sm text-gray-500">Your current state</div>
-            <div className="font-medium text-gray-900">
+            <div className="text-sm font-medium text-gray-500 uppercase tracking-wide">Your current state</div>
+            <div className="font-semibold text-gray-900 text-lg mt-1">
               {responses.energy_level <= 2 ? 'Low energy - taking it easy' :
                responses.energy_level <= 4 ? 'Good energy - ready to work' : 'High energy - lets go!'}
             </div>
           </div>
         </div>
-        <button onClick={resetCheckin} className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1">
+        <button
+          onClick={resetCheckin}
+          className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors font-medium"
+        >
           <RotateCcw className="w-4 h-4" /> Redo
         </button>
       </div>
 
       {matchedTasks.length > 0 ? (
-        <div className="space-y-4">
+        <div className="space-y-5">
           {matchedTasks.map(({ task, reasons }, index) => {
             const energyConfig = ENERGY_LEVEL_CONFIG[task.energy_required]
             const workTypeConfig = WORK_TYPE_CONFIG[task.work_type]
             const timeConfig = TIME_ESTIMATE_CONFIG[task.time_estimate]
             const priorityConfig = PRIORITY_CONFIG[task.priority]
-            
+
             return (
-              <div key={task.id} className={clsx('card p-6', index === 0 && 'ring-2 ring-primary-500 ring-offset-2')}>
-                {index === 0 && <div className="text-xs font-medium text-primary-600 mb-2">TOP MATCH</div>}
-                
+              <div
+                key={task.id}
+                className={clsx(
+                  'card p-7 transition-all hover:shadow-xl',
+                  index === 0 && 'ring-2 ring-primary-500 ring-offset-2 shadow-lg bg-gradient-to-br from-white to-primary-50/30'
+                )}
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                {index === 0 && (
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="text-xs font-bold text-primary-600 bg-primary-100 px-3 py-1 rounded-full uppercase tracking-wide">
+                      ⭐ Top Match
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex items-start justify-between gap-4 mb-4">
-                  <div>
-                    <h3 className="font-semibold text-gray-900 text-lg">{task.title}</h3>
-                    {task.goals && <p className="text-sm text-gray-500 mt-1">Goal: {task.goals.title}</p>}
+                  <div className="flex-1">
+                    <h3 className="font-bold text-gray-900 text-xl mb-1">{task.title}</h3>
+                    {task.goals && (
+                      <p className="text-sm text-gray-500 font-medium">
+                        <span className="text-primary-600">→</span> {task.goals.title}
+                      </p>
+                    )}
                   </div>
                   {task.estimated_value && (
-                    <span className="text-sm font-medium text-green-600 bg-green-50 px-2 py-1 rounded">${task.estimated_value}</span>
+                    <span className="text-sm font-bold text-green-700 bg-green-100 px-3 py-1.5 rounded-lg whitespace-nowrap">
+                      💰 ${task.estimated_value}
+                    </span>
                   )}
                 </div>
 
                 <div className="flex flex-wrap gap-2 mb-4">
-                  <span className={`text-xs px-2 py-1 rounded-full ${energyConfig.color}`}>{energyConfig.label}</span>
-                  <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">{workTypeConfig.icon} {workTypeConfig.label}</span>
-                  <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">⏱️ {timeConfig.label}</span>
-                  <span className={`text-xs px-2 py-1 rounded-full ${priorityConfig.color}`}>{priorityConfig.label}</span>
+                  <span className={`text-xs font-medium px-3 py-1.5 rounded-full ${energyConfig.color}`}>
+                    {energyConfig.label}
+                  </span>
+                  <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-gray-100 text-gray-700">
+                    {workTypeConfig.icon} {workTypeConfig.label}
+                  </span>
+                  <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-gray-100 text-gray-700">
+                    ⏱️ {timeConfig.label}
+                  </span>
+                  <span className={`text-xs font-medium px-3 py-1.5 rounded-full ${priorityConfig.color}`}>
+                    {priorityConfig.label}
+                  </span>
                 </div>
 
                 {reasons.length > 0 && (
-                  <div className="text-sm text-gray-600 mb-4">
-                    <span className="font-medium">Why this task: </span>{reasons.join(' • ')}
+                  <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-5">
+                    <div className="text-sm text-blue-900">
+                      <span className="font-bold">Why this task:</span>
+                      <span className="ml-2">{reasons.join(' • ')}</span>
+                    </div>
                   </div>
                 )}
 
-                <div className="flex gap-2">
-                  <button onClick={() => handleTaskAction(task.id, 'completed')} disabled={submitting === task.id} className="btn-primary flex-1">
-                    {submitting === task.id ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Mark Complete'}
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleTaskAction(task.id, 'completed')}
+                    disabled={submitting === task.id}
+                    className="btn-primary flex-1 shadow-md hover:shadow-lg disabled:opacity-50"
+                  >
+                    {submitting === task.id ? (
+                      <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+                    ) : (
+                      <>
+                        <Check className="w-5 h-5 inline mr-2" />
+                        Mark Complete
+                      </>
+                    )}
                   </button>
-                  <button onClick={() => handleTaskAction(task.id, 'deferred')} disabled={submitting === task.id} className="btn-secondary">
+                  <button
+                    onClick={() => handleTaskAction(task.id, 'deferred')}
+                    disabled={submitting === task.id}
+                    className="btn-secondary px-6 disabled:opacity-50"
+                  >
                     Not today
                   </button>
                 </div>
@@ -332,11 +399,21 @@ export default function CheckinPage() {
           })}
         </div>
       ) : (
-        <div className="card p-8 text-center">
-          <div className="text-4xl mb-4">🎉</div>
-          <h3 className="font-semibold text-gray-900 mb-2">No tasks right now!</h3>
-          <p className="text-gray-600 mb-4">You're all caught up, or you haven't added tasks yet.</p>
-          <button onClick={() => router.push('/tasks')} className="btn-primary">Add some tasks</button>
+        <div className="card p-12 text-center shadow-md">
+          <div className="w-20 h-20 bg-gradient-to-br from-yellow-100 to-yellow-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-5xl">🎉</span>
+          </div>
+          <h3 className="font-bold text-gray-900 text-2xl mb-2">All clear!</h3>
+          <p className="text-gray-600 mb-6 text-lg">
+            You're all caught up, or you haven't added tasks yet.
+          </p>
+          <button
+            onClick={() => router.push('/tasks')}
+            className="btn-primary inline-flex items-center gap-2 shadow-lg"
+          >
+            <CheckSquare className="w-5 h-5" />
+            Add some tasks
+          </button>
         </div>
       )}
 

@@ -118,24 +118,30 @@ export default function GoalsPage() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-8 animate-fade-in">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Goals</h1>
-          <p className="text-gray-600 mt-1">What you're working toward</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Goals</h1>
+          <p className="text-lg text-gray-600">What you're working toward</p>
         </div>
-        <button onClick={() => setShowForm(true)} className="btn-primary inline-flex items-center gap-2">
-          <Plus className="w-4 h-4" /> Add Goal
+        <button
+          onClick={() => setShowForm(true)}
+          className="btn-primary inline-flex items-center gap-2 shadow-lg hover:shadow-xl"
+        >
+          <Plus className="w-5 h-5" /> Add Goal
         </button>
       </div>
 
       {/* Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-lg w-full p-6" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-8 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold">{editingGoal ? 'Edit Goal' : 'Add New Goal'}</h2>
-              <button onClick={resetForm} className="text-gray-400 hover:text-gray-600">
-                <X className="w-5 h-5" />
+              <h2 className="text-2xl font-bold text-gray-900">{editingGoal ? 'Edit Goal' : 'Add New Goal'}</h2>
+              <button
+                onClick={resetForm}
+                className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-6 h-6" />
               </button>
             </div>
 
@@ -234,56 +240,62 @@ export default function GoalsPage() {
 
       {/* Goals List */}
       {goals.length > 0 ? (
-        <div className="space-y-3">
-          {goals.map((goal) => {
+        <div className="space-y-4">
+          {goals.map((goal, index) => {
             const config = GOAL_CATEGORY_CONFIG[goal.category]
             return (
-              <div key={goal.id} className="card p-4 flex items-center gap-4 group">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${config.color}`}>
-                  <span className="text-2xl">{config.icon}</span>
+              <div
+                key={goal.id}
+                className="card p-6 flex items-center gap-5 group hover:shadow-lg transition-all animate-slide-in"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${config.color} group-hover:scale-110 transition-transform shadow-sm`}>
+                  <span className="text-3xl">{config.icon}</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900">{goal.title}</h3>
-                  <div className="flex items-center gap-2 mt-1 flex-wrap">
-                    <span className="text-sm text-gray-500">{config.label}</span>
+                  <h3 className="font-bold text-gray-900 text-lg mb-1">{goal.title}</h3>
+                  <div className="flex items-center gap-2 mt-2 flex-wrap">
+                    <span className="text-sm font-medium text-gray-500">{config.label}</span>
                     {goal.income_stream_name && (
-                      <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
+                      <span className="text-xs bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">
                         💰 {goal.income_stream_name}
                       </span>
                     )}
                     {goal.target_date && (
-                      <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                      <span className="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">
                         🎯 {new Date(goal.target_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                       </span>
                     )}
                   </div>
                   {goal.description && (
-                    <p className="text-sm text-gray-500 mt-1">{goal.description}</p>
+                    <p className="text-sm text-gray-600 mt-2 italic">{goal.description}</p>
                   )}
                   {goal.success_metric && (
-                    <p className="text-sm text-purple-700 mt-1">
-                      <span className="font-medium">Success:</span> {goal.success_metric}
-                    </p>
+                    <div className="mt-2 inline-block">
+                      <p className="text-sm text-purple-700 bg-purple-50 px-3 py-1 rounded-lg">
+                        <span className="font-bold">Success:</span> {goal.success_metric}
+                      </p>
+                    </div>
                   )}
                 </div>
                 <div className="relative">
                   <button
                     onClick={() => setMenuOpen(menuOpen === goal.id ? null : goal.id)}
-                    className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                    className="p-2 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
                   >
-                    <MoreVertical className="w-5 h-5" />
+                    <MoreVertical className="w-6 h-6" />
                   </button>
                   {menuOpen === goal.id && (
-                    <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 w-32">
+                    <div className="absolute right-0 top-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl py-1 z-10 w-36 animate-scale-in">
                       <button
                         onClick={() => openEditForm(goal)}
-                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                        className="w-full px-4 py-2.5 text-left text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
                       >
                         <Edit2 className="w-4 h-4" /> Edit
                       </button>
                       <button
                         onClick={() => deleteGoal(goal.id)}
-                        className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                        className="w-full px-4 py-2.5 text-left text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" /> Delete
                       </button>
@@ -295,14 +307,19 @@ export default function GoalsPage() {
           })}
         </div>
       ) : (
-        <div className="card p-12 text-center">
-          <Target className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No goals yet</h3>
-          <p className="text-gray-600 mb-6">
+        <div className="card p-16 text-center shadow-md">
+          <div className="w-20 h-20 bg-gradient-to-br from-primary-100 to-primary-50 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Target className="w-10 h-10 text-primary-600" />
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 mb-3">No goals yet</h3>
+          <p className="text-gray-600 mb-8 text-lg max-w-md mx-auto">
             Goals give your tasks meaning. Add 3-5 goals across different areas of your life.
           </p>
-          <button onClick={() => setShowForm(true)} className="btn-primary inline-flex items-center gap-2">
-            <Plus className="w-4 h-4" /> Add your first goal
+          <button
+            onClick={() => setShowForm(true)}
+            className="btn-primary inline-flex items-center gap-2 shadow-lg hover:shadow-xl"
+          >
+            <Plus className="w-5 h-5" /> Add your first goal
           </button>
         </div>
       )}
