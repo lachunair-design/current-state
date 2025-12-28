@@ -20,6 +20,7 @@ export default function GoalsPage() {
   const [category, setCategory] = useState<GoalCategory>('career')
   const [description, setDescription] = useState('')
   const [incomeStream, setIncomeStream] = useState('')
+  const [targetDate, setTargetDate] = useState('')
 
   useEffect(() => {
     fetchGoals()
@@ -45,6 +46,7 @@ export default function GoalsPage() {
     setCategory('career')
     setDescription('')
     setIncomeStream('')
+    setTargetDate('')
     setShowForm(false)
     setEditingGoal(null)
   }
@@ -55,6 +57,7 @@ export default function GoalsPage() {
     setCategory(goal.category)
     setDescription(goal.description || '')
     setIncomeStream(goal.income_stream_name || '')
+    setTargetDate(goal.target_date || '')
     setShowForm(true)
     setMenuOpen(null)
   }
@@ -72,6 +75,7 @@ export default function GoalsPage() {
         category,
         description: description.trim() || undefined,
         income_stream_name: incomeStream.trim() || undefined,
+        target_date: targetDate || undefined,
       }
 
       if (editingGoal) {
@@ -190,6 +194,17 @@ export default function GoalsPage() {
                 <p className="text-xs text-gray-500 mt-1">Add this if this goal generates income</p>
               </div>
 
+              <div>
+                <label className="label">Target date (optional)</label>
+                <input
+                  type="date"
+                  value={targetDate}
+                  onChange={e => setTargetDate(e.target.value)}
+                  className="input"
+                />
+                <p className="text-xs text-gray-500 mt-1">When do you want to achieve this goal?</p>
+              </div>
+
               <div className="flex gap-2 pt-4">
                 <button onClick={saveGoal} disabled={saving || !title.trim()} className="btn-primary flex-1">
                   {saving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : (editingGoal ? 'Save Changes' : 'Add Goal')}
@@ -213,11 +228,16 @@ export default function GoalsPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-gray-900">{goal.title}</h3>
-                  <div className="flex items-center gap-2 mt-1">
+                  <div className="flex items-center gap-2 mt-1 flex-wrap">
                     <span className="text-sm text-gray-500">{config.label}</span>
                     {goal.income_stream_name && (
                       <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
                         💰 {goal.income_stream_name}
+                      </span>
+                    )}
+                    {goal.target_date && (
+                      <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
+                        🎯 {new Date(goal.target_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                       </span>
                     )}
                   </div>

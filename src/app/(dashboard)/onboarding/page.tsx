@@ -31,6 +31,7 @@ export default function OnboardingPage() {
   const [goalCategory, setGoalCategory] = useState<GoalCategory>('career')
   const [goalDescription, setGoalDescription] = useState('')
   const [incomeStream, setIncomeStream] = useState('')
+  const [goalTargetDate, setGoalTargetDate] = useState('')
 
   const addGoal = () => {
     if (!goalTitle.trim()) return
@@ -41,6 +42,7 @@ export default function OnboardingPage() {
       category: goalCategory,
       description: goalDescription.trim() || undefined,
       income_stream_name: incomeStream.trim() || undefined,
+      target_date: goalTargetDate || undefined,
       display_order: goals.length,
     }
 
@@ -57,6 +59,7 @@ export default function OnboardingPage() {
     setGoalCategory('career')
     setGoalDescription('')
     setIncomeStream('')
+    setGoalTargetDate('')
     setShowGoalForm(false)
   }
 
@@ -290,6 +293,19 @@ export default function OnboardingPage() {
                       />
                       <p className="text-xs text-gray-500 mt-1">
                         Add this if this goal is tied to making money
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="label">Target date (optional)</label>
+                      <input
+                        type="date"
+                        value={goalTargetDate}
+                        onChange={(e) => setGoalTargetDate(e.target.value)}
+                        className="input"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">
+                        When do you want to achieve this goal?
                       </p>
                     </div>
 

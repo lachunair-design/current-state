@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { ArrowRight, ArrowLeft, Check, Loader2, Sparkles, RotateCcw } from 'lucide-react'
+import { ArrowRight, ArrowLeft, Check, Loader2, Sparkles, RotateCcw, Clock, Timer, Calendar } from 'lucide-react'
 import {
   QUESTIONNAIRE_QUESTIONS,
   Task,
@@ -337,6 +337,69 @@ export default function CheckinPage() {
           <h3 className="font-semibold text-gray-900 mb-2">No tasks right now!</h3>
           <p className="text-gray-600 mb-4">You're all caught up, or you haven't added tasks yet.</p>
           <button onClick={() => router.push('/tasks')} className="btn-primary">Add some tasks</button>
+        </div>
+      )}
+
+      {/* Focus Work Suggestions */}
+      {matchedTasks.length > 0 && (
+        <div className="mt-8 card p-6 bg-gradient-to-br from-indigo-50 to-white border-indigo-100">
+          <div className="flex items-start gap-3 mb-4">
+            <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0">
+              <Timer className="w-5 h-5 text-indigo-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900">Focus Work Suggestions</h3>
+              <p className="text-sm text-gray-600 mt-0.5">Based on your available time and energy</p>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {/* Pomodoro Suggestion */}
+            <div className="bg-white rounded-lg p-4 border border-indigo-100">
+              <div className="flex items-center gap-2 mb-2">
+                <Clock className="w-4 h-4 text-indigo-600" />
+                <h4 className="font-medium text-gray-900">Pomodoro Technique</h4>
+              </div>
+              {responses.available_time <= 2 ? (
+                <p className="text-sm text-gray-600">
+                  <strong>Quick sprint:</strong> Try 1-2 Pomodoros (25 min work, 5 min break)
+                </p>
+              ) : responses.available_time <= 4 ? (
+                <p className="text-sm text-gray-600">
+                  <strong>Standard session:</strong> 3-4 Pomodoros with breaks (2 hours total)
+                </p>
+              ) : (
+                <p className="text-sm text-gray-600">
+                  <strong>Deep work session:</strong> 4-6 Pomodoros with longer breaks (3-4 hours)
+                </p>
+              )}
+            </div>
+
+            {/* Time Blocking Suggestion */}
+            <div className="bg-white rounded-lg p-4 border border-indigo-100">
+              <div className="flex items-center gap-2 mb-2">
+                <Calendar className="w-4 h-4 text-indigo-600" />
+                <h4 className="font-medium text-gray-900">Time Blocking</h4>
+              </div>
+              {responses.mental_clarity >= 4 ? (
+                <p className="text-sm text-gray-600">
+                  <strong>High clarity:</strong> Start with your hardest task while sharp
+                </p>
+              ) : responses.mental_clarity >= 3 ? (
+                <p className="text-sm text-gray-600">
+                  <strong>Medium clarity:</strong> Tackle medium-effort tasks first
+                </p>
+              ) : (
+                <p className="text-sm text-gray-600">
+                  <strong>Low clarity:</strong> Start with quick wins to build momentum
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-4 text-xs text-gray-500 text-center">
+            💡 Tip: Turn off notifications and set a timer to stay focused
+          </div>
         </div>
       )}
 
