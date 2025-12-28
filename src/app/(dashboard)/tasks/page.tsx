@@ -17,12 +17,15 @@ interface TaskWithGoal extends Task {
 
 export default function TasksPage() {
   const [tasks, setTasks] = useState<TaskWithGoal[]>([])
+  const [filteredTasks, setFilteredTasks] = useState<TaskWithGoal[]>([])
   const [goals, setGoals] = useState<Goal[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [saving, setSaving] = useState(false)
-  const [filter, setFilter] = useState<'active' | 'completed'>('active')
+  const [filter, setFilter] = useState<'active' | 'completed' | 'all'>('active')
+  const [workTypeFilter, setWorkTypeFilter] = useState<WorkType | 'all'>('all')
+  const [priorityFilter, setPriorityFilter] = useState<PriorityLevel | 'all'>('all')
   const [menuOpen, setMenuOpen] = useState<string | null>(null)
   const supabase = createClient()
   const { celebrate, CelebrationComponent } = useCelebration()
