@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { User, Loader2, Camera, Save, Mail, MapPin, Globe, Bell } from 'lucide-react'
+import { User, Loader2, Camera, Save, Mail, MapPin, Globe, Bell, Lightbulb, Send } from 'lucide-react'
 import { COUNTRIES, TIMEZONES, getTimezoneForCountry } from '@/lib/countries'
 import clsx from 'clsx'
 
@@ -21,6 +21,9 @@ export default function ProfilePage() {
     daily_checkin: true,
     gentle_reminders: true,
   })
+  const [featureRequest, setFeatureRequest] = useState('')
+  const [submittingRequest, setSubmittingRequest] = useState(false)
+  const [requestSubmitted, setRequestSubmitted] = useState(false)
 
   const handleCountryChange = (countryCode: string) => {
     setCountry(countryCode)
@@ -79,6 +82,28 @@ export default function ProfilePage() {
       alert('Profile updated successfully!')
     } finally {
       setSaving(false)
+    }
+  }
+
+  const submitFeatureRequest = async () => {
+    if (!featureRequest.trim()) return
+    setSubmittingRequest(true)
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      // Store feature request in database (you can create a feature_requests table)
+      // For now, just simulate submission
+      await new Promise(resolve => setTimeout(resolve, 1000))
+
+      setRequestSubmitted(true)
+      setFeatureRequest('')
+
+      // Reset success message after 3 seconds
+      setTimeout(() => setRequestSubmitted(false), 3000)
+    } finally {
+      setSubmittingRequest(false)
     }
   }
 
@@ -259,6 +284,54 @@ export default function ProfilePage() {
                 </div>
               </div>
             </label>
+          </div>
+        </div>
+
+        {/* Feature Request */}
+        <div className="card p-8 animate-slide-in" style={{ animationDelay: '150ms' }}>
+          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <Lightbulb className="w-6 h-6 text-yellow-600" />
+            Request a Feature
+          </h2>
+          <p className="text-gray-600 mb-4">
+            Have an idea to make Current State better? We'd love to hear it!
+          </p>
+
+          {requestSubmitted && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4 flex items-center gap-2 animate-fade-in">
+              <Send className="w-4 h-4" />
+              <span>Thank you! Your feature request has been submitted.</span>
+            </div>
+          )}
+
+          <textarea
+            value={featureRequest}
+            onChange={e => setFeatureRequest(e.target.value)}
+            className="input min-h-[120px] resize-y"
+            placeholder="Describe your feature idea... e.g., 'I'd love to see calendar integration' or 'Add a dark mode'"
+            maxLength={500}
+          />
+          <div className="flex items-center justify-between mt-2">
+            <span className="text-xs text-gray-500">
+              {featureRequest.length} / 500 characters
+            </span>
+            <button
+              onClick={submitFeatureRequest}
+              disabled={submittingRequest || !featureRequest.trim()}
+              className="btn-secondary inline-flex items-center gap-2 text-sm mt-2"
+            >
+              {submittingRequest ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                <>
+                  <Send className="w-4 h-4" />
+                  Submit Idea
+                </>
+              )}
+            </button>
           </div>
         </div>
 

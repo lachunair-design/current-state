@@ -1,5 +1,20 @@
 # Database Migration Instructions
 
+## ⚠️ CRITICAL: Habits Not Saving?
+
+If habits aren't being saved, you **MUST** apply the habits migration first!
+
+### Quick Fix for Habits
+
+1. Go to your Supabase Dashboard: https://supabase.com/dashboard
+2. Click **SQL Editor** in the left sidebar
+3. Click **"New query"**
+4. Copy and paste the **entire contents** of `supabase-habits-migration.sql`
+5. Click **"Run"** (or press Ctrl+Enter)
+6. Refresh your app - habits will now save!
+
+---
+
 ## Issue: Goal Setting Not Working
 
 If you're experiencing issues with goal setting or being stuck in a redirect loop, it's likely because the `onboarding_completed` column is missing from your profiles table.
@@ -8,7 +23,7 @@ If you're experiencing issues with goal setting or being stuck in a redirect loo
 
 You need to run the following SQL migrations in your Supabase database in order:
 
-### 1. Apply Onboarding Migration (REQUIRED)
+### 1. Apply Onboarding Migration (REQUIRED FOR GOALS)
 
 **File:** `supabase-onboarding-migration.sql`
 
