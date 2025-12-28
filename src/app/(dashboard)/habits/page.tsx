@@ -17,6 +17,7 @@ import {
   GOAL_CATEGORY_CONFIG
 } from '@/types/database'
 import { useCelebration } from '@/components/Celebration'
+import { TaskVsHabitGuide } from '@/components/TaskVsHabitGuide'
 import clsx from 'clsx'
 
 export default function HabitsPage() {
@@ -259,6 +260,7 @@ export default function HabitsPage() {
                   placeholder="e.g., Morning meditation, Workout, Take vitamins"
                   autoFocus
                 />
+                {title && <TaskVsHabitGuide title={title} />}
               </div>
 
               {/* Three Versions */}

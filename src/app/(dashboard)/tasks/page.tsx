@@ -3,10 +3,11 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Plus, CheckSquare, Loader2, X, MoreVertical, Trash2, Edit2, Check } from 'lucide-react'
-import { 
+import {
   Task, Goal, EnergyLevel, WorkType, TimeEstimate, PriorityLevel,
   ENERGY_LEVEL_CONFIG, WORK_TYPE_CONFIG, TIME_ESTIMATE_CONFIG, PRIORITY_CONFIG, GOAL_CATEGORY_CONFIG
 } from '@/types/database'
+import { TaskVsHabitGuide } from '@/components/TaskVsHabitGuide'
 import clsx from 'clsx'
 
 interface TaskWithGoal extends Task {
@@ -184,6 +185,7 @@ export default function TasksPage() {
               <div>
                 <label className="label">Task title</label>
                 <input type="text" value={title} onChange={e => setTitle(e.target.value)} className="input" placeholder="What needs to be done?" autoFocus />
+                {title && <TaskVsHabitGuide title={title} />}
               </div>
 
               <div>

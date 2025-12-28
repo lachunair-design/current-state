@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Plus, Target, Loader2, X, MoreVertical, Trash2, Edit2 } from 'lucide-react'
+import { Plus, Target, Loader2, X, MoreVertical, Trash2, Edit2, Sparkles, CheckSquare } from 'lucide-react'
 import { Goal, GoalCategory, GOAL_CATEGORY_CONFIG, CreateGoalInput } from '@/types/database'
+import { getSmartTaskSuggestions, TaskSuggestion } from '@/lib/goalTaskSuggestions'
 import clsx from 'clsx'
 
 export default function GoalsPage() {
@@ -13,6 +14,10 @@ export default function GoalsPage() {
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null)
   const [saving, setSaving] = useState(false)
   const [menuOpen, setMenuOpen] = useState<string | null>(null)
+  const [showTaskSuggestions, setShowTaskSuggestions] = useState(false)
+  const [suggestedTasks, setSuggestedTasks] = useState<TaskSuggestion[]>([])
+  const [newGoalId, setNewGoalId] = useState<string | null>(null)
+  const [addingTask, setAddingTask] = useState<string | null>(null)
   const supabase = createClient()
 
   // Form state
@@ -87,16 +92,59 @@ export default function GoalsPage() {
           .from('goals')
           .update(goalData as never)
           .eq('id', editingGoal.id)
+        await fetchGoals()
+        resetForm()
       } else {
-        await supabase
+        // Insert new goal and get the ID
+        const { data: newGoalData } = await supabase
           .from('goals')
           .insert({ ...goalData, user_id: user.id, display_order: goals.length } as never)
-      }
+          .select()
+          .single() as { data: any }
 
-      await fetchGoals()
-      resetForm()
+        await fetchGoals()
+
+        // Show task suggestions for new goals
+        if (newGoalData) {
+          const suggestions = getSmartTaskSuggestions(title.trim(), category)
+          setSuggestedTasks(suggestions)
+          setNewGoalId(newGoalData.id)
+          setShowTaskSuggestions(true)
+        }
+
+        resetForm()
+      }
     } finally {
       setSaving(false)
+    }
+  }
+
+  const addSuggestedTask = async (suggestion: TaskSuggestion) => {
+    if (!newGoalId) return
+    setAddingTask(suggestion.title)
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      await supabase
+        .from('tasks')
+        .insert({
+          user_id: user.id,
+          goal_id: newGoalId,
+          title: suggestion.title,
+          description: suggestion.description,
+          energy_required: suggestion.energy_required,
+          work_type: suggestion.work_type,
+          time_estimate: suggestion.time_estimate,
+          priority: suggestion.priority,
+          status: 'active',
+        } as never)
+
+      // Remove from suggestions list
+      setSuggestedTasks(suggestedTasks.filter(t => t.title !== suggestion.title))
+    } finally {
+      setAddingTask(null)
     }
   }
 
@@ -233,6 +281,94 @@ export default function GoalsPage() {
                 </button>
                 <button onClick={resetForm} className="btn-secondary">Cancel</button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Task Suggestions Modal */}
+      {showTaskSuggestions && suggestedTasks.length > 0 && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-8 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-primary-50 rounded-xl flex items-center justify-center">
+                  <Sparkles className="w-6 h-6 text-primary-600" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">Suggested Tasks</h2>
+                  <p className="text-sm text-gray-600">Get started faster with smart suggestions</p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setShowTaskSuggestions(false)
+                  setNewGoalId(null)
+                  setSuggestedTasks([])
+                }}
+                className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+
+            <p className="text-gray-700 mb-6">
+              Based on your goal, here are some tasks to help you get started. Click to add any that are relevant:
+            </p>
+
+            <div className="space-y-3">
+              {suggestedTasks.map((suggestion, index) => (
+                <div
+                  key={index}
+                  className="card p-4 hover:shadow-md transition-all animate-slide-in"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <div className="flex items-start gap-4">
+                    <CheckSquare className="w-5 h-5 text-primary-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-semibold text-gray-900 mb-1">{suggestion.title}</h3>
+                      {suggestion.description && (
+                        <p className="text-sm text-gray-600 mb-2">{suggestion.description}</p>
+                      )}
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
+                          {suggestion.energy_required} energy
+                        </span>
+                        <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full font-medium">
+                          {suggestion.time_estimate}
+                        </span>
+                        <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-medium">
+                          {suggestion.priority.replace('_', ' ')}
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => addSuggestedTask(suggestion)}
+                      disabled={addingTask === suggestion.title}
+                      className="btn-primary text-sm px-4 py-2 flex-shrink-0"
+                    >
+                      {addingTask === suggestion.title ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        'Add Task'
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setShowTaskSuggestions(false)
+                  setNewGoalId(null)
+                  setSuggestedTasks([])
+                }}
+                className="btn-secondary"
+              >
+                Done
+              </button>
             </div>
           </div>
         </div>
