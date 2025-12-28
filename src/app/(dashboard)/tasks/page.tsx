@@ -8,6 +8,7 @@ import {
   ENERGY_LEVEL_CONFIG, WORK_TYPE_CONFIG, TIME_ESTIMATE_CONFIG, PRIORITY_CONFIG, GOAL_CATEGORY_CONFIG
 } from '@/types/database'
 import { TaskVsHabitGuide } from '@/components/TaskVsHabitGuide'
+import { useCelebration } from '@/components/Celebration'
 import clsx from 'clsx'
 
 interface TaskWithGoal extends Task {
@@ -24,6 +25,7 @@ export default function TasksPage() {
   const [filter, setFilter] = useState<'active' | 'completed'>('active')
   const [menuOpen, setMenuOpen] = useState<string | null>(null)
   const supabase = createClient()
+  const { celebrate, CelebrationComponent } = useCelebration()
 
   // Form state
   const [title, setTitle] = useState('')
@@ -118,7 +120,15 @@ export default function TasksPage() {
   }
 
   const completeTask = async (taskId: string) => {
+    const task = tasks.find(t => t.id === taskId)
+
     await supabase.from('tasks').update({ status: 'completed', completed_at: new Date().toISOString() } as never).eq('id', taskId)
+
+    // Celebrate completion!
+    if (task) {
+      celebrate(`You completed "${task.title}"! Keep up the great work! 💪`)
+    }
+
     setTasks(tasks.filter(t => t.id !== taskId))
     setMenuOpen(null)
   }
@@ -365,6 +375,9 @@ export default function TasksPage() {
           )}
         </div>
       )}
+
+      {/* Celebration Component */}
+      {CelebrationComponent}
     </div>
   )
 }

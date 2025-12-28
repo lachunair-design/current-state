@@ -13,13 +13,25 @@ export function Celebration({ message, onClose, duration = 3000 }: CelebrationPr
   const [show, setShow] = useState(true)
 
   useEffect(() => {
+    console.log('🎉 Celebration mounted with message:', message)
     const timer = setTimeout(() => {
+      console.log('🎉 Celebration auto-hiding after', duration, 'ms')
       setShow(false)
       onClose?.()
     }, duration)
 
-    return () => clearTimeout(timer)
-  }, [duration, onClose])
+    return () => {
+      console.log('🎉 Celebration cleanup')
+      clearTimeout(timer)
+    }
+  }, [duration, message]) // Removed onClose from dependencies to prevent re-running
+
+  useEffect(() => {
+    // Call onClose when show becomes false
+    if (!show && onClose) {
+      onClose()
+    }
+  }, [show, onClose])
 
   if (!show) return null
 
@@ -63,12 +75,16 @@ export function useCelebration() {
   const [celebration, setCelebration] = useState<{ message: string } | null>(null)
 
   const celebrate = (message: string) => {
+    console.log('🎊 celebrate() called with message:', message)
     setCelebration({ message })
   }
 
   const clear = () => {
+    console.log('🎊 clear() called - hiding celebration')
     setCelebration(null)
   }
+
+  console.log('🎊 useCelebration render, celebration:', celebration)
 
   return {
     celebration,
