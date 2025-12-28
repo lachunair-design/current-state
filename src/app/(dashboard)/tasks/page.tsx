@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Plus, CheckSquare, Loader2, X, MoreVertical, Trash2, Edit2, Check } from 'lucide-react'
+import { Plus, CheckSquare, Loader2, X, MoreVertical, Trash2, Edit2, Check, RotateCcw } from 'lucide-react'
 import {
   Task, Goal, EnergyLevel, WorkType, TimeEstimate, PriorityLevel,
   ENERGY_LEVEL_CONFIG, WORK_TYPE_CONFIG, TIME_ESTIMATE_CONFIG, PRIORITY_CONFIG, GOAL_CATEGORY_CONFIG
@@ -41,7 +41,12 @@ export default function TasksPage() {
 
   useEffect(() => {
     fetchData()
-  }, [filter])
+  }, [])
+
+  useEffect(() => {
+    // Apply filters whenever tasks or filter settings change
+    applyFilters()
+  }, [tasks, filter, workTypeFilter, priorityFilter])
 
   const fetchData = async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -52,7 +57,7 @@ export default function TasksPage() {
         .from('tasks')
         .select('*, goals(*)')
         .eq('user_id', user.id)
-        .eq('status', filter === 'active' ? 'active' : 'completed')
+        .in('status', ['active', 'completed'])
         .order('created_at', { ascending: false }),
       supabase
         .from('goals')
@@ -64,6 +69,30 @@ export default function TasksPage() {
     setTasks(tasksRes.data || [])
     setGoals(goalsRes.data || [])
     setLoading(false)
+  }
+
+  const applyFilters = () => {
+    let filtered = [...tasks]
+
+    // Status filter
+    if (filter === 'active') {
+      filtered = filtered.filter(t => t.status === 'active')
+    } else if (filter === 'completed') {
+      filtered = filtered.filter(t => t.status === 'completed')
+    }
+    // 'all' shows everything
+
+    // Work type filter
+    if (workTypeFilter !== 'all') {
+      filtered = filtered.filter(t => t.work_type === workTypeFilter)
+    }
+
+    // Priority filter
+    if (priorityFilter !== 'all') {
+      filtered = filtered.filter(t => t.priority === priorityFilter)
+    }
+
+    setFilteredTasks(filtered)
   }
 
   const resetForm = () => {
@@ -132,14 +161,20 @@ export default function TasksPage() {
       celebrate(`You completed "${task.title}"! Keep up the great work! 💪`)
     }
 
-    setTasks(tasks.filter(t => t.id !== taskId))
+    await fetchData()
+    setMenuOpen(null)
+  }
+
+  const restoreTask = async (taskId: string) => {
+    await supabase.from('tasks').update({ status: 'active', completed_at: null } as never).eq('id', taskId)
+    await fetchData()
     setMenuOpen(null)
   }
 
   const deleteTask = async (taskId: string) => {
     if (!confirm('Delete this task?')) return
     await supabase.from('tasks').update({ status: 'archived' } as never).eq('id', taskId)
-    setTasks(tasks.filter(t => t.id !== taskId))
+    await fetchData()
     setMenuOpen(null)
   }
 
@@ -163,24 +198,74 @@ export default function TasksPage() {
         </button>
       </div>
 
-      {/* Filter tabs */}
-      <div className="flex gap-2 mb-6">
-        <button
-          onClick={() => setFilter('active')}
-          className={clsx('px-4 py-2 rounded-lg text-sm font-medium transition-colors',
-            filter === 'active' ? 'bg-primary-100 text-primary-700' : 'text-gray-600 hover:bg-gray-100'
-          )}
-        >
-          Active
-        </button>
-        <button
-          onClick={() => setFilter('completed')}
-          className={clsx('px-4 py-2 rounded-lg text-sm font-medium transition-colors',
-            filter === 'completed' ? 'bg-primary-100 text-primary-700' : 'text-gray-600 hover:bg-gray-100'
-          )}
-        >
-          Completed
-        </button>
+      {/* Filters */}
+      <div className="card p-4 mb-6">
+        <div className="flex flex-col sm:flex-row gap-4">
+          {/* Status filter */}
+          <div className="flex-1">
+            <label className="label text-xs">Status</label>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setFilter('active')}
+                className={clsx('px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex-1',
+                  filter === 'active' ? 'bg-primary-100 text-primary-700' : 'text-gray-600 hover:bg-gray-100'
+                )}
+              >
+                Active
+              </button>
+              <button
+                onClick={() => setFilter('completed')}
+                className={clsx('px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex-1',
+                  filter === 'completed' ? 'bg-primary-100 text-primary-700' : 'text-gray-600 hover:bg-gray-100'
+                )}
+              >
+                Completed
+              </button>
+              <button
+                onClick={() => setFilter('all')}
+                className={clsx('px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex-1',
+                  filter === 'all' ? 'bg-primary-100 text-primary-700' : 'text-gray-600 hover:bg-gray-100'
+                )}
+              >
+                All
+              </button>
+            </div>
+          </div>
+
+          {/* Work type filter */}
+          <div className="flex-1">
+            <label className="label text-xs">Work Type</label>
+            <select
+              value={workTypeFilter}
+              onChange={(e) => setWorkTypeFilter(e.target.value as WorkType | 'all')}
+              className="input text-sm py-1.5"
+            >
+              <option value="all">All Types</option>
+              {(Object.keys(WORK_TYPE_CONFIG) as WorkType[]).map((type) => (
+                <option key={type} value={type}>
+                  {WORK_TYPE_CONFIG[type].icon} {WORK_TYPE_CONFIG[type].label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Priority filter */}
+          <div className="flex-1">
+            <label className="label text-xs">Priority</label>
+            <select
+              value={priorityFilter}
+              onChange={(e) => setPriorityFilter(e.target.value as PriorityLevel | 'all')}
+              className="input text-sm py-1.5"
+            >
+              <option value="all">All Priorities</option>
+              {(Object.keys(PRIORITY_CONFIG) as PriorityLevel[]).map((priority) => (
+                <option key={priority} value={priority}>
+                  {PRIORITY_CONFIG[priority].label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
       </div>
 
       {/* Form Modal */}
@@ -285,9 +370,9 @@ export default function TasksPage() {
       )}
 
       {/* Tasks List */}
-      {tasks.length > 0 ? (
+      {filteredTasks.length > 0 ? (
         <div className="space-y-3">
-          {tasks.map((task) => {
+          {filteredTasks.map((task) => {
             const energyConfig = ENERGY_LEVEL_CONFIG[task.energy_required]
             const workConfig = WORK_TYPE_CONFIG[task.work_type]
             const timeConfig = TIME_ESTIMATE_CONFIG[task.time_estimate]
@@ -335,8 +420,8 @@ export default function TasksPage() {
                       <MoreVertical className="w-5 h-5" />
                     </button>
                     {menuOpen === task.id && (
-                      <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 w-32">
-                        {filter === 'active' && (
+                      <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 w-36">
+                        {task.status === 'active' ? (
                           <>
                             <button onClick={() => openEditForm(task)}
                               className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
@@ -347,6 +432,11 @@ export default function TasksPage() {
                               <Check className="w-4 h-4" /> Complete
                             </button>
                           </>
+                        ) : (
+                          <button onClick={() => restoreTask(task.id)}
+                            className="w-full px-4 py-2 text-left text-sm text-blue-600 hover:bg-blue-50 flex items-center gap-2">
+                            <RotateCcw className="w-4 h-4" /> Restore
+                          </button>
                         )}
                         <button onClick={() => deleteTask(task.id)}
                           className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
