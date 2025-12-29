@@ -20,9 +20,19 @@ import { useCelebration } from '@/components/Celebration'
 import { TaskVsHabitGuide } from '@/components/TaskVsHabitGuide'
 import clsx from 'clsx'
 
+interface HabitStats {
+  totalCompletions: number
+  currentStreak: number
+  bestStreak: number
+  lastCompleted: Date | null
+  last7Days: boolean[] // true = completed, false = missed
+  weeklyRate: number // percentage
+}
+
 export default function HabitsPage() {
   const [habits, setHabits] = useState<Habit[]>([])
   const [goals, setGoals] = useState<Goal[]>([])
+  const [habitStats, setHabitStats] = useState<Record<string, HabitStats>>({})
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null)
@@ -45,6 +55,12 @@ export default function HabitsPage() {
     fetchHabits()
     fetchGoals()
   }, [])
+
+  useEffect(() => {
+    if (habits.length > 0) {
+      fetchHabitStats()
+    }
+  }, [habits])
 
   const fetchHabits = async () => {
     const { data: { user } } = await supabase.auth.getUser()
@@ -73,6 +89,122 @@ export default function HabitsPage() {
       .order('display_order')
 
     setGoals(data || [])
+  }
+
+  const fetchHabitStats = async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    const stats: Record<string, HabitStats> = {}
+
+    for (const habit of habits) {
+      // Fetch all completions for this habit
+      const { data: completions } = await supabase
+        .from('habit_completions')
+        .select('completed_at')
+        .eq('habit_id', habit.id)
+        .order('completed_at', { ascending: false }) as { data: Array<{ completed_at: string }> | null }
+
+      if (!completions || completions.length === 0) {
+        stats[habit.id] = {
+          totalCompletions: 0,
+          currentStreak: 0,
+          bestStreak: 0,
+          lastCompleted: null,
+          last7Days: [false, false, false, false, false, false, false],
+          weeklyRate: 0,
+        }
+        continue
+      }
+
+      // Calculate stats
+      const totalCompletions = completions.length
+      const lastCompleted = new Date(completions[0].completed_at)
+
+      // Calculate streaks and last 7 days
+      const { currentStreak, bestStreak, last7Days } = calculateStreaks(
+        completions.map(c => new Date(c.completed_at))
+      )
+
+      // Calculate weekly completion rate
+      const completedDays = last7Days.filter(d => d).length
+      const weeklyRate = Math.round((completedDays / 7) * 100)
+
+      stats[habit.id] = {
+        totalCompletions,
+        currentStreak,
+        bestStreak,
+        lastCompleted,
+        last7Days,
+        weeklyRate,
+      }
+    }
+
+    setHabitStats(stats)
+  }
+
+  const calculateStreaks = (completionDates: Date[]) => {
+    if (completionDates.length === 0) {
+      return {
+        currentStreak: 0,
+        bestStreak: 0,
+        last7Days: [false, false, false, false, false, false, false],
+      }
+    }
+
+    // Sort dates ascending
+    const dates = Array.from(completionDates).sort((a, b) => a.getTime() - b.getTime())
+
+    // Get dates only (ignore time)
+    const dateStrings = dates.map(d => d.toISOString().split('T')[0])
+    const uniqueDates = Array.from(new Set(dateStrings))
+
+    // Calculate current streak (working backwards from today)
+    let currentStreak = 0
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    for (let i = 0; i < 100; i++) {
+      const checkDate = new Date(today)
+      checkDate.setDate(today.getDate() - i)
+      const dateStr = checkDate.toISOString().split('T')[0]
+
+      if (uniqueDates.includes(dateStr)) {
+        currentStreak++
+      } else if (i > 0) {
+        // Only break if we're past today (allow today to be incomplete)
+        break
+      }
+    }
+
+    // Calculate best streak
+    let bestStreak = 0
+    let tempStreak = 1
+
+    for (let i = 1; i < uniqueDates.length; i++) {
+      const prevDate = new Date(uniqueDates[i - 1])
+      const currDate = new Date(uniqueDates[i])
+      const diffDays = Math.round((currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24))
+
+      if (diffDays === 1) {
+        tempStreak++
+        bestStreak = Math.max(bestStreak, tempStreak)
+      } else {
+        tempStreak = 1
+      }
+    }
+    bestStreak = Math.max(bestStreak, tempStreak)
+
+    // Calculate last 7 days
+    const last7Days: boolean[] = []
+    for (let i = 6; i >= 0; i--) {
+      const checkDate = new Date(today)
+      checkDate.setDate(today.getDate() - i)
+      const dateStr = checkDate.toISOString().split('T')[0]
+      last7Days.push(uniqueDates.includes(dateStr))
+    }
+
+    return { currentStreak, bestStreak, last7Days }
   }
 
   const resetForm = () => {
@@ -110,12 +242,12 @@ export default function HabitsPage() {
         title: title.trim(),
         habit_type: habitType,
         full_version: title.trim(), // Use title as full version
-        scaled_version: null, // Will be auto-generated by app
-        minimal_version: null, // Will be auto-generated by app
+        scaled_version: undefined, // Will be auto-generated by app
+        minimal_version: undefined, // Will be auto-generated by app
         target_frequency: targetFrequency,
-        linked_goal_id: linkedGoalId || null,
-        why_this_helps: whyThisHelps.trim() || null,
-        best_time_of_day: bestTimeOfDay || null,
+        linked_goal_id: linkedGoalId || undefined,
+        why_this_helps: whyThisHelps.trim() || undefined,
+        best_time_of_day: bestTimeOfDay || undefined,
       }
 
       let result
@@ -170,16 +302,45 @@ export default function HabitsPage() {
           version_completed: 'full', // Always record as full for simplicity
         } as never)
 
-      // Celebrate completion!
-      if (habit) {
+      // Refresh stats to show updated numbers
+      await fetchHabitStats()
+
+      // Check for milestone celebrations
+      const stats = await getHabitStatsForId(habitId)
+      if (stats) {
+        if (stats.currentStreak === 7) {
+          celebrate(`🎉 7-DAY STREAK! You completed "${habit?.title}" for a full week! Your brain is building new pathways! 🧠✨`)
+        } else if (stats.currentStreak === 14) {
+          celebrate(`🔥 2-WEEK STREAK! Incredible consistency on "${habit?.title}"! This is becoming automatic! 💪`)
+        } else if (stats.currentStreak === 30) {
+          celebrate(`🌟 30-DAY STREAK! A full month of "${habit?.title}"! This is now a SOLID habit! 🏆`)
+        } else if (habit) {
+          celebrate(`You completed "${habit.title}"! ${habit.why_this_helps ? habit.why_this_helps + ' 💚' : 'Keep it up! 💪'}`)
+        }
+      } else if (habit) {
         celebrate(`You completed "${habit.title}"! ${habit.why_this_helps ? habit.why_this_helps + ' 💚' : 'Keep it up! 💪'}`)
       }
 
-      // Optionally refresh to show updated stats
       await fetchHabits()
     } finally {
       setCompletingHabit(null)
     }
+  }
+
+  const getHabitStatsForId = async (habitId: string): Promise<HabitStats | null> => {
+    const { data: completions } = await supabase
+      .from('habit_completions')
+      .select('completed_at')
+      .eq('habit_id', habitId)
+      .order('completed_at', { ascending: false }) as { data: Array<{ completed_at: string }> | null }
+
+    if (!completions || completions.length === 0) return null
+
+    const { currentStreak } = calculateStreaks(
+      completions.map(c => new Date(c.completed_at))
+    )
+
+    return { currentStreak } as HabitStats
   }
 
   if (loading) {
@@ -423,6 +584,78 @@ export default function HabitsPage() {
                           <Heart className="w-4 h-4 inline mr-1 text-purple-600" />
                           <span className="font-semibold">Why:</span> {habit.why_this_helps}
                         </p>
+                      </div>
+                    )}
+
+                    {/* Habit Stats - Neuroscience-Optimized */}
+                    {habitStats[habit.id] && (
+                      <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100 rounded-xl p-4 mb-4">
+                        {/* Current Streak - PROMINENT (Loss Aversion) */}
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-2">
+                            <span className="text-3xl">🔥</span>
+                            <div>
+                              <div className="flex items-baseline gap-1">
+                                <span className="text-2xl font-bold text-orange-600">
+                                  {habitStats[habit.id].currentStreak}
+                                </span>
+                                <span className="text-sm text-gray-600 font-medium">day streak</span>
+                              </div>
+                              {habitStats[habit.id].bestStreak > habitStats[habit.id].currentStreak && (
+                                <span className="text-xs text-gray-500">
+                                  Best: {habitStats[habit.id].bestStreak} days
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-xs text-gray-500 mb-1">Total</div>
+                            <div className="text-lg font-bold text-gray-700">
+                              {habitStats[habit.id].totalCompletions}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Last 7 Days - Visual Pattern Recognition */}
+                        <div className="mb-3">
+                          <div className="text-xs text-gray-600 mb-2 font-medium">Last 7 days</div>
+                          <div className="flex gap-1">
+                            {habitStats[habit.id].last7Days.map((completed, i) => (
+                              <div
+                                key={i}
+                                className={clsx(
+                                  'flex-1 h-8 rounded-md transition-all',
+                                  completed
+                                    ? 'bg-green-500 shadow-sm'
+                                    : 'bg-gray-200'
+                                )}
+                                title={`${7 - i} days ago${completed ? ' - completed' : ' - missed'}`}
+                              />
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Weekly Completion Rate + Last Completed */}
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-2">
+                            <div className="font-semibold text-blue-700">
+                              {habitStats[habit.id].weeklyRate}% this week
+                            </div>
+                            {habitStats[habit.id].weeklyRate >= 80 && (
+                              <span className="text-green-600">💪</span>
+                            )}
+                          </div>
+                          {habitStats[habit.id].lastCompleted && (
+                            <div className="text-gray-500">
+                              Last: {new Date(habitStats[habit.id].lastCompleted!).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                hour: 'numeric',
+                                minute: '2-digit',
+                              })}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
 
