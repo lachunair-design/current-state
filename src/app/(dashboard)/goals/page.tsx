@@ -212,7 +212,7 @@ export default function GoalsPage() {
     <div className="max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-8 animate-fade-in">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Goals</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Destinations</h1>
           <p className="text-lg text-gray-600">What you're working toward</p>
         </div>
         <button

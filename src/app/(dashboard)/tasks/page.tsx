@@ -190,7 +190,7 @@ export default function TasksPage() {
     <div className="max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Tasks</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Steps</h1>
           <p className="text-gray-600 mt-1">Your work, tagged for energy matching</p>
         </div>
         <button onClick={() => setShowForm(true)} className="btn-primary inline-flex items-center gap-2">

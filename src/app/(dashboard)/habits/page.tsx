@@ -184,7 +184,7 @@ export default function HabitsPage() {
     <div className="max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-8 animate-fade-in">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Habits</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Rituals</h1>
           <p className="text-lg text-gray-600">Build routines that work with your energy</p>
         </div>
         <button

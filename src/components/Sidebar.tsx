@@ -24,11 +24,11 @@ interface SidebarProps {
 }
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Check In', href: '/checkin', icon: Sparkles },
-  { name: 'Goals', href: '/goals', icon: Target },
-  { name: 'Tasks', href: '/tasks', icon: CheckSquare },
-  { name: 'Habits', href: '/habits', icon: Heart },
+  { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Current State', href: '/checkin', icon: Sparkles },
+  { name: 'Destinations', href: '/goals', icon: Target },
+  { name: 'Steps', href: '/tasks', icon: CheckSquare },
+  { name: 'Rituals', href: '/habits', icon: Heart },
 ]
 
 export function Sidebar({ user }: SidebarProps) {
