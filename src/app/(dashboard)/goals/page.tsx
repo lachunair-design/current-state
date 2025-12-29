@@ -305,9 +305,44 @@ export default function GoalsPage() {
             return (
               <div
                 key={goal.id}
-                className="bg-white rounded-2xl p-6 shadow-md hover:shadow-lg hover:scale-[1.02] transition-all animate-fade-in relative"
+                className="bg-white rounded-2xl p-6 shadow-md hover:shadow-lg hover:scale-[1.02] transition-all animate-fade-in relative flex items-center gap-6"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
+                {/* Left side content */}
+                <div className="flex-1 min-w-0">
+                  {/* Icon */}
+                  <div className={`w-16 h-16 ${iconConfig.color} rounded-2xl flex items-center justify-center mb-4 shadow-sm`}>
+                    <span className="text-3xl">{iconConfig.emoji}</span>
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="text-xl font-bold text-text-primary mb-2 pr-8">{goal.title}</h3>
+
+                  {/* Progress Text */}
+                  <p className="text-sm text-text-secondary">
+                    {progress.completed} of {progress.total} tasks complete
+                  </p>
+                </div>
+
+                {/* Right side: Circular Progress Indicator */}
+                <div className="flex-shrink-0">
+                  <div className="relative w-24 h-24">
+                    <div
+                      className="w-24 h-24 rounded-full"
+                      style={{
+                        background: `conic-gradient(
+                          #4FB3D4 ${percentage * 3.6}deg,
+                          #E8E5E0 ${percentage * 3.6}deg
+                        )`
+                      }}
+                    >
+                      <div className="absolute inset-2 bg-white rounded-full flex items-center justify-center">
+                        <span className="text-2xl font-bold text-ocean-600">{percentage}%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Menu button */}
                 <div className="absolute top-4 right-4">
                   <button
@@ -332,38 +367,6 @@ export default function GoalsPage() {
                       </button>
                     </div>
                   )}
-                </div>
-
-                {/* Icon */}
-                <div className={`w-16 h-16 ${iconConfig.color} rounded-2xl flex items-center justify-center mb-4 shadow-sm`}>
-                  <span className="text-3xl">{iconConfig.emoji}</span>
-                </div>
-
-                {/* Title */}
-                <h3 className="text-xl font-bold text-text-primary mb-2 pr-8">{goal.title}</h3>
-
-                {/* Progress Text */}
-                <p className="text-sm text-text-secondary mb-4">
-                  {progress.completed} of {progress.total} tasks complete
-                </p>
-
-                {/* Circular Progress Indicator */}
-                <div className="flex items-center justify-center">
-                  <div className="relative w-24 h-24">
-                    <div
-                      className="w-24 h-24 rounded-full"
-                      style={{
-                        background: `conic-gradient(
-                          #4FB3D4 ${percentage * 3.6}deg,
-                          #E8E5E0 ${percentage * 3.6}deg
-                        )`
-                      }}
-                    >
-                      <div className="absolute inset-2 bg-white rounded-full flex items-center justify-center">
-                        <span className="text-2xl font-bold text-ocean-600">{percentage}%</span>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             )
