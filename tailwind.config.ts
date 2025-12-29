@@ -9,40 +9,71 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Dark green theme - soft & organic
-        primary: {
-          50: '#f0fff4',
-          100: '#c6f6d5',
-          200: '#9ae6b4',
-          300: '#68d391',
-          400: '#48bb78',
-          500: '#00FF00',  // Bright neon green
-          600: '#00DD00',
-          700: '#00BB00',
-          800: '#009900',
-          900: '#007700',
+        // Sunset to Ocean gradient palette (from logo)
+        sunset: {
+          50: '#FFF9F0',    // Lightest cream
+          100: '#FFF4D6',   // Light peach
+          200: '#FFE5B4',   // Soft peach
+          300: '#FFD4A3',   // Peach
+          400: '#FFB88C',   // Light coral
+          500: '#FF9D76',   // Coral
+          600: '#F4845F',   // Deep coral
+          700: '#E66A47',   // Orange
+          800: '#D55030',   // Deep orange
+          900: '#C43A1A',   // Rich orange
         },
-        dark: {
-          bg: '#0d1810',      // Very dark green-black background
-          card: '#1a2620',    // Dark green for cards
-          border: '#2d3d32',  // Subtle borders
-          hover: '#243028',   // Hover state
+        ocean: {
+          50: '#F0FDFB',    // Lightest aqua
+          100: '#D4F8F0',   // Very light mint
+          200: '#A8E6CF',   // Light mint
+          300: '#7DDDC3',   // Mint
+          400: '#6DD5C3',   // Turquoise
+          500: '#4FB3D4',   // Ocean blue
+          600: '#3B9FB5',   // Deep ocean
+          700: '#2A8296',   // Deeper blue
+          800: '#1D6678',   // Dark blue
+          900: '#124A59',   // Very dark blue
         },
-        accent: {
-          green: '#00FF00',   // Neon green for high energy / positive actions
-          amber: '#FBBF24',   // Warm amber for low energy / gentle guidance
+        // Neutral backgrounds
+        bg: {
+          primary: '#FDFCFA',    // Warm off-white
+          secondary: '#F8F7F4',  // Soft cream
+          tertiary: '#F3F1ED',   // Light beige
         },
+        // Card and surface colors
+        surface: {
+          white: '#FFFFFF',
+          cream: '#FFFBF7',
+          light: '#F9F8F6',
+          border: '#E8E5E0',
+          hover: '#F5F3EE',
+        },
+        // Text colors
         text: {
-          primary: '#FFFFFF',   // High contrast white
-          secondary: '#D1D5DB', // Lighter gray for better readability
-          muted: '#9CA3AF',     // Medium gray for subtle text
+          primary: '#124A59',    // Deep ocean (main text)
+          secondary: '#2A8296',  // Medium ocean
+          muted: '#6B7280',      // Gray for subtle text
+          light: '#9CA3AF',      // Light gray
         },
-        // Semantic colors for energy states
+        // Accent colors from gradient
+        accent: {
+          sunset: '#FF9D76',     // Sunset coral
+          ocean: '#4FB3D4',      // Ocean blue
+          mint: '#6DD5C3',       // Turquoise
+          peach: '#FFD4A3',      // Soft peach
+        },
+        // Energy state colors (using gradient)
         energy: {
-          low: '#FBBF24',      // Warm amber
-          medium: '#48bb78',   // Mid-range green
-          high: '#00FF00',     // Bright neon green
+          low: '#FFD4A3',        // Soft peach (gentle, restful)
+          medium: '#6DD5C3',     // Turquoise (balanced)
+          high: '#FF9D76',       // Coral (energized)
         },
+      },
+      backgroundImage: {
+        'gradient-sunset': 'linear-gradient(135deg, #FF9D76 0%, #FFD4A3 100%)',
+        'gradient-ocean': 'linear-gradient(135deg, #4FB3D4 0%, #6DD5C3 100%)',
+        'gradient-flow': 'linear-gradient(135deg, #FF9D76 0%, #FFD4A3 25%, #A8E6CF 50%, #6DD5C3 75%, #4FB3D4 100%)',
+        'gradient-sunset-ocean': 'linear-gradient(to bottom, #FFD4A3 0%, #FFFFFF 50%, #A8E6CF 100%)',
       },
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],

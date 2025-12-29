@@ -7,8 +7,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
 
 :root {
-  --background: #0d1810;
-  --foreground: #ffffff;
+  --background: #FDFCFA;
+  --foreground: #124A59;
 }
 
 body {
@@ -21,32 +21,34 @@ body {
 /* Custom utility classes */
 @layer components {
   .btn-primary {
-    @apply bg-accent-green text-black px-4 py-2 rounded-lg font-medium
-           hover:bg-primary-600 transition-colors duration-200
-           focus:outline-none focus:ring-2 focus:ring-accent-green focus:ring-offset-2 focus:ring-offset-dark-bg
-           disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply bg-gradient-ocean text-white px-6 py-2.5 rounded-lg font-semibold
+           hover:shadow-lg hover:scale-105 transition-all duration-200
+           focus:outline-none focus:ring-2 focus:ring-ocean-400 focus:ring-offset-2
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
   }
 
   .btn-secondary {
-    @apply bg-dark-card text-text-primary px-4 py-2 rounded-lg font-medium
-           border border-dark-border hover:bg-dark-hover transition-colors duration-200
-           focus:outline-none focus:ring-2 focus:ring-accent-green focus:ring-offset-2 focus:ring-offset-dark-bg
+    @apply bg-white text-text-primary px-6 py-2.5 rounded-lg font-medium
+           border-2 border-surface-border hover:border-ocean-400 hover:bg-surface-hover transition-all duration-200
+           focus:outline-none focus:ring-2 focus:ring-ocean-400 focus:ring-offset-2
            disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .input {
-    @apply w-full px-4 py-2 border border-dark-border rounded-lg
-           bg-dark-card text-text-primary
-           focus:outline-none focus:ring-2 focus:ring-accent-green focus:border-transparent
-           placeholder:text-text-muted;
+    @apply w-full px-4 py-2.5 border-2 border-surface-border rounded-lg
+           bg-white text-text-primary
+           focus:outline-none focus:ring-2 focus:ring-ocean-400 focus:border-ocean-400
+           placeholder:text-text-muted
+           transition-colors duration-200;
   }
 
   .card {
-    @apply bg-dark-card rounded-xl border border-dark-border shadow-sm;
+    @apply bg-white rounded-xl border-2 border-surface-border shadow-sm
+           hover:border-ocean-300 hover:shadow-md transition-all duration-200;
   }
 
   .label {
-    @apply block text-sm font-medium text-text-secondary mb-1;
+    @apply block text-sm font-semibold text-text-primary mb-1.5;
   }
 }
 
@@ -184,14 +186,14 @@ input[type='number'] {
 /* Subtle animated background gradient */
 .bg-animated {
   position: relative;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #FF9D76 0%, #FFD4A3 25%, #A8E6CF 50%, #6DD5C3 75%, #4FB3D4 100%);
   background-size: 200% 200%;
   animation: gradient-shift 15s ease infinite;
 }
 
 /* Soft gradient overlay for pages */
 .page-gradient {
-  background: linear-gradient(to bottom, #f9fafb 0%, #ffffff 100%);
+  background: linear-gradient(to bottom, #FFF9F0 0%, #FDFCFA 50%, #F0FDFB 100%);
 }
 
 /* Floating shapes animation */
@@ -207,7 +209,7 @@ input[type='number'] {
 .floating-shape {
   position: absolute;
   border-radius: 50%;
-  opacity: 0.1;
+  opacity: 0.08;
   animation: float 6s ease-in-out infinite;
 }
 
@@ -216,7 +218,7 @@ input[type='number'] {
   height: 80px;
   top: 10%;
   left: 10%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #FF9D76 0%, #FFD4A3 100%);
   animation-delay: 0s;
   animation-duration: 8s;
 }
@@ -226,7 +228,7 @@ input[type='number'] {
   height: 120px;
   top: 60%;
   right: 15%;
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  background: linear-gradient(135deg, #A8E6CF 0%, #6DD5C3 100%);
   animation-delay: 2s;
   animation-duration: 10s;
 }
@@ -236,7 +238,7 @@ input[type='number'] {
   height: 100px;
   bottom: 20%;
   left: 20%;
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  background: linear-gradient(135deg, #4FB3D4 0%, #6DD5C3 100%);
   animation-delay: 4s;
   animation-duration: 12s;
 }

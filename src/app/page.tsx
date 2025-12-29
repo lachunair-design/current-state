@@ -3,21 +3,21 @@ import { Zap, CheckCircle, TrendingUp, Battery, Target, Sparkles, ArrowRight } f
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-dark-bg text-text-primary">
+    <div className="min-h-screen bg-gradient-to-b from-sunset-50 via-bg-primary to-ocean-50">
       {/* Header */}
-      <header className="container mx-auto px-4 py-6 border-b border-dark-border">
+      <header className="container mx-auto px-4 py-6 border-b border-surface-border backdrop-blur-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-accent-green rounded-xl flex items-center justify-center">
-              <Zap className="w-6 h-6 text-black" />
+            <div className="w-10 h-10 bg-gradient-flow rounded-xl flex items-center justify-center shadow-md">
+              <Zap className="w-6 h-6 text-white" />
             </div>
             <span className="font-accent font-semibold text-xl text-text-primary">Current State</span>
           </div>
           <div className="flex gap-3">
-            <Link href="/login" className="px-4 py-2 rounded-lg font-medium text-text-secondary hover:text-text-primary hover:bg-dark-hover transition-colors">
+            <Link href="/login" className="px-4 py-2 rounded-lg font-medium text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors">
               Sign in
             </Link>
-            <Link href="/signup" className="btn-primary">
+            <Link href="/signup" className="px-6 py-2 rounded-lg font-semibold bg-gradient-ocean text-white hover:shadow-lg hover:scale-105 transition-all">
               Get started free
             </Link>
           </div>
@@ -28,15 +28,15 @@ export default function LandingPage() {
       <section className="container mx-auto px-4 py-20 text-center">
         <div className="animate-fade-in">
           {/* Free Trial Badge */}
-          <div className="inline-flex items-center gap-2 bg-accent-green/10 border border-accent-green/30 rounded-full px-4 py-2 mb-8">
-            <Sparkles className="w-4 h-4 text-accent-green" />
-            <span className="text-sm font-medium text-accent-green">Free for a limited time • No credit card required</span>
+          <div className="inline-flex items-center gap-2 bg-gradient-sunset rounded-full px-4 py-2 mb-8 shadow-md">
+            <Sparkles className="w-4 h-4 text-white" />
+            <span className="text-sm font-semibold text-white">Free for a limited time • No credit card required</span>
           </div>
 
           <h1 className="text-5xl md:text-6xl font-accent font-bold text-text-primary mb-6 leading-tight">
             Work with your energy,
             <br />
-            <span className="text-accent-green">
+            <span className="bg-gradient-flow bg-clip-text text-transparent">
               not against it
             </span>
           </h1>
@@ -45,10 +45,10 @@ export default function LandingPage() {
             Match tasks to your actual capacity, see which work pays, and stop feeling guilty.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/signup" className="btn-primary text-lg px-8 py-4 inline-flex items-center justify-center gap-2 shadow-lg shadow-accent-green/20 hover:shadow-xl hover:shadow-accent-green/30 hover:-translate-y-0.5 transition-all">
+            <Link href="/signup" className="text-lg px-8 py-4 rounded-xl font-semibold bg-gradient-ocean text-white shadow-lg shadow-ocean-500/30 hover:shadow-xl hover:shadow-ocean-500/40 hover:-translate-y-0.5 transition-all inline-flex items-center justify-center gap-2">
               Start for free <ArrowRight className="w-5 h-5" />
             </Link>
-            <Link href="/how-it-works" className="px-8 py-4 rounded-lg font-medium text-text-secondary border border-dark-border hover:border-accent-green/30 hover:bg-dark-hover hover:text-text-primary inline-flex items-center justify-center hover:-translate-y-0.5 transition-all">
+            <Link href="/how-it-works" className="px-8 py-4 rounded-xl font-medium text-text-secondary bg-white border-2 border-surface-border hover:border-ocean-400 hover:bg-surface-hover hover:text-text-primary inline-flex items-center justify-center hover:-translate-y-0.5 transition-all">
               See how it works
             </Link>
           </div>
@@ -70,10 +70,10 @@ export default function LandingPage() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {/* Feature 1 */}
-          <div className="bg-dark-card border border-dark-border rounded-2xl p-8 hover:border-accent-green/30 transition-all group">
-            <div className="w-12 h-12 bg-accent-green/10 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-              <Battery className="w-6 h-6 text-accent-green" />
+          {/* Feature 1 - Sunset theme */}
+          <div className="bg-white border-2 border-sunset-200 rounded-2xl p-8 hover:border-sunset-400 hover:shadow-xl hover:shadow-sunset-200/50 transition-all group">
+            <div className="w-12 h-12 bg-gradient-sunset rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-md">
+              <Battery className="w-6 h-6 text-white" />
             </div>
             <h3 className="text-xl font-semibold text-text-primary mb-2">Daily Check-in</h3>
             <p className="text-text-secondary">
@@ -82,10 +82,10 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* Feature 2 */}
-          <div className="bg-dark-card border border-dark-border rounded-2xl p-8 hover:border-accent-green/30 transition-all group">
-            <div className="w-12 h-12 bg-accent-green/10 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-              <Target className="w-6 h-6 text-accent-green" />
+          {/* Feature 2 - Mint theme */}
+          <div className="bg-white border-2 border-ocean-200 rounded-2xl p-8 hover:border-ocean-400 hover:shadow-xl hover:shadow-ocean-200/50 transition-all group">
+            <div className="w-12 h-12 bg-gradient-ocean rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-md">
+              <Target className="w-6 h-6 text-white" />
             </div>
             <h3 className="text-xl font-semibold text-text-primary mb-2">Energy Matching</h3>
             <p className="text-text-secondary">
@@ -94,10 +94,10 @@ export default function LandingPage() {
             </p>
           </div>
 
-          {/* Feature 3 */}
-          <div className="bg-dark-card border border-dark-border rounded-2xl p-8 hover:border-accent-green/30 transition-all group">
-            <div className="w-12 h-12 bg-accent-green/10 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-              <TrendingUp className="w-6 h-6 text-accent-green" />
+          {/* Feature 3 - Full gradient */}
+          <div className="bg-white border-2 border-sunset-200 rounded-2xl p-8 hover:border-ocean-400 hover:shadow-xl hover:shadow-accent-mint/50 transition-all group">
+            <div className="w-12 h-12 bg-gradient-flow rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-md">
+              <TrendingUp className="w-6 h-6 text-white" />
             </div>
             <h3 className="text-xl font-semibold text-text-primary mb-2">Financial ROI</h3>
             <p className="text-text-secondary">
@@ -109,8 +109,10 @@ export default function LandingPage() {
 
       {/* Anti-guilt message */}
       <section className="container mx-auto px-4 py-20">
-        <div className="max-w-3xl mx-auto bg-gradient-to-br from-accent-green/10 to-transparent border border-accent-green/30 rounded-2xl p-12 text-center">
-          <CheckCircle className="w-16 h-16 text-accent-green mx-auto mb-6" />
+        <div className="max-w-3xl mx-auto bg-gradient-to-br from-ocean-100 via-white to-sunset-100 border-2 border-ocean-300 rounded-2xl p-12 text-center shadow-xl">
+          <div className="w-16 h-16 bg-gradient-ocean rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <CheckCircle className="w-10 h-10 text-white" />
+          </div>
           <h2 className="text-3xl font-accent font-bold text-text-primary mb-4">
             No "overdue" badges. No guilt.
           </h2>
@@ -128,14 +130,16 @@ export default function LandingPage() {
       {/* CTA */}
       <section className="container mx-auto px-4 py-20 text-center">
         <div className="max-w-2xl mx-auto">
-          <Zap className="w-16 h-16 text-accent-green mx-auto mb-6" />
+          <div className="w-16 h-16 bg-gradient-flow rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <Zap className="w-10 h-10 text-white" />
+          </div>
           <h2 className="text-4xl font-accent font-bold text-text-primary mb-4">
             Ready to work with yourself?
           </h2>
           <p className="text-lg text-text-secondary mb-8">
             Join multi-income professionals who've found a better way to work.
           </p>
-          <Link href="/signup" className="btn-primary text-lg px-8 py-4 inline-flex items-center gap-2">
+          <Link href="/signup" className="text-lg px-8 py-4 rounded-xl font-semibold bg-gradient-flow text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all inline-flex items-center gap-2">
             Get started free <Zap className="w-5 h-5" />
           </Link>
           <p className="text-sm text-text-muted mt-4">
@@ -145,10 +149,19 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-dark-border py-8">
-        <div className="container mx-auto px-4 text-center text-text-muted text-sm">
-          <p>Built for humans with fluctuating everything.</p>
-          <p className="mt-2">&copy; {new Date().getFullYear()} Current State. All rights reserved.</p>
+      <footer className="border-t border-surface-border bg-white/50 backdrop-blur-sm py-8">
+        <div className="container mx-auto px-4 text-center">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="w-6 h-6 bg-gradient-flow rounded-lg"></div>
+            <span className="font-accent font-semibold text-text-primary">Current State</span>
+          </div>
+          <p className="text-text-muted text-sm mb-2">Built for humans with fluctuating everything.</p>
+          <div className="flex items-center justify-center gap-4 text-sm text-text-secondary mb-2">
+            <Link href="/privacy" className="hover:text-ocean-600 transition-colors">Privacy</Link>
+            <span>•</span>
+            <Link href="/terms" className="hover:text-ocean-600 transition-colors">Terms</Link>
+          </div>
+          <p className="text-xs text-text-muted">&copy; {new Date().getFullYear()} Current State. All rights reserved.</p>
         </div>
       </footer>
     </div>
