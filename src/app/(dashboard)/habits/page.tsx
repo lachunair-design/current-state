@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Plus, Loader2, X, MoreVertical, Trash2, Edit2, CheckCircle, Heart } from 'lucide-react'
+import { Plus, Loader2, X, MoreVertical, Trash2, Edit2, CheckCircle, Heart, Check } from 'lucide-react'
 import {
   Habit,
   HabitType,
@@ -27,6 +27,7 @@ interface HabitStats {
   lastCompleted: Date | null
   last7Days: boolean[] // true = completed, false = missed
   weeklyRate: number // percentage
+  completedToday: boolean
 }
 
 export default function HabitsPage() {
@@ -113,6 +114,7 @@ export default function HabitsPage() {
           lastCompleted: null,
           last7Days: [false, false, false, false, false, false, false],
           weeklyRate: 0,
+          completedToday: false,
         }
         continue
       }
@@ -120,6 +122,15 @@ export default function HabitsPage() {
       // Calculate stats
       const totalCompletions = completions.length
       const lastCompleted = new Date(completions[0].completed_at)
+
+      // Check if completed today
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+      const todayStr = today.toISOString().split('T')[0]
+      const completedToday = completions.some(c => {
+        const compDate = new Date(c.completed_at).toISOString().split('T')[0]
+        return compDate === todayStr
+      })
 
       // Calculate streaks and last 7 days
       const { currentStreak, bestStreak, last7Days } = calculateStreaks(
@@ -137,6 +148,7 @@ export default function HabitsPage() {
         lastCompleted,
         last7Days,
         weeklyRate,
+        completedToday,
       }
     }
 
@@ -287,6 +299,12 @@ export default function HabitsPage() {
   }
 
   const completeHabit = async (habitId: string) => {
+    // Check if already completed today
+    if (habitStats[habitId]?.completedToday) {
+      alert('You already completed this habit today! 🎉')
+      return
+    }
+
     setCompletingHabit(habitId)
     try {
       const { data: { user } } = await supabase.auth.getUser()
@@ -302,10 +320,10 @@ export default function HabitsPage() {
           version_completed: 'full', // Always record as full for simplicity
         } as never)
 
-      // Refresh stats to show updated numbers
-      await fetchHabitStats()
+      // Refresh habits, which will trigger useEffect to refresh stats
+      await fetchHabits()
 
-      // Check for milestone celebrations
+      // Check for milestone celebrations after refresh
       const stats = await getHabitStatsForId(habitId)
       if (stats) {
         if (stats.currentStreak === 7) {
@@ -320,8 +338,6 @@ export default function HabitsPage() {
       } else if (habit) {
         celebrate(`You completed "${habit.title}"! ${habit.why_this_helps ? habit.why_this_helps + ' 💚' : 'Keep it up! 💪'}`)
       }
-
-      await fetchHabits()
     } finally {
       setCompletingHabit(null)
     }
@@ -660,20 +676,30 @@ export default function HabitsPage() {
                     )}
 
                     {/* Complete Button */}
-                    <button
-                      onClick={() => completeHabit(habit.id)}
-                      disabled={completingHabit === habit.id}
-                      className="btn-primary text-sm px-6 py-2 flex items-center gap-2 shadow-sm"
-                    >
-                      {completingHabit === habit.id ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <>
-                          <CheckCircle className="w-4 h-4" />
-                          Done
-                        </>
-                      )}
-                    </button>
+                    {habitStats[habit.id]?.completedToday ? (
+                      <button
+                        disabled
+                        className="btn-secondary text-sm px-6 py-2 flex items-center gap-2 opacity-70 cursor-not-allowed"
+                      >
+                        <Check className="w-4 h-4" />
+                        Completed Today ✓
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => completeHabit(habit.id)}
+                        disabled={completingHabit === habit.id}
+                        className="btn-primary text-sm px-6 py-2 flex items-center gap-2 shadow-sm"
+                      >
+                        {completingHabit === habit.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <>
+                            <CheckCircle className="w-4 h-4" />
+                            Done
+                          </>
+                        )}
+                      </button>
+                    )}
                   </div>
 
                   {/* Menu */}
