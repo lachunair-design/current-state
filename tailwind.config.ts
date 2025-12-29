@@ -34,8 +34,8 @@ const config: Config = {
         },
         text: {
           primary: '#FFFFFF',   // High contrast white
-          secondary: '#A0AEC0', // Light gray for subtext
-          muted: '#718096',     // Even more subtle text
+          secondary: '#D1D5DB', // Lighter gray for better readability
+          muted: '#9CA3AF',     // Medium gray for subtle text
         },
         // Semantic colors for energy states
         energy: {
