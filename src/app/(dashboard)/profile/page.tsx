@@ -176,7 +176,7 @@ export default function ProfilePage() {
 
       <div className="space-y-6">
         {/* Avatar Section */}
-        <div className="bg-dark-card border border-dark-border rounded-2xl p-8 animate-slide-in">
+        <div className="bg-white border border-surface-border rounded-2xl p-8 animate-slide-in">
           <h2 className="text-xl font-bold text-text-primary mb-6">Profile Photo</h2>
           <div className="flex items-center gap-6">
             <div className="relative">
@@ -184,15 +184,15 @@ export default function ProfilePage() {
                 <img
                   src={avatarUrl}
                   alt="Profile"
-                  className="w-24 h-24 rounded-full object-cover border-4 border-dark-border"
+                  className="w-24 h-24 rounded-full object-cover border-4 border-surface-border"
                 />
               ) : (
-                <div className="w-24 h-24 rounded-full bg-accent-green/10 flex items-center justify-center border-4 border-dark-border">
-                  <User className="w-12 h-12 text-accent-green" />
+                <div className="w-24 h-24 rounded-full bg-accent-ocean/10 flex items-center justify-center border-4 border-surface-border">
+                  <User className="w-12 h-12 text-accent-ocean" />
                 </div>
               )}
               <button
-                className="absolute bottom-0 right-0 w-8 h-8 bg-accent-green rounded-full flex items-center justify-center text-black hover:bg-primary-600 transition-colors shadow-lg"
+                className="absolute bottom-0 right-0 w-8 h-8 bg-accent-ocean rounded-full flex items-center justify-center text-black hover:bg-primary-600 transition-colors shadow-lg"
                 title="Change photo"
               >
                 <Camera className="w-4 h-4" />
@@ -213,7 +213,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Basic Info */}
-        <div className="bg-dark-card border border-dark-border rounded-2xl p-8 animate-slide-in" style={{ animationDelay: '50ms' }}>
+        <div className="bg-white border border-surface-border rounded-2xl p-8 animate-slide-in" style={{ animationDelay: '50ms' }}>
           <h2 className="text-xl font-bold text-text-primary mb-6">Basic Information</h2>
           <div className="space-y-4">
             <div>
@@ -238,7 +238,7 @@ export default function ProfilePage() {
               <input
                 type="email"
                 value={profile?.email || ''}
-                className="input bg-dark-hover cursor-not-allowed opacity-60"
+                className="input bg-surface-hover cursor-not-allowed opacity-60"
                 disabled
                 readOnly
               />
@@ -291,9 +291,9 @@ export default function ProfilePage() {
         </div>
 
         {/* Notification Preferences */}
-        <div className="bg-dark-card border border-dark-border rounded-2xl p-8 animate-slide-in" style={{ animationDelay: '100ms' }}>
+        <div className="bg-white border border-surface-border rounded-2xl p-8 animate-slide-in" style={{ animationDelay: '100ms' }}>
           <h2 className="text-xl font-bold text-text-primary mb-6 flex items-center gap-2">
-            <Bell className="w-6 h-6 text-accent-green" />
+            <Bell className="w-6 h-6 text-accent-ocean" />
             Notifications
           </h2>
           <div className="space-y-4">
@@ -305,10 +305,10 @@ export default function ProfilePage() {
                   ...notificationPreferences,
                   daily_checkin: e.target.checked
                 })}
-                className="mt-1 w-5 h-5 accent-accent-green rounded"
+                className="mt-1 w-5 h-5 accent-accent-ocean rounded"
               />
               <div className="flex-1">
-                <div className="font-semibold text-text-primary group-hover:text-accent-green transition-colors">
+                <div className="font-semibold text-text-primary group-hover:text-accent-ocean transition-colors">
                   Daily Check-in Reminders
                 </div>
                 <div className="text-sm text-text-secondary">
@@ -325,10 +325,10 @@ export default function ProfilePage() {
                   ...notificationPreferences,
                   gentle_reminders: e.target.checked
                 })}
-                className="mt-1 w-5 h-5 accent-accent-green rounded"
+                className="mt-1 w-5 h-5 accent-accent-ocean rounded"
               />
               <div className="flex-1">
-                <div className="font-semibold text-text-primary group-hover:text-accent-green transition-colors">
+                <div className="font-semibold text-text-primary group-hover:text-accent-ocean transition-colors">
                   Gentle Task Reminders
                 </div>
                 <div className="text-sm text-text-secondary">
@@ -340,9 +340,9 @@ export default function ProfilePage() {
         </div>
 
         {/* Feature Request */}
-        <div id="feature-request" className="bg-dark-card border border-dark-border rounded-2xl p-8 animate-slide-in" style={{ animationDelay: '150ms' }}>
+        <div id="feature-request" className="bg-white border border-surface-border rounded-2xl p-8 animate-slide-in" style={{ animationDelay: '150ms' }}>
           <h2 className="text-xl font-bold text-text-primary mb-6 flex items-center gap-2">
-            <Lightbulb className="w-6 h-6 text-accent-amber" />
+            <Lightbulb className="w-6 h-6 text-accent-sunset" />
             Request a Feature
           </h2>
           <p className="text-text-secondary mb-4">
@@ -350,7 +350,7 @@ export default function ProfilePage() {
           </p>
 
           {requestSubmitted && (
-            <div className="bg-accent-green/10 border border-accent-green/30 text-accent-green px-4 py-3 rounded-lg mb-4 flex items-center gap-2 animate-fade-in">
+            <div className="bg-accent-ocean/10 border border-accent-ocean/30 text-accent-ocean px-4 py-3 rounded-lg mb-4 flex items-center gap-2 animate-fade-in">
               <Send className="w-4 h-4" />
               <span>Thank you! Your feature request has been submitted.</span>
             </div>
@@ -370,7 +370,7 @@ export default function ProfilePage() {
             <button
               onClick={submitFeatureRequest}
               disabled={submittingRequest || !featureRequest.trim()}
-              className="px-4 py-2 bg-dark-hover border border-dark-border rounded-lg font-medium text-text-primary hover:border-accent-green/30 hover:text-accent-green transition-colors disabled:opacity-50 inline-flex items-center gap-2 text-sm mt-2"
+              className="px-4 py-2 bg-surface-hover border border-surface-border rounded-lg font-medium text-text-primary hover:border-accent-ocean/30 hover:text-accent-ocean transition-colors disabled:opacity-50 inline-flex items-center gap-2 text-sm mt-2"
             >
               {submittingRequest ? (
                 <>
@@ -436,7 +436,7 @@ export default function ProfilePage() {
       {/* Delete Account Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-dark-card border border-dark-border rounded-2xl p-8 max-w-md w-full shadow-2xl animate-slide-in">
+          <div className="bg-white border border-surface-border rounded-2xl p-8 max-w-md w-full shadow-2xl animate-slide-in">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-12 h-12 bg-red-950/50 rounded-full flex items-center justify-center">
                 <AlertTriangle className="w-6 h-6 text-red-500" />
@@ -474,7 +474,7 @@ export default function ProfilePage() {
                   setDeleteError('')
                 }}
                 disabled={deleting}
-                className="flex-1 px-4 py-3 bg-dark-hover border border-dark-border text-text-primary rounded-lg font-medium hover:bg-dark-bg transition-colors"
+                className="flex-1 px-4 py-3 bg-surface-hover border border-surface-border text-text-primary rounded-lg font-medium hover:page-gradient transition-colors"
               >
                 Cancel
               </button>

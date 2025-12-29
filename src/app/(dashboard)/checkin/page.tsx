@@ -198,8 +198,8 @@ export default function CheckinPage() {
     return (
       <div className="max-w-xl mx-auto">
         <div className="text-center mb-8 animate-fade-in">
-          <div className="w-16 h-16 bg-accent-green/10 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <Sparkles className="w-8 h-8 text-accent-green" />
+          <div className="w-16 h-16 bg-accent-ocean/10 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <Sparkles className="w-8 h-8 text-accent-ocean" />
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-2">How are you right now?</h1>
           <p className="text-lg text-text-secondary">Quick check-in to find your perfect tasks</p>
@@ -210,9 +210,9 @@ export default function CheckinPage() {
             <div
               key={i}
               className={clsx('h-2 flex-1 rounded-full transition-all duration-300',
-                i < currentQuestion ? 'bg-accent-green' :
-                i === currentQuestion ? 'bg-accent-green/60 scale-110' :
-                'bg-dark-border'
+                i < currentQuestion ? 'bg-accent-ocean' :
+                i === currentQuestion ? 'bg-accent-ocean/60 scale-110' :
+                'bg-surface-border'
               )}
             />
           ))}
@@ -236,8 +236,8 @@ export default function CheckinPage() {
                   onClick={() => handleResponse(value)}
                   className={clsx('flex-1 py-5 rounded-2xl text-xl font-bold transition-all duration-200 shadow-sm',
                     responses[question.id] === value
-                      ? 'bg-accent-green text-black scale-110 shadow-lg shadow-accent-green/20'
-                      : 'bg-dark-card text-text-secondary hover:bg-dark-hover hover:scale-105 hover:shadow-md'
+                      ? 'bg-accent-ocean text-black scale-110 shadow-lg shadow-accent-ocean/20'
+                      : 'bg-white text-text-secondary hover:bg-surface-hover hover:scale-105 hover:shadow-md'
                   )}
                 >
                   {value}
@@ -246,7 +246,7 @@ export default function CheckinPage() {
             </div>
           </div>
 
-          <div className="flex justify-between mt-10 pt-6 border-t border-dark-border">
+          <div className="flex justify-between mt-10 pt-6 border-t border-surface-border">
             <button
               onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
               disabled={currentQuestion === 0}
@@ -287,15 +287,15 @@ export default function CheckinPage() {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="text-center mb-6 animate-fade-in">
-        <div className="w-16 h-16 bg-gradient-to-br bg-accent-green/10 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-          <Check className="w-8 h-8 text-accent-green" />
+        <div className="w-16 h-16 bg-gradient-to-br bg-accent-ocean/10 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+          <Check className="w-8 h-8 text-accent-ocean" />
         </div>
         <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-2">Here's what matches your state</h1>
         <p className="text-lg text-text-secondary">The app chose these for you—no decisions needed.</p>
       </div>
 
       {/* Mental Model Explainer */}
-      <div className="bg-dark-card border border-dark-border rounded-lg p-4 mb-6">
+      <div className="bg-white border border-surface-border rounded-lg p-4 mb-6">
         <div className="flex gap-3">
           <div className="text-2xl flex-shrink-0">🧭</div>
           <div className="text-sm text-text-primary">
@@ -320,7 +320,7 @@ export default function CheckinPage() {
         </div>
         <button
           onClick={resetCheckin}
-          className="text-sm text-text-muted hover:text-text-secondary flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-dark-hover transition-colors font-medium"
+          className="text-sm text-text-muted hover:text-text-secondary flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-surface-hover transition-colors font-medium"
         >
           <RotateCcw className="w-4 h-4" /> Redo
         </button>
@@ -345,7 +345,7 @@ export default function CheckinPage() {
               >
                 {index === 0 && (
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="text-xs font-bold text-accent-green bg-primary-100 px-3 py-1 rounded-full uppercase tracking-wide">
+                    <div className="text-xs font-bold text-accent-ocean bg-primary-100 px-3 py-1 rounded-full uppercase tracking-wide">
                       ⭐ Top Match
                     </div>
                   </div>
@@ -356,7 +356,7 @@ export default function CheckinPage() {
                     <h3 className="font-bold text-text-primary text-xl mb-1">{task.title}</h3>
                     {task.goals && (
                       <p className="text-sm text-text-muted font-medium">
-                        <span className="text-accent-green">→</span> {task.goals.title}
+                        <span className="text-accent-ocean">→</span> {task.goals.title}
                       </p>
                     )}
                   </div>
@@ -371,10 +371,10 @@ export default function CheckinPage() {
                   <span className={`text-xs font-medium px-3 py-1.5 rounded-full ${energyConfig.color}`}>
                     {energyConfig.label}
                   </span>
-                  <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-dark-hover text-text-secondary">
+                  <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-surface-hover text-text-secondary">
                     {workTypeConfig.icon} {workTypeConfig.label}
                   </span>
-                  <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-dark-hover text-text-secondary">
+                  <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-surface-hover text-text-secondary">
                     ⏱️ {timeConfig.label}
                   </span>
                   <span className={`text-xs font-medium px-3 py-1.5 rounded-full ${priorityConfig.color}`}>
@@ -470,7 +470,7 @@ export default function CheckinPage() {
 
           <div className="grid md:grid-cols-2 gap-4">
             {/* Pomodoro Suggestion */}
-            <div className="bg-dark-card rounded-lg p-4 border border-indigo-100">
+            <div className="bg-white rounded-lg p-4 border border-indigo-100">
               <div className="flex items-center gap-2 mb-2">
                 <Clock className="w-4 h-4 text-indigo-600" />
                 <h4 className="font-medium text-text-primary">Pomodoro Technique</h4>
@@ -491,7 +491,7 @@ export default function CheckinPage() {
             </div>
 
             {/* Time Blocking Suggestion */}
-            <div className="bg-dark-card rounded-lg p-4 border border-indigo-100">
+            <div className="bg-white rounded-lg p-4 border border-indigo-100">
               <div className="flex items-center gap-2 mb-2">
                 <Calendar className="w-4 h-4 text-indigo-600" />
                 <h4 className="font-medium text-text-primary">Time Blocking</h4>

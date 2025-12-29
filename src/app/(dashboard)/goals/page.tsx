@@ -227,12 +227,12 @@ export default function GoalsPage() {
       {/* Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-dark-card rounded-2xl max-w-lg w-full p-8 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl max-w-lg w-full p-8 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-text-primary">{editingGoal ? 'Edit Goal' : 'Add New Goal'}</h2>
               <button
                 onClick={resetForm}
-                className="text-text-muted hover:text-text-secondary p-2 hover:bg-dark-hover rounded-lg transition-colors"
+                className="text-text-muted hover:text-text-secondary p-2 hover:bg-surface-hover rounded-lg transition-colors"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -263,7 +263,7 @@ export default function GoalsPage() {
                         onClick={() => setCategory(cat)}
                         className={clsx(
                           'p-3 rounded-lg border text-center transition-all',
-                          category === cat ? `${config.color} border-current` : 'border-dark-border hover:border-dark-border'
+                          category === cat ? `${config.color} border-current` : 'border-surface-border hover:border-surface-border'
                         )}
                       >
                         <span className="text-xl">{config.icon}</span>
@@ -334,7 +334,7 @@ export default function GoalsPage() {
       {/* Task Suggestions Modal */}
       {showTaskSuggestions && suggestedTasks.length > 0 && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-dark-card rounded-2xl max-w-2xl w-full p-8 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-8 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-primary-50 rounded-xl flex items-center justify-center">
@@ -351,7 +351,7 @@ export default function GoalsPage() {
                   setNewGoalId(null)
                   setSuggestedTasks([])
                 }}
-                className="text-text-muted hover:text-text-secondary p-2 hover:bg-dark-hover rounded-lg transition-colors"
+                className="text-text-muted hover:text-text-secondary p-2 hover:bg-surface-hover rounded-lg transition-colors"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -456,7 +456,7 @@ export default function GoalsPage() {
                 <div className="p-6 flex items-center gap-5 group">
                   <button
                     onClick={() => toggleGoalExpansion(goal.id)}
-                    className="flex-shrink-0 p-2 hover:bg-dark-hover rounded-lg transition-colors"
+                    className="flex-shrink-0 p-2 hover:bg-surface-hover rounded-lg transition-colors"
                     title={isExpanded ? "Collapse tasks" : "Expand to see tasks"}
                   >
                     {isExpanded ? (
@@ -485,7 +485,7 @@ export default function GoalsPage() {
                         </span>
                       )}
                       {tasks.length > 0 && (
-                        <span className="text-xs bg-dark-hover text-text-secondary px-3 py-1 rounded-full font-medium">
+                        <span className="text-xs bg-surface-hover text-text-secondary px-3 py-1 rounded-full font-medium">
                           {activeTasks.length} active / {completedTasks.length} done
                         </span>
                       )}
@@ -505,15 +505,15 @@ export default function GoalsPage() {
                   <div className="relative">
                     <button
                       onClick={() => setMenuOpen(menuOpen === goal.id ? null : goal.id)}
-                      className="p-2 text-text-muted hover:text-text-secondary rounded-lg hover:bg-dark-hover transition-colors"
+                      className="p-2 text-text-muted hover:text-text-secondary rounded-lg hover:bg-surface-hover transition-colors"
                     >
                       <MoreVertical className="w-6 h-6" />
                     </button>
                     {menuOpen === goal.id && (
-                      <div className="absolute right-0 top-full mt-2 bg-dark-card border border-dark-border rounded-xl shadow-xl py-1 z-10 w-36 animate-scale-in">
+                      <div className="absolute right-0 top-full mt-2 bg-white border border-surface-border rounded-xl shadow-xl py-1 z-10 w-36 animate-scale-in">
                         <button
                           onClick={() => openEditForm(goal)}
-                          className="w-full px-4 py-2.5 text-left text-sm font-medium text-text-secondary hover:bg-dark-hover flex items-center gap-2 transition-colors"
+                          className="w-full px-4 py-2.5 text-left text-sm font-medium text-text-secondary hover:bg-surface-hover flex items-center gap-2 transition-colors"
                         >
                           <Edit2 className="w-4 h-4" /> Edit
                         </button>
@@ -554,8 +554,8 @@ export default function GoalsPage() {
                               Active ({activeTasks.length})
                             </h5>
                             {activeTasks.map(task => (
-                              <div key={task.id} className="bg-dark-card rounded-lg p-3 mb-2 flex items-start gap-3">
-                                <div className="w-5 h-5 rounded-full border-2 border-dark-border flex-shrink-0 mt-0.5" />
+                              <div key={task.id} className="bg-white rounded-lg p-3 mb-2 flex items-start gap-3">
+                                <div className="w-5 h-5 rounded-full border-2 border-surface-border flex-shrink-0 mt-0.5" />
                                 <div className="flex-1 min-w-0">
                                   <p className="font-medium text-text-primary text-sm">{task.title}</p>
                                   <div className="flex items-center gap-2 mt-1 flex-wrap">
@@ -579,7 +579,7 @@ export default function GoalsPage() {
                               Completed ({completedTasks.length})
                             </h5>
                             {completedTasks.slice(0, 3).map(task => (
-                              <div key={task.id} className="bg-dark-card rounded-lg p-3 mb-2 flex items-start gap-3 opacity-60">
+                              <div key={task.id} className="bg-white rounded-lg p-3 mb-2 flex items-start gap-3 opacity-60">
                                 <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                                   <Check className="w-3 h-3 text-green-600" />
                                 </div>

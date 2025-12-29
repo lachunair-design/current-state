@@ -86,7 +86,7 @@ export default async function DashboardPage() {
         <h1 className="text-2xl font-bold font-accent text-text-primary mb-1">
           Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'}, {firstName}
         </h1>
-        <p className="text-base text-accent-green font-semibold flex items-center gap-2">
+        <p className="text-base text-accent-ocean font-semibold flex items-center gap-2">
           <span className="text-xl">{energyDisplay.emoji}</span>
           {energyDisplay.message}
         </p>
@@ -95,11 +95,11 @@ export default async function DashboardPage() {
       {/* Energy State Card - Compact */}
       <Link
         href="/checkin"
-        className="block mb-6 rounded-xl bg-dark-card border border-dark-border p-4 hover:bg-dark-hover hover:shadow-lg transition-all group"
+        className="block mb-6 rounded-xl bg-white border border-surface-border p-4 hover:bg-surface-hover hover:shadow-lg transition-all group"
       >
         <div className="flex items-center justify-between">
           <div>
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-accent-green text-black text-xs font-bold uppercase tracking-wider mb-2">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-accent-ocean text-black text-xs font-bold uppercase tracking-wider mb-2">
               {hasCheckedInToday ? 'Checked In' : 'Not Yet'}
             </span>
             <h2 className="text-lg font-bold font-accent text-text-primary leading-tight">
@@ -125,15 +125,15 @@ export default async function DashboardPage() {
       {/* Simple Stats - No Pressure */}
       <div className="mb-6">
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-dark-card border border-dark-border rounded-lg p-3 text-center">
+          <div className="bg-white border border-surface-border rounded-lg p-3 text-center">
             <div className="text-2xl font-bold text-text-primary">{completedThisWeek || 0}</div>
             <div className="text-xs text-text-secondary font-medium mt-0.5">Done This Week</div>
           </div>
-          <div className="bg-dark-card border border-dark-border rounded-lg p-3 text-center">
+          <div className="bg-white border border-surface-border rounded-lg p-3 text-center">
             <div className="text-2xl font-bold text-text-primary">{tasks?.length || 0}</div>
             <div className="text-xs text-text-secondary font-medium mt-0.5">In Parking Lot</div>
           </div>
-          <div className="bg-dark-card border border-dark-border rounded-lg p-3 text-center">
+          <div className="bg-white border border-surface-border rounded-lg p-3 text-center">
             <div className="text-2xl font-bold text-text-primary">{goals?.length || 0}</div>
             <div className="text-xs text-text-secondary font-medium mt-0.5">Goals Active</div>
           </div>
@@ -145,7 +145,7 @@ export default async function DashboardPage() {
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-base font-bold font-accent text-text-primary">Up Next</h3>
-            <Link href="/tasks" className="text-sm font-medium text-accent-green hover:text-primary-500">
+            <Link href="/tasks" className="text-sm font-medium text-accent-ocean hover:text-primary-500">
               See All
             </Link>
           </div>
@@ -153,7 +153,7 @@ export default async function DashboardPage() {
             {tasks.slice(1, 4).map((task) => (
               <div
                 key={task.id}
-                className="bg-dark-card hover:bg-dark-hover border border-dark-border rounded-lg p-3 transition-colors"
+                className="bg-white hover:bg-surface-hover border border-surface-border rounded-lg p-3 transition-colors"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
@@ -179,7 +179,7 @@ export default async function DashboardPage() {
 
       {/* Empty State */}
       {(!tasks || tasks.length === 0) && (
-        <div className="bg-dark-card border border-dark-border rounded-xl p-8 text-center">
+        <div className="bg-white border border-surface-border rounded-xl p-8 text-center">
           <div className="text-5xl mb-3">😊</div>
           <h3 className="font-bold font-accent text-text-primary mb-2">No tasks yet?</h3>
           <p className="text-text-secondary mb-4 text-sm">

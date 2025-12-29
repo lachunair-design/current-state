@@ -3,11 +3,11 @@ import { ArrowLeft } from 'lucide-react'
 
 export default function TermsOfServicePage() {
   return (
-    <div className="min-h-screen bg-dark-bg text-text-primary">
+    <div className="min-h-screen bg-gradient-to-b from-sunset-50 via-bg-primary to-ocean-50 text-text-primary">
       <div className="max-w-4xl mx-auto px-4 py-12">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-accent-green hover:text-primary-600 mb-8 transition-colors"
+          className="inline-flex items-center gap-2 text-accent-ocean hover:text-primary-600 mb-8 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Home
@@ -142,7 +142,7 @@ export default function TermsOfServicePage() {
             <h2 className="text-2xl font-bold text-text-primary mb-3">Data and Privacy</h2>
             <p>
               Your use of the Service is also governed by our Privacy Policy. Please review our
-              <Link href="/privacy" className="text-accent-green hover:underline mx-1">Privacy Policy</Link>
+              <Link href="/privacy" className="text-accent-ocean hover:underline mx-1">Privacy Policy</Link>
               to understand our data practices.
             </p>
           </section>
@@ -208,11 +208,11 @@ export default function TermsOfServicePage() {
               If you have questions about these Terms, please contact us at:
             </p>
             <p className="mt-2">
-              <strong>Email:</strong> <a href="mailto:legal@currentstate.app" className="text-accent-green hover:underline">legal@currentstate.app</a>
+              <strong>Email:</strong> <a href="mailto:legal@currentstate.app" className="text-accent-ocean hover:underline">legal@currentstate.app</a>
             </p>
           </section>
 
-          <section className="border-t border-dark-border pt-6 mt-8">
+          <section className="border-t border-surface-border pt-6 mt-8">
             <p className="text-sm text-text-muted">
               By using Current State, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.
             </p>

@@ -4,7 +4,7 @@ export default function LegalLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen bg-dark-bg text-text-primary">
+    <div className="min-h-screen bg-gradient-to-b from-sunset-50 via-bg-primary to-ocean-50 text-text-primary">
       {children}
     </div>
   )

@@ -397,14 +397,14 @@ export default function HabitsPage() {
       {/* Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-dark-card rounded-2xl max-w-2xl w-full p-8 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-8 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-text-primary">
                 {editingHabit ? 'Edit Habit' : 'Add New Habit'}
               </h2>
               <button
                 onClick={resetForm}
-                className="text-text-muted hover:text-text-secondary p-2 hover:bg-dark-hover rounded-lg transition-colors"
+                className="text-text-muted hover:text-text-secondary p-2 hover:bg-surface-hover rounded-lg transition-colors"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -426,7 +426,7 @@ export default function HabitsPage() {
                           'p-4 rounded-xl border-2 text-center transition-all',
                           habitType === type
                             ? `${config.color} border-current shadow-md scale-105`
-                            : 'border-dark-border hover:border-dark-border hover:shadow-sm'
+                            : 'border-surface-border hover:border-surface-border hover:shadow-sm'
                         )}
                       >
                         <span className="text-3xl block mb-2">{config.icon}</span>
@@ -519,7 +519,7 @@ export default function HabitsPage() {
                           'p-3 rounded-lg border text-center transition-all text-sm',
                           bestTimeOfDay === time
                             ? 'bg-primary-100 text-primary-800 border-primary-300 font-semibold'
-                            : 'border-dark-border hover:border-dark-border'
+                            : 'border-surface-border hover:border-surface-border'
                         )}
                       >
                         <div className="text-lg mb-1">{config.icon}</div>
@@ -577,7 +577,7 @@ export default function HabitsPage() {
                           {linkedGoal && (
                             <>
                               <span className="text-gray-300">•</span>
-                              <span className="text-xs bg-dark-hover text-text-secondary px-2 py-0.5 rounded-full">
+                              <span className="text-xs bg-surface-hover text-text-secondary px-2 py-0.5 rounded-full">
                                 🎯 {linkedGoal.title}
                               </span>
                             </>
@@ -686,15 +686,15 @@ export default function HabitsPage() {
                   <div className="relative">
                     <button
                       onClick={() => setMenuOpen(menuOpen === habit.id ? null : habit.id)}
-                      className="p-2 text-text-muted hover:text-text-secondary rounded-lg hover:bg-dark-hover transition-colors"
+                      className="p-2 text-text-muted hover:text-text-secondary rounded-lg hover:bg-surface-hover transition-colors"
                     >
                       <MoreVertical className="w-6 h-6" />
                     </button>
                     {menuOpen === habit.id && (
-                      <div className="absolute right-0 top-full mt-2 bg-dark-card border border-dark-border rounded-xl shadow-xl py-1 z-10 w-36 animate-scale-in">
+                      <div className="absolute right-0 top-full mt-2 bg-white border border-surface-border rounded-xl shadow-xl py-1 z-10 w-36 animate-scale-in">
                         <button
                           onClick={() => openEditForm(habit)}
-                          className="w-full px-4 py-2.5 text-left text-sm font-medium text-text-secondary hover:bg-dark-hover flex items-center gap-2 transition-colors"
+                          className="w-full px-4 py-2.5 text-left text-sm font-medium text-text-secondary hover:bg-surface-hover flex items-center gap-2 transition-colors"
                         >
                           <Edit2 className="w-4 h-4" /> Edit
                         </button>

@@ -68,12 +68,12 @@ export function FeedbackCard() {
   if (!isVisible) return null
 
   return (
-    <div className="mb-6 bg-gradient-to-br from-accent-green/10 to-transparent border border-accent-green/30 rounded-2xl p-6 animate-fade-in">
+    <div className="mb-6 bg-gradient-to-br from-ocean-100 to-sunset-50 border-2 border-ocean-300 rounded-2xl p-6 animate-fade-in shadow-md">
       {!hasResponded ? (
         <>
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-accent-green" />
+              <MessageSquare className="w-5 h-5 text-ocean-600" />
               <h3 className="font-semibold text-text-primary">Quick feedback</h3>
             </div>
             <button
@@ -94,11 +94,11 @@ export function FeedbackCard() {
               <button
                 key={option.value}
                 onClick={() => handleResponse(option.value)}
-                className="w-full text-left px-4 py-3 bg-dark-card border border-dark-border rounded-lg hover:border-accent-green/30 hover:bg-dark-hover transition-all group"
+                className="w-full text-left px-4 py-3 bg-white border-2 border-surface-border rounded-lg hover:border-ocean-400 hover:shadow-md transition-all group"
               >
                 <span className="flex items-center gap-2">
                   <span className="text-lg">{option.emoji}</span>
-                  <span className="text-sm text-text-primary group-hover:text-accent-green transition-colors">
+                  <span className="text-sm text-text-primary group-hover:text-ocean-600 transition-colors">
                     {option.label}
                   </span>
                 </span>
@@ -112,7 +112,7 @@ export function FeedbackCard() {
         </>
       ) : (
         <div className="text-center py-2 animate-fade-in">
-          <div className="inline-flex items-center gap-2 text-accent-green">
+          <div className="inline-flex items-center gap-2 text-ocean-600">
             <ThumbsUp className="w-5 h-5" />
             <span className="font-semibold">Thank you for your feedback!</span>
           </div>

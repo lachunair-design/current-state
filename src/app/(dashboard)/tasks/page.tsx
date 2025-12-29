@@ -201,7 +201,7 @@ export default function TasksPage() {
       </div>
 
       {/* Mental Model Explainer */}
-      <div className="bg-dark-card border border-dark-border rounded-lg p-4 mb-6">
+      <div className="bg-white border border-surface-border rounded-lg p-4 mb-6">
         <div className="flex gap-3">
           <div className="text-2xl flex-shrink-0">💡</div>
           <div className="text-sm text-text-primary">
@@ -224,7 +224,7 @@ export default function TasksPage() {
               <button
                 onClick={() => setFilter('active')}
                 className={clsx('px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex-1',
-                  filter === 'active' ? 'bg-accent-green/10 text-accent-green' : 'text-text-secondary hover:bg-dark-hover'
+                  filter === 'active' ? 'bg-accent-ocean/10 text-accent-ocean' : 'text-text-secondary hover:bg-surface-hover'
                 )}
               >
                 Active
@@ -232,7 +232,7 @@ export default function TasksPage() {
               <button
                 onClick={() => setFilter('completed')}
                 className={clsx('px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex-1',
-                  filter === 'completed' ? 'bg-accent-green/10 text-accent-green' : 'text-text-secondary hover:bg-dark-hover'
+                  filter === 'completed' ? 'bg-accent-ocean/10 text-accent-ocean' : 'text-text-secondary hover:bg-surface-hover'
                 )}
               >
                 Completed
@@ -240,7 +240,7 @@ export default function TasksPage() {
               <button
                 onClick={() => setFilter('all')}
                 className={clsx('px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex-1',
-                  filter === 'all' ? 'bg-accent-green/10 text-accent-green' : 'text-text-secondary hover:bg-dark-hover'
+                  filter === 'all' ? 'bg-accent-ocean/10 text-accent-ocean' : 'text-text-secondary hover:bg-surface-hover'
                 )}
               >
                 All
@@ -270,7 +270,7 @@ export default function TasksPage() {
       {/* Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-dark-card rounded-xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold text-text-primary">{editingTask ? 'Edit Task' : 'Add New Task'}</h2>
               <button onClick={resetForm} className="text-text-muted hover:text-text-primary">
@@ -298,13 +298,13 @@ export default function TasksPage() {
               <button
                 type="button"
                 onClick={() => setShowAdvanced(!showAdvanced)}
-                className="text-sm text-accent-green hover:text-primary-500 font-medium flex items-center gap-1"
+                className="text-sm text-accent-ocean hover:text-primary-500 font-medium flex items-center gap-1"
               >
                 {showAdvanced ? '▼' : '▶'} More details (optional)
               </button>
 
               {showAdvanced && (
-                <div className="space-y-4 pl-4 border-l-2 border-dark-border">
+                <div className="space-y-4 pl-4 border-l-2 border-surface-border">
                   <div>
                     <label className="label">Linked goal (optional)</label>
                     <select value={goalId} onChange={e => setGoalId(e.target.value)} className="input">
@@ -321,7 +321,7 @@ export default function TasksPage() {
                       {(Object.keys(ENERGY_LEVEL_CONFIG) as EnergyLevel[]).map(e => (
                         <button key={e} type="button" onClick={() => setEnergy(e)}
                           className={clsx('p-2 rounded-lg border text-sm transition-all',
-                            energy === e ? `${ENERGY_LEVEL_CONFIG[e].color} border-current` : 'border-dark-border hover:border-dark-hover text-text-secondary'
+                            energy === e ? `${ENERGY_LEVEL_CONFIG[e].color} border-current` : 'border-surface-border hover:border-surface-hover text-text-secondary'
                           )}>
                           {ENERGY_LEVEL_CONFIG[e].label}
                         </button>
@@ -335,7 +335,7 @@ export default function TasksPage() {
                       {(Object.keys(WORK_TYPE_CONFIG) as WorkType[]).map(w => (
                         <button key={w} type="button" onClick={() => setWorkType(w)}
                           className={clsx('p-2 rounded-lg border text-sm transition-all',
-                            workType === w ? 'bg-accent-green/10 text-accent-green border-accent-green' : 'border-dark-border hover:border-dark-hover text-text-secondary'
+                            workType === w ? 'bg-accent-ocean/10 text-accent-ocean border-accent-ocean' : 'border-surface-border hover:border-surface-hover text-text-secondary'
                           )}>
                           {WORK_TYPE_CONFIG[w].icon} {WORK_TYPE_CONFIG[w].label}
                         </button>
@@ -349,7 +349,7 @@ export default function TasksPage() {
                       {(Object.keys(TIME_ESTIMATE_CONFIG) as TimeEstimate[]).map(t => (
                         <button key={t} type="button" onClick={() => setTimeEstimate(t)}
                           className={clsx('p-2 rounded-lg border text-xs transition-all',
-                            timeEstimate === t ? 'bg-accent-green/10 text-accent-green border-accent-green' : 'border-dark-border hover:border-dark-hover text-text-secondary'
+                            timeEstimate === t ? 'bg-accent-ocean/10 text-accent-ocean border-accent-ocean' : 'border-surface-border hover:border-surface-hover text-text-secondary'
                           )}>
                           {TIME_ESTIMATE_CONFIG[t].label}
                         </button>
@@ -391,13 +391,13 @@ export default function TasksPage() {
                   {filter === 'active' ? (
                     <button
                       onClick={() => completeTask(task.id)}
-                      className="w-6 h-6 rounded-full border-2 border-dark-border hover:border-accent-green hover:bg-accent-green/10 flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors"
+                      className="w-6 h-6 rounded-full border-2 border-surface-border hover:border-accent-ocean hover:bg-accent-ocean/10 flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors"
                     >
-                      <Check className="w-3 h-3 text-transparent group-hover:text-accent-green" />
+                      <Check className="w-3 h-3 text-transparent group-hover:text-accent-ocean" />
                     </button>
                   ) : (
-                    <div className="w-6 h-6 rounded-full bg-accent-green/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Check className="w-3 h-3 text-accent-green" />
+                    <div className="w-6 h-6 rounded-full bg-accent-ocean/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-3 h-3 text-accent-ocean" />
                     </div>
                   )}
 
@@ -412,36 +412,36 @@ export default function TasksPage() {
                     )}
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       <span className={`text-xs px-2 py-0.5 rounded-full ${energyConfig.color}`}>{energyConfig.label}</span>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-dark-hover text-text-secondary">{workConfig.icon} {workConfig.label}</span>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-dark-hover text-text-secondary">⏱️ {timeConfig.label}</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-surface-hover text-text-secondary">{workConfig.icon} {workConfig.label}</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-surface-hover text-text-secondary">⏱️ {timeConfig.label}</span>
                       <span className={`text-xs px-2 py-0.5 rounded-full ${priorityConfig.color}`}>{priorityConfig.label}</span>
                       {task.estimated_value && (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-accent-green/20 text-accent-green">${task.estimated_value}</span>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-accent-ocean/20 text-accent-ocean">${task.estimated_value}</span>
                       )}
                     </div>
                   </div>
 
                   <div className="relative">
                     <button onClick={() => setMenuOpen(menuOpen === task.id ? null : task.id)}
-                      className="p-2 text-text-muted hover:text-text-primary rounded-lg hover:bg-dark-hover">
+                      className="p-2 text-text-muted hover:text-text-primary rounded-lg hover:bg-surface-hover">
                       <MoreVertical className="w-5 h-5" />
                     </button>
                     {menuOpen === task.id && (
-                      <div className="absolute right-0 top-full mt-1 bg-dark-card border border-dark-border rounded-lg shadow-lg py-1 z-10 w-36">
+                      <div className="absolute right-0 top-full mt-1 bg-white border border-surface-border rounded-lg shadow-lg py-1 z-10 w-36">
                         {task.status === 'active' ? (
                           <>
                             <button onClick={() => openEditForm(task)}
-                              className="w-full px-4 py-2 text-left text-sm text-text-primary hover:bg-dark-hover flex items-center gap-2">
+                              className="w-full px-4 py-2 text-left text-sm text-text-primary hover:bg-surface-hover flex items-center gap-2">
                               <Edit2 className="w-4 h-4" /> Edit
                             </button>
                             <button onClick={() => completeTask(task.id)}
-                              className="w-full px-4 py-2 text-left text-sm text-text-primary hover:bg-dark-hover flex items-center gap-2">
+                              className="w-full px-4 py-2 text-left text-sm text-text-primary hover:bg-surface-hover flex items-center gap-2">
                               <Check className="w-4 h-4" /> Complete
                             </button>
                           </>
                         ) : (
                           <button onClick={() => restoreTask(task.id)}
-                            className="w-full px-4 py-2 text-left text-sm text-accent-green hover:bg-accent-green/10 flex items-center gap-2">
+                            className="w-full px-4 py-2 text-left text-sm text-accent-ocean hover:bg-accent-ocean/10 flex items-center gap-2">
                             <RotateCcw className="w-4 h-4" /> Restore
                           </button>
                         )}

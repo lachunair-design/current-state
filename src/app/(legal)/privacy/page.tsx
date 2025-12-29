@@ -3,11 +3,11 @@ import { ArrowLeft } from 'lucide-react'
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="min-h-screen bg-dark-bg text-text-primary">
+    <div className="min-h-screen bg-gradient-to-b from-sunset-50 via-bg-primary to-ocean-50 text-text-primary">
       <div className="max-w-4xl mx-auto px-4 py-12">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-accent-green hover:text-primary-600 mb-8 transition-colors"
+          className="inline-flex items-center gap-2 text-accent-ocean hover:text-primary-600 mb-8 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Home
@@ -153,11 +153,11 @@ export default function PrivacyPolicyPage() {
               If you have questions or concerns about this Privacy Policy or our data practices, please contact us at:
             </p>
             <p className="mt-2">
-              <strong>Email:</strong> <a href="mailto:privacy@currentstate.app" className="text-accent-green hover:underline">privacy@currentstate.app</a>
+              <strong>Email:</strong> <a href="mailto:privacy@currentstate.app" className="text-accent-ocean hover:underline">privacy@currentstate.app</a>
             </p>
           </section>
 
-          <section className="border-t border-dark-border pt-6 mt-8">
+          <section className="border-t border-surface-border pt-6 mt-8">
             <p className="text-sm text-text-muted">
               This privacy policy is effective as of the date stated above and applies to all users of Current State.
             </p>
