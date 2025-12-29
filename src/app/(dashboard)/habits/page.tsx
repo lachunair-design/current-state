@@ -626,73 +626,64 @@ export default function HabitsPage() {
                       </div>
                     )}
 
-                    {/* Habit Stats - Neuroscience-Optimized */}
+                    {/* Habit Stats - Compact Neuroscience-Optimized */}
                     {habitStats[habit.id] && (
-                      <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100 rounded-xl p-4 mb-4">
-                        {/* Current Streak - PROMINENT (Loss Aversion) */}
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex items-center gap-2">
-                            <span className="text-3xl">🔥</span>
+                      <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100 rounded-lg p-3 mb-3">
+                        {/* Top Row: Streak + Total + Last 7 Days */}
+                        <div className="flex items-center gap-3 mb-2">
+                          {/* Streak */}
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-2xl">🔥</span>
                             <div>
-                              <div className="flex items-baseline gap-1">
-                                <span className="text-2xl font-bold text-orange-600">
+                              <div className="flex items-baseline gap-0.5">
+                                <span className="text-xl font-bold text-orange-600">
                                   {habitStats[habit.id].currentStreak}
                                 </span>
-                                <span className="text-sm text-gray-600 font-medium">day streak</span>
+                                <span className="text-xs text-gray-600 font-medium">day</span>
                               </div>
-                              {habitStats[habit.id].bestStreak > habitStats[habit.id].currentStreak && (
-                                <span className="text-xs text-gray-500">
-                                  Best: {habitStats[habit.id].bestStreak} days
-                                </span>
-                              )}
                             </div>
                           </div>
-                          <div className="text-right">
-                            <div className="text-xs text-gray-500 mb-1">Total</div>
-                            <div className="text-lg font-bold text-gray-700">
-                              {habitStats[habit.id].totalCompletions}
-                            </div>
-                          </div>
-                        </div>
 
-                        {/* Last 7 Days - Visual Pattern Recognition */}
-                        <div className="mb-3">
-                          <div className="text-xs text-gray-600 mb-2 font-medium">Last 7 days</div>
-                          <div className="flex gap-1">
+                          {/* 7-Day Calendar - Compact */}
+                          <div className="flex gap-0.5 flex-1">
                             {habitStats[habit.id].last7Days.map((completed, i) => (
                               <div
                                 key={i}
                                 className={clsx(
-                                  'flex-1 h-8 rounded-md transition-all',
-                                  completed
-                                    ? 'bg-green-500 shadow-sm'
-                                    : 'bg-gray-200'
+                                  'flex-1 h-6 rounded transition-all',
+                                  completed ? 'bg-green-500' : 'bg-gray-200'
                                 )}
                                 title={`${7 - i} days ago${completed ? ' - completed' : ' - missed'}`}
                               />
                             ))}
                           </div>
+
+                          {/* Total */}
+                          <div className="text-right">
+                            <div className="text-xs text-gray-500">Total</div>
+                            <div className="text-sm font-bold text-gray-700">
+                              {habitStats[habit.id].totalCompletions}
+                            </div>
+                          </div>
                         </div>
 
-                        {/* Weekly Completion Rate + Last Completed */}
-                        <div className="flex items-center justify-between text-xs">
-                          <div className="flex items-center gap-2">
-                            <div className="font-semibold text-blue-700">
-                              {habitStats[habit.id].weeklyRate}% this week
-                            </div>
+                        {/* Bottom Row: Weekly % + Last Completed */}
+                        <div className="flex items-center justify-between text-xs text-gray-600">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-semibold text-blue-700">
+                              {habitStats[habit.id].weeklyRate}%
+                            </span>
                             {habitStats[habit.id].weeklyRate >= 80 && (
                               <span className="text-green-600">💪</span>
                             )}
                           </div>
                           {habitStats[habit.id].lastCompleted && (
-                            <div className="text-gray-500">
+                            <span className="text-gray-500">
                               Last: {new Date(habitStats[habit.id].lastCompleted!).toLocaleDateString('en-US', {
                                 month: 'short',
                                 day: 'numeric',
-                                hour: 'numeric',
-                                minute: '2-digit',
                               })}
-                            </div>
+                            </span>
                           )}
                         </div>
                       </div>
