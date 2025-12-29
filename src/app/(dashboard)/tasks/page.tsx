@@ -192,8 +192,8 @@ export default function TasksPage() {
     <div className="max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Steps</h1>
-          <p className="text-gray-600 mt-1">Your task parking lot—not a to-do list</p>
+          <h1 className="text-2xl font-bold font-accent text-text-primary">Steps</h1>
+          <p className="text-text-secondary mt-1">Your task parking lot—not a to-do list</p>
         </div>
         <button onClick={() => setShowForm(true)} className="btn-primary inline-flex items-center gap-2">
           <Plus className="w-4 h-4" /> Add Task
@@ -201,13 +201,13 @@ export default function TasksPage() {
       </div>
 
       {/* Mental Model Explainer */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+      <div className="bg-dark-card border border-dark-border rounded-lg p-4 mb-6">
         <div className="flex gap-3">
           <div className="text-2xl flex-shrink-0">💡</div>
-          <div className="text-sm text-blue-900">
+          <div className="text-sm text-text-primary">
             <p className="font-semibold mb-1">How to use this page:</p>
             <p className="mb-2">This is your <strong>parking lot</strong>—dump tasks here without overthinking. The app will recommend what to work on based on your energy during check-ins.</p>
-            <p className="text-xs text-blue-700">
+            <p className="text-xs text-text-secondary">
               ✨ <strong>Use Energy Check-In</strong> to let the app guide you → <strong>Use this page</strong> to capture tasks manually
             </p>
           </div>
@@ -224,7 +224,7 @@ export default function TasksPage() {
               <button
                 onClick={() => setFilter('active')}
                 className={clsx('px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex-1',
-                  filter === 'active' ? 'bg-primary-100 text-primary-700' : 'text-gray-600 hover:bg-gray-100'
+                  filter === 'active' ? 'bg-accent-green/10 text-accent-green' : 'text-text-secondary hover:bg-dark-hover'
                 )}
               >
                 Active
@@ -232,7 +232,7 @@ export default function TasksPage() {
               <button
                 onClick={() => setFilter('completed')}
                 className={clsx('px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex-1',
-                  filter === 'completed' ? 'bg-primary-100 text-primary-700' : 'text-gray-600 hover:bg-gray-100'
+                  filter === 'completed' ? 'bg-accent-green/10 text-accent-green' : 'text-text-secondary hover:bg-dark-hover'
                 )}
               >
                 Completed
@@ -240,7 +240,7 @@ export default function TasksPage() {
               <button
                 onClick={() => setFilter('all')}
                 className={clsx('px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex-1',
-                  filter === 'all' ? 'bg-primary-100 text-primary-700' : 'text-gray-600 hover:bg-gray-100'
+                  filter === 'all' ? 'bg-accent-green/10 text-accent-green' : 'text-text-secondary hover:bg-dark-hover'
                 )}
               >
                 All
@@ -270,10 +270,10 @@ export default function TasksPage() {
       {/* Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
+          <div className="bg-dark-card rounded-xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold">{editingTask ? 'Edit Task' : 'Add New Task'}</h2>
-              <button onClick={resetForm} className="text-gray-400 hover:text-gray-600">
+              <h2 className="text-xl font-semibold text-text-primary">{editingTask ? 'Edit Task' : 'Add New Task'}</h2>
+              <button onClick={resetForm} className="text-text-muted hover:text-text-primary">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -291,20 +291,20 @@ export default function TasksPage() {
                   autoFocus
                 />
                 {title && <TaskVsHabitGuide title={title} />}
-                <p className="text-xs text-gray-500 mt-1">💡 Don't overthink it. Add details later if needed.</p>
+                <p className="text-xs text-text-muted mt-1">💡 Don't overthink it. Add details later if needed.</p>
               </div>
 
               {/* Expandable details */}
               <button
                 type="button"
                 onClick={() => setShowAdvanced(!showAdvanced)}
-                className="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1"
+                className="text-sm text-accent-green hover:text-primary-500 font-medium flex items-center gap-1"
               >
                 {showAdvanced ? '▼' : '▶'} More details (optional)
               </button>
 
               {showAdvanced && (
-                <div className="space-y-4 pl-4 border-l-2 border-gray-200">
+                <div className="space-y-4 pl-4 border-l-2 border-dark-border">
                   <div>
                     <label className="label">Linked goal (optional)</label>
                     <select value={goalId} onChange={e => setGoalId(e.target.value)} className="input">
@@ -321,7 +321,7 @@ export default function TasksPage() {
                       {(Object.keys(ENERGY_LEVEL_CONFIG) as EnergyLevel[]).map(e => (
                         <button key={e} type="button" onClick={() => setEnergy(e)}
                           className={clsx('p-2 rounded-lg border text-sm transition-all',
-                            energy === e ? `${ENERGY_LEVEL_CONFIG[e].color} border-current` : 'border-gray-200 hover:border-gray-300'
+                            energy === e ? `${ENERGY_LEVEL_CONFIG[e].color} border-current` : 'border-dark-border hover:border-dark-hover text-text-secondary'
                           )}>
                           {ENERGY_LEVEL_CONFIG[e].label}
                         </button>
@@ -335,7 +335,7 @@ export default function TasksPage() {
                       {(Object.keys(WORK_TYPE_CONFIG) as WorkType[]).map(w => (
                         <button key={w} type="button" onClick={() => setWorkType(w)}
                           className={clsx('p-2 rounded-lg border text-sm transition-all',
-                            workType === w ? 'bg-primary-100 text-primary-700 border-primary-300' : 'border-gray-200 hover:border-gray-300'
+                            workType === w ? 'bg-accent-green/10 text-accent-green border-accent-green' : 'border-dark-border hover:border-dark-hover text-text-secondary'
                           )}>
                           {WORK_TYPE_CONFIG[w].icon} {WORK_TYPE_CONFIG[w].label}
                         </button>
@@ -349,7 +349,7 @@ export default function TasksPage() {
                       {(Object.keys(TIME_ESTIMATE_CONFIG) as TimeEstimate[]).map(t => (
                         <button key={t} type="button" onClick={() => setTimeEstimate(t)}
                           className={clsx('p-2 rounded-lg border text-xs transition-all',
-                            timeEstimate === t ? 'bg-primary-100 text-primary-700 border-primary-300' : 'border-gray-200 hover:border-gray-300'
+                            timeEstimate === t ? 'bg-accent-green/10 text-accent-green border-accent-green' : 'border-dark-border hover:border-dark-hover text-text-secondary'
                           )}>
                           {TIME_ESTIMATE_CONFIG[t].label}
                         </button>
@@ -360,7 +360,7 @@ export default function TasksPage() {
                   <div>
                     <label className="label">Estimated value $ (optional)</label>
                     <input type="number" value={value} onChange={e => setValue(e.target.value)} className="input" placeholder="e.g., 500" />
-                    <p className="text-xs text-gray-500 mt-1">How much is completing this task worth?</p>
+                    <p className="text-xs text-text-muted mt-1">How much is completing this task worth?</p>
                   </div>
                 </div>
               )}
@@ -391,62 +391,62 @@ export default function TasksPage() {
                   {filter === 'active' ? (
                     <button
                       onClick={() => completeTask(task.id)}
-                      className="w-6 h-6 rounded-full border-2 border-gray-300 hover:border-primary-500 hover:bg-primary-50 flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors"
+                      className="w-6 h-6 rounded-full border-2 border-dark-border hover:border-accent-green hover:bg-accent-green/10 flex-shrink-0 mt-0.5 flex items-center justify-center transition-colors"
                     >
-                      <Check className="w-3 h-3 text-transparent group-hover:text-primary-500" />
+                      <Check className="w-3 h-3 text-transparent group-hover:text-accent-green" />
                     </button>
                   ) : (
-                    <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Check className="w-3 h-3 text-green-600" />
+                    <div className="w-6 h-6 rounded-full bg-accent-green/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-3 h-3 text-accent-green" />
                     </div>
                   )}
-                  
+
                   <div className="flex-1 min-w-0">
-                    <h3 className={clsx('font-medium', filter === 'completed' ? 'text-gray-500 line-through' : 'text-gray-900')}>
+                    <h3 className={clsx('font-medium', filter === 'completed' ? 'text-text-muted line-through' : 'text-text-primary')}>
                       {task.title}
                     </h3>
                     {task.goals && (
-                      <p className="text-sm text-gray-500 mt-0.5">
+                      <p className="text-sm text-text-secondary mt-0.5">
                         {GOAL_CATEGORY_CONFIG[task.goals.category].icon} {task.goals.title}
                       </p>
                     )}
                     <div className="flex flex-wrap gap-1.5 mt-2">
                       <span className={`text-xs px-2 py-0.5 rounded-full ${energyConfig.color}`}>{energyConfig.label}</span>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">{workConfig.icon} {workConfig.label}</span>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">⏱️ {timeConfig.label}</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-dark-hover text-text-secondary">{workConfig.icon} {workConfig.label}</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-dark-hover text-text-secondary">⏱️ {timeConfig.label}</span>
                       <span className={`text-xs px-2 py-0.5 rounded-full ${priorityConfig.color}`}>{priorityConfig.label}</span>
                       {task.estimated_value && (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">${task.estimated_value}</span>
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-accent-green/20 text-accent-green">${task.estimated_value}</span>
                       )}
                     </div>
                   </div>
 
                   <div className="relative">
                     <button onClick={() => setMenuOpen(menuOpen === task.id ? null : task.id)}
-                      className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100">
+                      className="p-2 text-text-muted hover:text-text-primary rounded-lg hover:bg-dark-hover">
                       <MoreVertical className="w-5 h-5" />
                     </button>
                     {menuOpen === task.id && (
-                      <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 w-36">
+                      <div className="absolute right-0 top-full mt-1 bg-dark-card border border-dark-border rounded-lg shadow-lg py-1 z-10 w-36">
                         {task.status === 'active' ? (
                           <>
                             <button onClick={() => openEditForm(task)}
-                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                              className="w-full px-4 py-2 text-left text-sm text-text-primary hover:bg-dark-hover flex items-center gap-2">
                               <Edit2 className="w-4 h-4" /> Edit
                             </button>
                             <button onClick={() => completeTask(task.id)}
-                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                              className="w-full px-4 py-2 text-left text-sm text-text-primary hover:bg-dark-hover flex items-center gap-2">
                               <Check className="w-4 h-4" /> Complete
                             </button>
                           </>
                         ) : (
                           <button onClick={() => restoreTask(task.id)}
-                            className="w-full px-4 py-2 text-left text-sm text-blue-600 hover:bg-blue-50 flex items-center gap-2">
+                            className="w-full px-4 py-2 text-left text-sm text-accent-green hover:bg-accent-green/10 flex items-center gap-2">
                             <RotateCcw className="w-4 h-4" /> Restore
                           </button>
                         )}
                         <button onClick={() => deleteTask(task.id)}
-                          className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2">
+                          className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-red-900/20 flex items-center gap-2">
                           <Trash2 className="w-4 h-4" /> Delete
                         </button>
                       </div>
@@ -459,12 +459,12 @@ export default function TasksPage() {
         </div>
       ) : (
         <div className="card p-12 text-center">
-          <CheckSquare className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          <CheckSquare className="w-16 h-16 text-text-muted mx-auto mb-4" />
+          <h3 className="text-lg font-semibold font-accent text-text-primary mb-2">
             {filter === 'active' ? 'No active tasks' : 'No completed tasks yet'}
           </h3>
-          <p className="text-gray-600 mb-6">
-            {filter === 'active' 
+          <p className="text-text-secondary mb-6">
+            {filter === 'active'
               ? 'Add tasks and tag them with energy levels for smart matching.'
               : 'Complete some tasks and they\'ll show up here.'}
           </p>

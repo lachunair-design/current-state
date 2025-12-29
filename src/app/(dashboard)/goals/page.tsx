@@ -213,8 +213,8 @@ export default function GoalsPage() {
     <div className="max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-8 animate-fade-in">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Destinations</h1>
-          <p className="text-lg text-gray-600">What you're working toward</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-2">Destinations</h1>
+          <p className="text-lg text-text-secondary">What you're working toward</p>
         </div>
         <button
           onClick={() => setShowForm(true)}
@@ -227,12 +227,12 @@ export default function GoalsPage() {
       {/* Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-8 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+          <div className="bg-dark-card rounded-2xl max-w-lg w-full p-8 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">{editingGoal ? 'Edit Goal' : 'Add New Goal'}</h2>
+              <h2 className="text-2xl font-bold text-text-primary">{editingGoal ? 'Edit Goal' : 'Add New Goal'}</h2>
               <button
                 onClick={resetForm}
-                className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="text-text-muted hover:text-text-secondary p-2 hover:bg-dark-hover rounded-lg transition-colors"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -263,7 +263,7 @@ export default function GoalsPage() {
                         onClick={() => setCategory(cat)}
                         className={clsx(
                           'p-3 rounded-lg border text-center transition-all',
-                          category === cat ? `${config.color} border-current` : 'border-gray-200 hover:border-gray-300'
+                          category === cat ? `${config.color} border-current` : 'border-dark-border hover:border-dark-border'
                         )}
                       >
                         <span className="text-xl">{config.icon}</span>
@@ -283,7 +283,7 @@ export default function GoalsPage() {
                   className="input"
                   placeholder="e.g., Get promoted, Earn $50k, Lose 20 lbs"
                 />
-                <p className="text-xs text-gray-500 mt-1">What does "done" look like?</p>
+                <p className="text-xs text-text-muted mt-1">What does "done" look like?</p>
               </div>
 
               <div>
@@ -306,7 +306,7 @@ export default function GoalsPage() {
                   className="input"
                   placeholder="e.g., Freelance clients, Consulting"
                 />
-                <p className="text-xs text-gray-500 mt-1">Add this if this goal generates income</p>
+                <p className="text-xs text-text-muted mt-1">Add this if this goal generates income</p>
               </div>
 
               <div>
@@ -317,7 +317,7 @@ export default function GoalsPage() {
                   onChange={e => setTargetDate(e.target.value)}
                   className="input"
                 />
-                <p className="text-xs text-gray-500 mt-1">When do you want to achieve this goal?</p>
+                <p className="text-xs text-text-muted mt-1">When do you want to achieve this goal?</p>
               </div>
 
               <div className="flex gap-2 pt-4">
@@ -334,15 +334,15 @@ export default function GoalsPage() {
       {/* Task Suggestions Modal */}
       {showTaskSuggestions && suggestedTasks.length > 0 && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-8 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+          <div className="bg-dark-card rounded-2xl max-w-2xl w-full p-8 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-primary-50 rounded-xl flex items-center justify-center">
                   <Sparkles className="w-6 h-6 text-primary-600" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Suggested Tasks</h2>
-                  <p className="text-sm text-gray-600">Get started faster with smart suggestions</p>
+                  <h2 className="text-2xl font-bold text-text-primary">Suggested Tasks</h2>
+                  <p className="text-sm text-text-secondary">Get started faster with smart suggestions</p>
                 </div>
               </div>
               <button
@@ -351,13 +351,13 @@ export default function GoalsPage() {
                   setNewGoalId(null)
                   setSuggestedTasks([])
                 }}
-                className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="text-text-muted hover:text-text-secondary p-2 hover:bg-dark-hover rounded-lg transition-colors"
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
 
-            <p className="text-gray-700 mb-6">
+            <p className="text-text-secondary mb-6">
               Based on your goal, here are some tasks to help you get started. Click to add any that are relevant:
             </p>
 
@@ -371,9 +371,9 @@ export default function GoalsPage() {
                   <div className="flex items-start gap-4">
                     <CheckSquare className="w-5 h-5 text-primary-600 mt-0.5 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-900 mb-1">{suggestion.title}</h3>
+                      <h3 className="font-semibold text-text-primary mb-1">{suggestion.title}</h3>
                       {suggestion.description && (
-                        <p className="text-sm text-gray-600 mb-2">{suggestion.description}</p>
+                        <p className="text-sm text-text-secondary mb-2">{suggestion.description}</p>
                       )}
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
@@ -456,13 +456,13 @@ export default function GoalsPage() {
                 <div className="p-6 flex items-center gap-5 group">
                   <button
                     onClick={() => toggleGoalExpansion(goal.id)}
-                    className="flex-shrink-0 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    className="flex-shrink-0 p-2 hover:bg-dark-hover rounded-lg transition-colors"
                     title={isExpanded ? "Collapse tasks" : "Expand to see tasks"}
                   >
                     {isExpanded ? (
-                      <ChevronDown className="w-5 h-5 text-gray-600" />
+                      <ChevronDown className="w-5 h-5 text-text-secondary" />
                     ) : (
-                      <ChevronRight className="w-5 h-5 text-gray-600" />
+                      <ChevronRight className="w-5 h-5 text-text-secondary" />
                     )}
                   </button>
 
@@ -471,9 +471,9 @@ export default function GoalsPage() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-gray-900 text-lg mb-1">{goal.title}</h3>
+                    <h3 className="font-bold text-text-primary text-lg mb-1">{goal.title}</h3>
                     <div className="flex items-center gap-2 mt-2 flex-wrap">
-                      <span className="text-sm font-medium text-gray-500">{config.label}</span>
+                      <span className="text-sm font-medium text-text-muted">{config.label}</span>
                       {goal.income_stream_name && (
                         <span className="text-xs bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">
                           💰 {goal.income_stream_name}
@@ -485,13 +485,13 @@ export default function GoalsPage() {
                         </span>
                       )}
                       {tasks.length > 0 && (
-                        <span className="text-xs bg-gray-100 text-gray-700 px-3 py-1 rounded-full font-medium">
+                        <span className="text-xs bg-dark-hover text-text-secondary px-3 py-1 rounded-full font-medium">
                           {activeTasks.length} active / {completedTasks.length} done
                         </span>
                       )}
                     </div>
                     {goal.description && (
-                      <p className="text-sm text-gray-600 mt-2 italic">{goal.description}</p>
+                      <p className="text-sm text-text-secondary mt-2 italic">{goal.description}</p>
                     )}
                     {goal.success_metric && (
                       <div className="mt-2 inline-block">
@@ -505,15 +505,15 @@ export default function GoalsPage() {
                   <div className="relative">
                     <button
                       onClick={() => setMenuOpen(menuOpen === goal.id ? null : goal.id)}
-                      className="p-2 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+                      className="p-2 text-text-muted hover:text-text-secondary rounded-lg hover:bg-dark-hover transition-colors"
                     >
                       <MoreVertical className="w-6 h-6" />
                     </button>
                     {menuOpen === goal.id && (
-                      <div className="absolute right-0 top-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl py-1 z-10 w-36 animate-scale-in">
+                      <div className="absolute right-0 top-full mt-2 bg-dark-card border border-dark-border rounded-xl shadow-xl py-1 z-10 w-36 animate-scale-in">
                         <button
                           onClick={() => openEditForm(goal)}
-                          className="w-full px-4 py-2.5 text-left text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
+                          className="w-full px-4 py-2.5 text-left text-sm font-medium text-text-secondary hover:bg-dark-hover flex items-center gap-2 transition-colors"
                         >
                           <Edit2 className="w-4 h-4" /> Edit
                         </button>
@@ -538,7 +538,7 @@ export default function GoalsPage() {
                     ) : tasks.length > 0 ? (
                       <div className="space-y-3">
                         <div className="flex items-center justify-between mb-3">
-                          <h4 className="font-semibold text-gray-900">Linked Tasks ({tasks.length})</h4>
+                          <h4 className="font-semibold text-text-primary">Linked Tasks ({tasks.length})</h4>
                           <a
                             href="/tasks"
                             className="text-sm text-primary-600 hover:text-primary-700 font-medium"
@@ -550,14 +550,14 @@ export default function GoalsPage() {
                         {/* Active Tasks */}
                         {activeTasks.length > 0 && (
                           <div>
-                            <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                            <h5 className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-2">
                               Active ({activeTasks.length})
                             </h5>
                             {activeTasks.map(task => (
-                              <div key={task.id} className="bg-white rounded-lg p-3 mb-2 flex items-start gap-3">
-                                <div className="w-5 h-5 rounded-full border-2 border-gray-300 flex-shrink-0 mt-0.5" />
+                              <div key={task.id} className="bg-dark-card rounded-lg p-3 mb-2 flex items-start gap-3">
+                                <div className="w-5 h-5 rounded-full border-2 border-dark-border flex-shrink-0 mt-0.5" />
                                 <div className="flex-1 min-w-0">
-                                  <p className="font-medium text-gray-900 text-sm">{task.title}</p>
+                                  <p className="font-medium text-text-primary text-sm">{task.title}</p>
                                   <div className="flex items-center gap-2 mt-1 flex-wrap">
                                     <span className={`text-xs px-2 py-0.5 rounded-full ${ENERGY_LEVEL_CONFIG[task.energy_required].color}`}>
                                       {ENERGY_LEVEL_CONFIG[task.energy_required].label}
@@ -575,19 +575,19 @@ export default function GoalsPage() {
                         {/* Completed Tasks */}
                         {completedTasks.length > 0 && (
                           <div>
-                            <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 mt-4">
+                            <h5 className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-2 mt-4">
                               Completed ({completedTasks.length})
                             </h5>
                             {completedTasks.slice(0, 3).map(task => (
-                              <div key={task.id} className="bg-white rounded-lg p-3 mb-2 flex items-start gap-3 opacity-60">
+                              <div key={task.id} className="bg-dark-card rounded-lg p-3 mb-2 flex items-start gap-3 opacity-60">
                                 <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                                   <Check className="w-3 h-3 text-green-600" />
                                 </div>
-                                <p className="font-medium text-gray-600 text-sm line-through">{task.title}</p>
+                                <p className="font-medium text-text-secondary text-sm line-through">{task.title}</p>
                               </div>
                             ))}
                             {completedTasks.length > 3 && (
-                              <p className="text-xs text-gray-500 text-center mt-2">
+                              <p className="text-xs text-text-muted text-center mt-2">
                                 + {completedTasks.length - 3} more completed
                               </p>
                             )}
@@ -597,8 +597,8 @@ export default function GoalsPage() {
                     ) : (
                       <div className="text-center py-8">
                         <CheckSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                        <p className="text-gray-600 font-medium mb-1">No tasks linked to this goal yet</p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-text-secondary font-medium mb-1">No tasks linked to this goal yet</p>
+                        <p className="text-sm text-text-muted">
                           <a href="/tasks" className="text-primary-600 hover:text-primary-700">
                             Add tasks
                           </a>{' '}
@@ -617,8 +617,8 @@ export default function GoalsPage() {
           <div className="w-20 h-20 bg-gradient-to-br from-primary-100 to-primary-50 rounded-full flex items-center justify-center mx-auto mb-6">
             <Target className="w-10 h-10 text-primary-600" />
           </div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-3">No goals yet</h3>
-          <p className="text-gray-600 mb-8 text-lg max-w-md mx-auto">
+          <h3 className="text-2xl font-bold text-text-primary mb-3">No goals yet</h3>
+          <p className="text-text-secondary mb-8 text-lg max-w-md mx-auto">
             Goals give your tasks meaning. Add 3-5 goals across different areas of your life.
           </p>
           <button

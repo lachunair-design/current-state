@@ -383,8 +383,8 @@ export default function HabitsPage() {
     <div className="max-w-4xl mx-auto">
       <div className="flex items-center justify-between mb-8 animate-fade-in">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Rituals</h1>
-          <p className="text-lg text-gray-600">Build routines that work with your energy</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-2">Rituals</h1>
+          <p className="text-lg text-text-secondary">Build routines that work with your energy</p>
         </div>
         <button
           onClick={() => setShowForm(true)}
@@ -397,14 +397,14 @@ export default function HabitsPage() {
       {/* Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-8 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto">
+          <div className="bg-dark-card rounded-2xl max-w-2xl w-full p-8 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">
+              <h2 className="text-2xl font-bold text-text-primary">
                 {editingHabit ? 'Edit Habit' : 'Add New Habit'}
               </h2>
               <button
                 onClick={resetForm}
-                className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="text-text-muted hover:text-text-secondary p-2 hover:bg-dark-hover rounded-lg transition-colors"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -426,12 +426,12 @@ export default function HabitsPage() {
                           'p-4 rounded-xl border-2 text-center transition-all',
                           habitType === type
                             ? `${config.color} border-current shadow-md scale-105`
-                            : 'border-gray-200 hover:border-gray-300 hover:shadow-sm'
+                            : 'border-dark-border hover:border-dark-border hover:shadow-sm'
                         )}
                       >
                         <span className="text-3xl block mb-2">{config.icon}</span>
                         <span className="block text-sm font-semibold">{config.label}</span>
-                        <span className="block text-xs text-gray-600 mt-1">{config.description}</span>
+                        <span className="block text-xs text-text-secondary mt-1">{config.description}</span>
                       </button>
                     )
                   })}
@@ -450,7 +450,7 @@ export default function HabitsPage() {
                   autoFocus
                 />
                 {title && <TaskVsHabitGuide title={title} />}
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-text-muted mt-1">
                   💡 The app will automatically suggest easier versions when your energy is low
                 </p>
               </div>
@@ -501,7 +501,7 @@ export default function HabitsPage() {
                   className="input"
                   placeholder="e.g., Helps me sleep better, Reduces stress, Gives me energy"
                 />
-                <p className="text-xs text-gray-500 mt-1">Personal reminder of the benefit</p>
+                <p className="text-xs text-text-muted mt-1">Personal reminder of the benefit</p>
               </div>
 
               {/* Best Time of Day */}
@@ -519,7 +519,7 @@ export default function HabitsPage() {
                           'p-3 rounded-lg border text-center transition-all text-sm',
                           bestTimeOfDay === time
                             ? 'bg-primary-100 text-primary-800 border-primary-300 font-semibold'
-                            : 'border-gray-200 hover:border-gray-300'
+                            : 'border-dark-border hover:border-dark-border'
                         )}
                       >
                         <div className="text-lg mb-1">{config.icon}</div>
@@ -571,13 +571,13 @@ export default function HabitsPage() {
                         <span className="text-2xl">{config.icon}</span>
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-bold text-gray-900 text-lg">{habit.title}</h3>
+                        <h3 className="font-bold text-text-primary text-lg">{habit.title}</h3>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="text-sm text-gray-500 font-medium">{config.label}</span>
+                          <span className="text-sm text-text-muted font-medium">{config.label}</span>
                           {linkedGoal && (
                             <>
                               <span className="text-gray-300">•</span>
-                              <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full">
+                              <span className="text-xs bg-dark-hover text-text-secondary px-2 py-0.5 rounded-full">
                                 🎯 {linkedGoal.title}
                               </span>
                             </>
@@ -590,18 +590,18 @@ export default function HabitsPage() {
                     <div className="space-y-2 mb-4">
                       <div className="flex items-start gap-2">
                         <span className="text-green-600 text-sm">✅</span>
-                        <span className="text-sm text-gray-700 font-medium">{habit.full_version}</span>
+                        <span className="text-sm text-text-secondary font-medium">{habit.full_version}</span>
                       </div>
                       {habit.scaled_version && (
                         <div className="flex items-start gap-2">
                           <span className="text-blue-600 text-sm">⚡</span>
-                          <span className="text-sm text-gray-600">{habit.scaled_version}</span>
+                          <span className="text-sm text-text-secondary">{habit.scaled_version}</span>
                         </div>
                       )}
                       {habit.minimal_version && (
                         <div className="flex items-start gap-2">
                           <span className="text-amber-600 text-sm">💫</span>
-                          <span className="text-sm text-gray-600">{habit.minimal_version}</span>
+                          <span className="text-sm text-text-secondary">{habit.minimal_version}</span>
                         </div>
                       )}
                     </div>
@@ -621,7 +621,7 @@ export default function HabitsPage() {
                         <div className="flex items-center gap-3">
                           {/* 7-Day Pattern - No judgment */}
                           <div className="flex-1">
-                            <div className="text-xs text-gray-600 mb-1.5">Last 7 days</div>
+                            <div className="text-xs text-text-secondary mb-1.5">Last 7 days</div>
                             <div className="flex gap-0.5">
                               {habitStats[habit.id].last7Days.map((completed, i) => (
                                 <div
@@ -638,12 +638,12 @@ export default function HabitsPage() {
 
                           {/* Simple Stats */}
                           <div className="text-right">
-                            <div className="text-xs text-gray-500">Completions</div>
-                            <div className="text-sm font-bold text-gray-700">
+                            <div className="text-xs text-text-muted">Completions</div>
+                            <div className="text-sm font-bold text-text-secondary">
                               {habitStats[habit.id].totalCompletions}
                             </div>
                             {habitStats[habit.id].lastCompleted && (
-                              <div className="text-xs text-gray-500 mt-1">
+                              <div className="text-xs text-text-muted mt-1">
                                 {new Date(habitStats[habit.id].lastCompleted!).toLocaleDateString('en-US', {
                                   month: 'short',
                                   day: 'numeric',
@@ -686,15 +686,15 @@ export default function HabitsPage() {
                   <div className="relative">
                     <button
                       onClick={() => setMenuOpen(menuOpen === habit.id ? null : habit.id)}
-                      className="p-2 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors"
+                      className="p-2 text-text-muted hover:text-text-secondary rounded-lg hover:bg-dark-hover transition-colors"
                     >
                       <MoreVertical className="w-6 h-6" />
                     </button>
                     {menuOpen === habit.id && (
-                      <div className="absolute right-0 top-full mt-2 bg-white border border-gray-200 rounded-xl shadow-xl py-1 z-10 w-36 animate-scale-in">
+                      <div className="absolute right-0 top-full mt-2 bg-dark-card border border-dark-border rounded-xl shadow-xl py-1 z-10 w-36 animate-scale-in">
                         <button
                           onClick={() => openEditForm(habit)}
-                          className="w-full px-4 py-2.5 text-left text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-colors"
+                          className="w-full px-4 py-2.5 text-left text-sm font-medium text-text-secondary hover:bg-dark-hover flex items-center gap-2 transition-colors"
                         >
                           <Edit2 className="w-4 h-4" /> Edit
                         </button>
@@ -717,8 +717,8 @@ export default function HabitsPage() {
           <div className="w-20 h-20 bg-gradient-to-br from-green-100 to-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
             <Heart className="w-10 h-10 text-green-600" />
           </div>
-          <h3 className="text-2xl font-bold text-gray-900 mb-3">No habits yet</h3>
-          <p className="text-gray-600 mb-8 text-lg max-w-lg mx-auto">
+          <h3 className="text-2xl font-bold text-text-primary mb-3">No habits yet</h3>
+          <p className="text-text-secondary mb-8 text-lg max-w-lg mx-auto">
             Build energy-aware routines with habits that adapt to how you're feeling.
           </p>
           <button
