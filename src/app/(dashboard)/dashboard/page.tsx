@@ -96,7 +96,7 @@ export default async function DashboardPage() {
       >
         <div className="flex items-center justify-between">
           <div>
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-accent-green text-dark-bg text-xs font-bold uppercase tracking-wider mb-2">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-accent-green text-black text-xs font-bold uppercase tracking-wider mb-2">
               {hasCheckedInToday ? 'Checked In' : 'Not Yet'}
             </span>
             <h2 className="text-lg font-bold font-accent text-text-primary leading-tight">
@@ -145,7 +145,7 @@ export default async function DashboardPage() {
 
             <Link
               href="/checkin"
-              className="w-full py-2.5 bg-accent-green hover:bg-primary-500 text-dark-bg font-bold rounded-lg flex items-center justify-center gap-2 transition-all text-sm"
+              className="w-full py-2.5 bg-accent-green hover:bg-primary-600 text-black font-bold rounded-lg flex items-center justify-center gap-2 transition-all text-sm"
             >
               <Play className="w-4 h-4" />
               Get Recommendations

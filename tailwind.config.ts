@@ -11,26 +11,26 @@ const config: Config = {
       colors: {
         // Dark green theme - soft & organic
         primary: {
-          50: '#f0fdf4',
-          100: '#dcfce7',
-          200: '#bbf7d0',
-          300: '#86efac',
-          400: '#6EE7B7',  // Vibrant teal-green accent
-          500: '#34d399',
-          600: '#10b981',
-          700: '#059669',
-          800: '#047857',
-          900: '#065f46',
+          50: '#f0fff4',
+          100: '#c6f6d5',
+          200: '#9ae6b4',
+          300: '#68d391',
+          400: '#48bb78',
+          500: '#00FF00',  // Bright neon green
+          600: '#00DD00',
+          700: '#00BB00',
+          800: '#009900',
+          900: '#007700',
         },
         dark: {
-          bg: '#1A201A',      // Deep dark forest green background
-          card: '#243028',    // Slightly lighter for cards
+          bg: '#0d1810',      // Very dark green-black background
+          card: '#1a2620',    // Dark green for cards
           border: '#2d3d32',  // Subtle borders
-          hover: '#2a362e',   // Hover state
+          hover: '#243028',   // Hover state
         },
         accent: {
-          green: '#6EE7B7',   // High energy / positive actions
-          amber: '#FBBF24',   // Low energy / gentle guidance
+          green: '#00FF00',   // Neon green for high energy / positive actions
+          amber: '#FBBF24',   // Warm amber for low energy / gentle guidance
         },
         text: {
           primary: '#FFFFFF',   // High contrast white
@@ -40,8 +40,8 @@ const config: Config = {
         // Semantic colors for energy states
         energy: {
           low: '#FBBF24',      // Warm amber
-          medium: '#60D7A0',   // Mid-range green
-          high: '#6EE7B7',     // Vibrant teal-green
+          medium: '#48bb78',   // Mid-range green
+          high: '#00FF00',     // Bright neon green
         },
       },
       fontFamily: {
