@@ -96,9 +96,19 @@ export default function HabitsPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return
 
+    // Fetch fresh habits data to avoid stale closure
+    const { data: freshHabits } = await supabase
+      .from('habits')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+      .order('display_order')
+
+    if (!freshHabits || freshHabits.length === 0) return
+
     const stats: Record<string, HabitStats> = {}
 
-    for (const habit of habits) {
+    for (const habit of freshHabits) {
       // Fetch all completions for this habit
       const { data: completions } = await supabase
         .from('habit_completions')
