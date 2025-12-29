@@ -15,30 +15,48 @@ body {
   background: var(--background);
   font-family: 'Inter', system-ui, sans-serif;
   min-height: 100vh;
+  /* Support for notched devices (iPhone X+) */
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+
+/* Prevent iOS Safari from auto-zooming on form inputs */
+@media (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
 }
 
 /* Custom utility classes */
 @layer components {
   .btn-primary {
-    @apply bg-gradient-ocean text-white px-6 py-2.5 rounded-lg font-semibold
+    @apply bg-gradient-ocean text-white px-6 py-3 rounded-lg font-semibold
            hover:shadow-lg hover:scale-105 transition-all duration-200
            focus:outline-none focus:ring-2 focus:ring-ocean-400 focus:ring-offset-2
-           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100
+           min-h-[44px] touch-manipulation;
   }
 
   .btn-secondary {
-    @apply bg-white text-text-primary px-6 py-2.5 rounded-lg font-medium
+    @apply bg-white text-text-primary px-6 py-3 rounded-lg font-medium
            border-2 border-surface-border hover:border-ocean-400 hover:bg-surface-hover transition-all duration-200
            focus:outline-none focus:ring-2 focus:ring-ocean-400 focus:ring-offset-2
-           disabled:opacity-50 disabled:cursor-not-allowed;
+           disabled:opacity-50 disabled:cursor-not-allowed
+           min-h-[44px] touch-manipulation;
   }
 
   .input {
-    @apply w-full px-4 py-2.5 border-2 border-surface-border rounded-lg
+    @apply w-full px-4 py-3 border-2 border-surface-border rounded-lg
            bg-white text-text-primary
            focus:outline-none focus:ring-2 focus:ring-ocean-400 focus:border-ocean-400
            placeholder:text-text-muted
-           transition-colors duration-200;
+           transition-colors duration-200
+           min-h-[44px] text-base;
   }
 
   .card {
