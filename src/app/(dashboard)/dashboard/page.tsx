@@ -1,8 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { Sparkles, CheckSquare, Play, Clock } from 'lucide-react'
-import { GOAL_CATEGORY_CONFIG, ENERGY_LEVEL_CONFIG, WORK_TYPE_CONFIG, TIME_ESTIMATE_CONFIG, TimeEstimate, WorkType, EnergyLevel } from '@/types/database'
+import { Sparkles, CheckSquare } from 'lucide-react'
+import { GOAL_CATEGORY_CONFIG, ENERGY_LEVEL_CONFIG, TIME_ESTIMATE_CONFIG, TimeEstimate, EnergyLevel } from '@/types/database'
+import { TodaysFocusCard } from '@/components/TodaysFocusCard'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -113,46 +114,7 @@ export default async function DashboardPage() {
       </Link>
 
       {/* Top Task Card - Single Focus */}
-      {topTask && (
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-base font-bold font-accent text-text-primary">Today's Focus</h3>
-          </div>
-          <div className="rounded-xl bg-dark-card border border-dark-border shadow-sm p-4">
-            <div className="flex justify-between items-start mb-3">
-              <div className="flex-1">
-                {topTask.goals && (
-                  <span className="text-xs font-medium text-text-muted uppercase tracking-wider block mb-1">
-                    {topTask.goals.title}
-                  </span>
-                )}
-                <h4 className="text-lg font-bold text-text-primary leading-snug">
-                  {topTask.title}
-                </h4>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 mb-4">
-              <div className="flex items-center gap-1.5 text-xs text-text-secondary bg-dark-hover px-2 py-1 rounded-md">
-                <Clock className="w-3.5 h-3.5" />
-                <span>{TIME_ESTIMATE_CONFIG[topTask.time_estimate as TimeEstimate]?.label || 'Unknown'}</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-xs text-text-secondary bg-dark-hover px-2 py-1 rounded-md">
-                <span>{WORK_TYPE_CONFIG[topTask.work_type as WorkType]?.icon || '📋'}</span>
-                <span>{WORK_TYPE_CONFIG[topTask.work_type as WorkType]?.label || 'Task'}</span>
-              </div>
-            </div>
-
-            <Link
-              href="/checkin"
-              className="w-full py-2.5 bg-accent-green hover:bg-primary-600 text-black font-bold rounded-lg flex items-center justify-center gap-2 transition-all text-sm"
-            >
-              <Play className="w-4 h-4" />
-              Get Recommendations
-            </Link>
-          </div>
-        </div>
-      )}
+      {topTask && <TodaysFocusCard task={topTask} />}
 
       {/* Simple Stats - No Pressure */}
       <div className="mb-6">
