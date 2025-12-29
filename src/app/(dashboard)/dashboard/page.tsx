@@ -80,10 +80,10 @@ export default async function DashboardPage() {
     <div className="max-w-2xl mx-auto pb-8">
       {/* Compact Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-1">
+        <h1 className="text-2xl font-bold font-accent text-text-primary mb-1">
           Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'}, {firstName}
         </h1>
-        <p className="text-base text-primary-600 font-semibold flex items-center gap-2">
+        <p className="text-base text-accent-green font-semibold flex items-center gap-2">
           <span className="text-xl">{energyDisplay.emoji}</span>
           {energyDisplay.message}
         </p>
@@ -92,17 +92,17 @@ export default async function DashboardPage() {
       {/* Energy State Card - Compact */}
       <Link
         href="/checkin"
-        className="block mb-6 rounded-xl bg-gradient-to-br from-primary-50 to-green-50 border border-primary-200 p-4 hover:shadow-md transition-all group"
+        className="block mb-6 rounded-xl bg-dark-card border border-dark-border p-4 hover:bg-dark-hover hover:shadow-lg transition-all group"
       >
         <div className="flex items-center justify-between">
           <div>
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-primary-600 text-white text-xs font-bold uppercase tracking-wider mb-2">
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-accent-green text-dark-bg text-xs font-bold uppercase tracking-wider mb-2">
               {hasCheckedInToday ? 'Checked In' : 'Not Yet'}
             </span>
-            <h2 className="text-lg font-bold text-gray-900 leading-tight">
+            <h2 className="text-lg font-bold font-accent text-text-primary leading-tight">
               {energyDisplay.suggestion}
             </h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-text-secondary mt-1">
               {hasCheckedInToday ? 'Tap to update' : 'Quick 30-second check-in'}
             </p>
           </div>
@@ -116,28 +116,28 @@ export default async function DashboardPage() {
       {topTask && (
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-base font-bold text-gray-900">Today's Focus</h3>
+            <h3 className="text-base font-bold font-accent text-text-primary">Today's Focus</h3>
           </div>
-          <div className="rounded-xl bg-white border border-gray-200 shadow-sm p-4">
+          <div className="rounded-xl bg-dark-card border border-dark-border shadow-sm p-4">
             <div className="flex justify-between items-start mb-3">
               <div className="flex-1">
                 {topTask.goals && (
-                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-1">
+                  <span className="text-xs font-medium text-text-muted uppercase tracking-wider block mb-1">
                     {topTask.goals.title}
                   </span>
                 )}
-                <h4 className="text-lg font-bold text-gray-900 leading-snug">
+                <h4 className="text-lg font-bold text-text-primary leading-snug">
                   {topTask.title}
                 </h4>
               </div>
             </div>
 
             <div className="flex items-center gap-2 mb-4">
-              <div className="flex items-center gap-1.5 text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-md">
+              <div className="flex items-center gap-1.5 text-xs text-text-secondary bg-dark-hover px-2 py-1 rounded-md">
                 <Clock className="w-3.5 h-3.5" />
                 <span>{TIME_ESTIMATE_CONFIG[topTask.time_estimate as TimeEstimate]?.label || 'Unknown'}</span>
               </div>
-              <div className="flex items-center gap-1.5 text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-md">
+              <div className="flex items-center gap-1.5 text-xs text-text-secondary bg-dark-hover px-2 py-1 rounded-md">
                 <span>{WORK_TYPE_CONFIG[topTask.work_type as WorkType]?.icon || '📋'}</span>
                 <span>{WORK_TYPE_CONFIG[topTask.work_type as WorkType]?.label || 'Task'}</span>
               </div>
@@ -145,7 +145,7 @@ export default async function DashboardPage() {
 
             <Link
               href="/checkin"
-              className="w-full py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all text-sm"
+              className="w-full py-2.5 bg-accent-green hover:bg-primary-500 text-dark-bg font-bold rounded-lg flex items-center justify-center gap-2 transition-all text-sm"
             >
               <Play className="w-4 h-4" />
               Get Recommendations
@@ -157,17 +157,17 @@ export default async function DashboardPage() {
       {/* Simple Stats - No Pressure */}
       <div className="mb-6">
         <div className="grid grid-cols-3 gap-3">
-          <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
-            <div className="text-2xl font-bold text-gray-900">{completedThisWeek || 0}</div>
-            <div className="text-xs text-gray-600 font-medium mt-0.5">Done This Week</div>
+          <div className="bg-dark-card border border-dark-border rounded-lg p-3 text-center">
+            <div className="text-2xl font-bold text-text-primary">{completedThisWeek || 0}</div>
+            <div className="text-xs text-text-secondary font-medium mt-0.5">Done This Week</div>
           </div>
-          <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
-            <div className="text-2xl font-bold text-gray-900">{tasks?.length || 0}</div>
-            <div className="text-xs text-gray-600 font-medium mt-0.5">In Parking Lot</div>
+          <div className="bg-dark-card border border-dark-border rounded-lg p-3 text-center">
+            <div className="text-2xl font-bold text-text-primary">{tasks?.length || 0}</div>
+            <div className="text-xs text-text-secondary font-medium mt-0.5">In Parking Lot</div>
           </div>
-          <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
-            <div className="text-2xl font-bold text-gray-900">{goals?.length || 0}</div>
-            <div className="text-xs text-gray-600 font-medium mt-0.5">Goals Active</div>
+          <div className="bg-dark-card border border-dark-border rounded-lg p-3 text-center">
+            <div className="text-2xl font-bold text-text-primary">{goals?.length || 0}</div>
+            <div className="text-xs text-text-secondary font-medium mt-0.5">Goals Active</div>
           </div>
         </div>
       </div>
@@ -176,8 +176,8 @@ export default async function DashboardPage() {
       {tasks && tasks.length > 1 && (
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-base font-bold text-gray-900">Up Next</h3>
-            <Link href="/tasks" className="text-sm font-medium text-primary-600 hover:text-primary-700">
+            <h3 className="text-base font-bold font-accent text-text-primary">Up Next</h3>
+            <Link href="/tasks" className="text-sm font-medium text-accent-green hover:text-primary-500">
               See All
             </Link>
           </div>
@@ -185,14 +185,14 @@ export default async function DashboardPage() {
             {tasks.slice(1, 4).map((task) => (
               <div
                 key={task.id}
-                className="bg-white hover:bg-gray-50 border border-gray-200 rounded-lg p-3 transition-colors"
+                className="bg-dark-card hover:bg-dark-hover border border-dark-border rounded-lg p-3 transition-colors"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-gray-900 leading-tight truncate">
+                    <p className="text-sm font-semibold text-text-primary leading-tight truncate">
                       {task.title}
                     </p>
-                    <p className="text-xs text-gray-500 mt-0.5">
+                    <p className="text-xs text-text-muted mt-0.5">
                       {task.goals?.title || 'No goal'} • {TIME_ESTIMATE_CONFIG[task.time_estimate as TimeEstimate]?.label || 'Unknown time'}
                     </p>
                   </div>
@@ -211,10 +211,10 @@ export default async function DashboardPage() {
 
       {/* Empty State */}
       {(!tasks || tasks.length === 0) && (
-        <div className="bg-white border border-gray-200 rounded-xl p-8 text-center">
+        <div className="bg-dark-card border border-dark-border rounded-xl p-8 text-center">
           <div className="text-5xl mb-3">😊</div>
-          <h3 className="font-bold text-gray-900 mb-2">No tasks yet?</h3>
-          <p className="text-gray-600 mb-4 text-sm">
+          <h3 className="font-bold font-accent text-text-primary mb-2">No tasks yet?</h3>
+          <p className="text-text-secondary mb-4 text-sm">
             Check in first, or add tasks to your parking lot
           </p>
           <div className="flex gap-2 justify-center">

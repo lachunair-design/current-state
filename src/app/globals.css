@@ -2,48 +2,51 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import Inter font */
+/* Import fonts */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #1A201A;
+  --foreground: #ffffff;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100vh;
 }
 
 /* Custom utility classes */
 @layer components {
   .btn-primary {
-    @apply bg-primary-600 text-white px-4 py-2 rounded-lg font-medium 
-           hover:bg-primary-700 transition-colors duration-200
-           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
+    @apply bg-accent-green text-dark-bg px-4 py-2 rounded-lg font-medium
+           hover:bg-primary-500 transition-colors duration-200
+           focus:outline-none focus:ring-2 focus:ring-accent-green focus:ring-offset-2 focus:ring-offset-dark-bg
            disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-secondary {
-    @apply bg-white text-gray-700 px-4 py-2 rounded-lg font-medium 
-           border border-gray-300 hover:bg-gray-50 transition-colors duration-200
-           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2
+    @apply bg-dark-card text-text-primary px-4 py-2 rounded-lg font-medium
+           border border-dark-border hover:bg-dark-hover transition-colors duration-200
+           focus:outline-none focus:ring-2 focus:ring-accent-green focus:ring-offset-2 focus:ring-offset-dark-bg
            disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .input {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-lg
-           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
-           placeholder:text-gray-400;
+    @apply w-full px-4 py-2 border border-dark-border rounded-lg
+           bg-dark-card text-text-primary
+           focus:outline-none focus:ring-2 focus:ring-accent-green focus:border-transparent
+           placeholder:text-text-muted;
   }
 
   .card {
-    @apply bg-white rounded-xl border border-gray-200 shadow-sm;
+    @apply bg-dark-card rounded-xl border border-dark-border shadow-sm;
   }
 
   .label {
-    @apply block text-sm font-medium text-gray-700 mb-1;
+    @apply block text-sm font-medium text-text-secondary mb-1;
   }
 }
 
