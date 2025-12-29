@@ -133,13 +133,18 @@ export default function HabitsPage() {
       const totalCompletions = completions.length
       const lastCompleted = new Date(completions[0].completed_at)
 
-      // Check if completed today
+      // Check if completed today (use local timezone not UTC)
+      const getLocalDateString = (date: Date) => {
+        const year = date.getFullYear()
+        const month = String(date.getMonth() + 1).padStart(2, '0')
+        const day = String(date.getDate()).padStart(2, '0')
+        return `${year}-${month}-${day}`
+      }
       const today = new Date()
-      today.setHours(0, 0, 0, 0)
-      const todayStr = today.toISOString().split('T')[0]
+      const todayStr = getLocalDateString(today)
       const completedToday = completions.some(c => {
-        const compDate = new Date(c.completed_at).toISOString().split('T')[0]
-        return compDate === todayStr
+        const compDate = new Date(c.completed_at)
+        return getLocalDateString(compDate) === todayStr
       })
 
       // Calculate streaks and last 7 days
@@ -174,11 +179,19 @@ export default function HabitsPage() {
       }
     }
 
+    // Helper to get date string in local timezone (not UTC)
+    const getLocalDateString = (date: Date) => {
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      return `${year}-${month}-${day}`
+    }
+
     // Sort dates ascending
     const dates = Array.from(completionDates).sort((a, b) => a.getTime() - b.getTime())
 
-    // Get dates only (ignore time)
-    const dateStrings = dates.map(d => d.toISOString().split('T')[0])
+    // Get dates only (ignore time) - use LOCAL timezone not UTC
+    const dateStrings = dates.map(d => getLocalDateString(d))
     const uniqueDates = Array.from(new Set(dateStrings))
 
     // Calculate current streak (working backwards from today)
@@ -189,7 +202,7 @@ export default function HabitsPage() {
     for (let i = 0; i < 100; i++) {
       const checkDate = new Date(today)
       checkDate.setDate(today.getDate() - i)
-      const dateStr = checkDate.toISOString().split('T')[0]
+      const dateStr = getLocalDateString(checkDate)
 
       if (uniqueDates.includes(dateStr)) {
         currentStreak++
@@ -204,8 +217,8 @@ export default function HabitsPage() {
     let tempStreak = 1
 
     for (let i = 1; i < uniqueDates.length; i++) {
-      const prevDate = new Date(uniqueDates[i - 1])
-      const currDate = new Date(uniqueDates[i])
+      const prevDate = new Date(uniqueDates[i - 1] + 'T00:00:00')
+      const currDate = new Date(uniqueDates[i] + 'T00:00:00')
       const diffDays = Math.round((currDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24))
 
       if (diffDays === 1) {
@@ -222,7 +235,7 @@ export default function HabitsPage() {
     for (let i = 6; i >= 0; i--) {
       const checkDate = new Date(today)
       checkDate.setDate(today.getDate() - i)
-      const dateStr = checkDate.toISOString().split('T')[0]
+      const dateStr = getLocalDateString(checkDate)
       last7Days.push(uniqueDates.includes(dateStr))
     }
 
