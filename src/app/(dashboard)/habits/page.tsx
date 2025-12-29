@@ -320,8 +320,8 @@ export default function HabitsPage() {
           version_completed: 'full', // Always record as full for simplicity
         } as never)
 
-      // Refresh habits, which will trigger useEffect to refresh stats
-      await fetchHabits()
+      // Manually refresh stats immediately after completion
+      await fetchHabitStats()
 
       // Check for milestone celebrations after refresh
       const stats = await getHabitStatsForId(habitId)
