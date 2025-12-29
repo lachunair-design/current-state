@@ -36,9 +36,6 @@ export default function HabitsPage() {
   // Form state
   const [title, setTitle] = useState('')
   const [habitType, setHabitType] = useState<HabitType>('foundational')
-  const [fullVersion, setFullVersion] = useState('')
-  const [scaledVersion, setScaledVersion] = useState('')
-  const [minimalVersion, setMinimalVersion] = useState('')
   const [targetFrequency, setTargetFrequency] = useState<FrequencyType>('daily')
   const [linkedGoalId, setLinkedGoalId] = useState('')
   const [whyThisHelps, setWhyThisHelps] = useState('')
@@ -81,9 +78,6 @@ export default function HabitsPage() {
   const resetForm = () => {
     setTitle('')
     setHabitType('foundational')
-    setFullVersion('')
-    setScaledVersion('')
-    setMinimalVersion('')
     setTargetFrequency('daily')
     setLinkedGoalId('')
     setWhyThisHelps('')
@@ -96,9 +90,6 @@ export default function HabitsPage() {
     setEditingHabit(habit)
     setTitle(habit.title)
     setHabitType(habit.habit_type)
-    setFullVersion(habit.full_version)
-    setScaledVersion(habit.scaled_version || '')
-    setMinimalVersion(habit.minimal_version || '')
     setTargetFrequency(habit.target_frequency)
     setLinkedGoalId(habit.linked_goal_id || '')
     setWhyThisHelps(habit.why_this_helps || '')
@@ -343,7 +334,7 @@ export default function HabitsPage() {
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={saveHabit}
-                  disabled={saving || !title.trim() || !fullVersion.trim()}
+                  disabled={saving || !title.trim()}
                   className="btn-primary flex-1 shadow-md"
                 >
                   {saving ? (
