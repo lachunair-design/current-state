@@ -1,8 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { Sparkles, Target, CheckSquare, TrendingUp, ArrowRight } from 'lucide-react'
-import { GOAL_CATEGORY_CONFIG } from '@/types/database'
+import { Sparkles, CheckSquare, Play, Clock } from 'lucide-react'
+import { GOAL_CATEGORY_CONFIG, ENERGY_LEVEL_CONFIG, WORK_TYPE_CONFIG, TIME_ESTIMATE_CONFIG } from '@/types/database'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -29,14 +29,16 @@ export default async function DashboardPage() {
     .eq('is_active', true)
     .order('display_order') as { data: any[] | null }
 
-  // Fetch active tasks count
-  const { count: activeTasks } = await supabase
+  // Fetch active tasks with goal info
+  const { data: tasks } = await supabase
     .from('tasks')
-    .select('*', { count: 'exact', head: true })
+    .select('*, goals(*)')
     .eq('user_id', user.id)
     .eq('status', 'active')
+    .order('created_at', { ascending: false })
+    .limit(4) as { data: any[] | null }
 
-  // Fetch today's check-ins
+  // Fetch today's check-in
   const today = new Date().toISOString().split('T')[0]
   const { data: todayCheckins } = await supabase
     .from('daily_responses')
@@ -44,7 +46,7 @@ export default async function DashboardPage() {
     .eq('user_id', user.id)
     .gte('responded_at', `${today}T00:00:00`)
     .order('responded_at', { ascending: false })
-    .limit(1)
+    .limit(1) as { data: any[] | null }
 
   // Fetch completed tasks this week
   const weekAgo = new Date()
@@ -58,164 +60,175 @@ export default async function DashboardPage() {
 
   const firstName = profile?.full_name?.split(' ')[0] || 'there'
   const hasCheckedInToday = todayCheckins && todayCheckins.length > 0
+  const latestCheckin = todayCheckins?.[0]
+
+  // Get energy emoji and message
+  const getEnergyDisplay = () => {
+    if (!hasCheckedInToday) {
+      return { emoji: '🤔', message: "Haven't checked in yet", suggestion: "Start with a quick energy check" }
+    }
+    const level = latestCheckin.energy_level
+    if (level <= 2) return { emoji: '😴', message: 'Low energy today', suggestion: 'Easy tasks are waiting' }
+    if (level <= 4) return { emoji: '😊', message: 'Good energy today', suggestion: 'Ready for steady work' }
+    return { emoji: '⚡', message: 'High energy today', suggestion: 'Great time for deep work' }
+  }
+
+  const energyDisplay = getEnergyDisplay()
+  const topTask = tasks?.[0]
 
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="mb-8 animate-fade-in">
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-          Hey {firstName} 👋
+    <div className="max-w-2xl mx-auto pb-8">
+      {/* Compact Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">
+          Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'}, {firstName}
         </h1>
-        <p className="text-lg text-gray-600">
-          {hasCheckedInToday
-            ? "You've checked in today. Here's your overview."
-            : "Start with a quick energy check-in to get task recommendations."}
+        <p className="text-base text-primary-600 font-semibold flex items-center gap-2">
+          <span className="text-xl">{energyDisplay.emoji}</span>
+          {energyDisplay.message}
         </p>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid sm:grid-cols-2 gap-4 mb-8 animate-slide-in">
-        <Link
-          href="/checkin"
-          className={`card p-6 hover:border-primary-300 hover:shadow-lg transition-all group relative overflow-hidden ${
-            !hasCheckedInToday ? 'ring-2 ring-primary-500 ring-offset-2 shadow-md' : ''
-          }`}
-        >
-          {!hasCheckedInToday && (
-            <div className="absolute top-2 right-2">
-              <span className="flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-primary-500"></span>
-              </span>
-            </div>
-          )}
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-primary-50 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                <Sparkles className="w-6 h-6 text-primary-600" />
-              </div>
-              <h3 className="font-semibold text-gray-900 text-lg">
-                {hasCheckedInToday ? 'Check in again' : 'Start your check-in'}
-              </h3>
-              <p className="text-sm text-gray-600 mt-1">
-                {hasCheckedInToday
-                  ? 'Energy changed? Update your state.'
-                  : '30 seconds to find your perfect tasks'}
-              </p>
-            </div>
-            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 group-hover:translate-x-1 transition-all" />
-          </div>
-        </Link>
-
-        <Link
-          href="/tasks"
-          className="card p-6 hover:border-green-300 hover:shadow-lg transition-all group"
-        >
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="w-12 h-12 bg-gradient-to-br from-green-100 to-green-50 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                <CheckSquare className="w-6 h-6 text-green-600" />
-              </div>
-              <h3 className="font-semibold text-gray-900 text-lg">View all tasks</h3>
-              <p className="text-sm text-gray-600 mt-1">
-                {activeTasks || 0} in your parking lot
-              </p>
-            </div>
-            <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-green-600 group-hover:translate-x-1 transition-all" />
-          </div>
-        </Link>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-8 animate-scale-in">
-        <div className="card p-5 text-center hover:shadow-md transition-all hover:border-primary-200 group">
-          <div className="text-3xl font-bold text-gray-900 mb-1 group-hover:text-primary-600 transition-colors">
-            {goals?.length || 0}
-          </div>
-          <div className="text-sm text-gray-600 font-medium">Active Goals</div>
-        </div>
-        <div className="card p-5 text-center hover:shadow-md transition-all hover:border-blue-200 group">
-          <div className="text-3xl font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
-            {activeTasks || 0}
-          </div>
-          <div className="text-sm text-gray-600 font-medium">Active Tasks</div>
-        </div>
-        <div className="card p-5 text-center hover:shadow-md transition-all hover:border-green-200 bg-gradient-to-br from-green-50 to-white group">
-          <div className="text-3xl font-bold text-green-600 mb-1 group-hover:scale-110 transition-transform">
-            {completedThisWeek || 0}
-          </div>
-          <div className="text-sm text-gray-700 font-medium">Done This Week</div>
-        </div>
-      </div>
-
-      {/* Goals Overview */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Your Goals</h2>
-          <Link href="/goals" className="text-sm text-primary-600 hover:text-primary-700 font-medium">
-            Manage goals →
-          </Link>
-        </div>
-
-        {goals && goals.length > 0 ? (
-          <div className="space-y-3">
-            {goals.slice(0, 3).map((goal, index) => {
-              const config = GOAL_CATEGORY_CONFIG[goal.category as keyof typeof GOAL_CATEGORY_CONFIG]
-              return (
-                <div
-                  key={goal.id}
-                  className="card p-5 flex items-center gap-4 hover:shadow-md hover:border-primary-200 transition-all group"
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${config?.color || 'bg-gray-100'} group-hover:scale-110 transition-transform`}>
-                    <span className="text-xl">{config?.icon || '🎯'}</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-gray-900 truncate text-lg">{goal.title}</h3>
-                    <p className="text-sm text-gray-500 font-medium">{config?.label || goal.category}</p>
-                  </div>
-                  {goal.income_stream_name && (
-                    <span className="text-xs bg-green-100 text-green-800 px-3 py-1.5 rounded-full font-medium">
-                      💰 {goal.income_stream_name}
-                    </span>
-                  )}
-                </div>
-              )
-            })}
-          </div>
-        ) : (
-          <div className="card p-12 text-center hover:shadow-md transition-all">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Target className="w-8 h-8 text-gray-400" />
-            </div>
-            <h3 className="font-semibold text-gray-900 mb-2 text-lg">No goals yet</h3>
-            <p className="text-gray-600 mb-6 max-w-md mx-auto">
-              Set up your goals to start matching tasks to your energy.
+      {/* Energy State Card - Compact */}
+      <Link
+        href="/checkin"
+        className="block mb-6 rounded-xl bg-gradient-to-br from-primary-50 to-green-50 border border-primary-200 p-4 hover:shadow-md transition-all group"
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-primary-600 text-white text-xs font-bold uppercase tracking-wider mb-2">
+              {hasCheckedInToday ? 'Checked In' : 'Not Yet'}
+            </span>
+            <h2 className="text-lg font-bold text-gray-900 leading-tight">
+              {energyDisplay.suggestion}
+            </h2>
+            <p className="text-sm text-gray-600 mt-1">
+              {hasCheckedInToday ? 'Tap to update' : 'Quick 30-second check-in'}
             </p>
-            <Link href="/goals" className="btn-primary inline-flex items-center gap-2 shadow-md hover:shadow-lg">
-              <Target className="w-4 h-4" />
-              Add your first goal
+          </div>
+          <div className="text-4xl group-hover:scale-110 transition-transform">
+            {energyDisplay.emoji}
+          </div>
+        </div>
+      </Link>
+
+      {/* Top Task Card - Single Focus */}
+      {topTask && (
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-base font-bold text-gray-900">Today's Focus</h3>
+          </div>
+          <div className="rounded-xl bg-white border border-gray-200 shadow-sm p-4">
+            <div className="flex justify-between items-start mb-3">
+              <div className="flex-1">
+                {topTask.goals && (
+                  <span className="text-xs font-medium text-gray-500 uppercase tracking-wider block mb-1">
+                    {topTask.goals.title}
+                  </span>
+                )}
+                <h4 className="text-lg font-bold text-gray-900 leading-snug">
+                  {topTask.title}
+                </h4>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-1.5 text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-md">
+                <Clock className="w-3.5 h-3.5" />
+                <span>{TIME_ESTIMATE_CONFIG[topTask.time_estimate]?.label || 'Unknown'}</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-md">
+                <span>{WORK_TYPE_CONFIG[topTask.work_type]?.icon || '📋'}</span>
+                <span>{WORK_TYPE_CONFIG[topTask.work_type]?.label || 'Task'}</span>
+              </div>
+            </div>
+
+            <Link
+              href="/checkin"
+              className="w-full py-2.5 bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all text-sm"
+            >
+              <Play className="w-4 h-4" />
+              Get Recommendations
             </Link>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
-      {/* Momentum message */}
-      <div className="card p-8 bg-gradient-to-br from-primary-50 via-white to-purple-50 border-primary-200 hover:shadow-md transition-all">
-        <div className="flex items-start gap-5">
-          <div className="w-14 h-14 bg-gradient-to-br from-primary-100 to-primary-50 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm">
-            <TrendingUp className="w-7 h-7 text-primary-600" />
+      {/* Simple Stats - No Pressure */}
+      <div className="mb-6">
+        <div className="grid grid-cols-3 gap-3">
+          <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
+            <div className="text-2xl font-bold text-gray-900">{completedThisWeek || 0}</div>
+            <div className="text-xs text-gray-600 font-medium mt-0.5">Done This Week</div>
           </div>
-          <div>
-            <h3 className="font-bold text-gray-900 text-xl mb-2">You're building momentum</h3>
-            <p className="text-gray-700 leading-relaxed">
-              {completedThisWeek && completedThisWeek > 0
-                ? `You've completed ${completedThisWeek} task${completedThisWeek === 1 ? '' : 's'} this week. Every small win counts. 🎉`
-                : "Progress isn't about perfection. It's about showing up. Check in when you're ready. 💪"}
-            </p>
+          <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
+            <div className="text-2xl font-bold text-gray-900">{tasks?.length || 0}</div>
+            <div className="text-xs text-gray-600 font-medium mt-0.5">In Parking Lot</div>
+          </div>
+          <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
+            <div className="text-2xl font-bold text-gray-900">{goals?.length || 0}</div>
+            <div className="text-xs text-gray-600 font-medium mt-0.5">Goals Active</div>
           </div>
         </div>
       </div>
+
+      {/* Up Next - Compact List */}
+      {tasks && tasks.length > 1 && (
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-base font-bold text-gray-900">Up Next</h3>
+            <Link href="/tasks" className="text-sm font-medium text-primary-600 hover:text-primary-700">
+              See All
+            </Link>
+          </div>
+          <div className="space-y-2">
+            {tasks.slice(1, 4).map((task) => (
+              <div
+                key={task.id}
+                className="bg-white hover:bg-gray-50 border border-gray-200 rounded-lg p-3 transition-colors"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-gray-900 leading-tight truncate">
+                      {task.title}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {task.goals?.title || 'No goal'} • {TIME_ESTIMATE_CONFIG[task.time_estimate]?.label || 'Unknown time'}
+                    </p>
+                  </div>
+                  <div
+                    className={`w-2 h-2 rounded-full flex-shrink-0 ml-3 ${
+                      ENERGY_LEVEL_CONFIG[task.energy_required]?.color || 'bg-gray-400'
+                    }`}
+                    title={ENERGY_LEVEL_CONFIG[task.energy_required]?.label}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {(!tasks || tasks.length === 0) && (
+        <div className="bg-white border border-gray-200 rounded-xl p-8 text-center">
+          <div className="text-5xl mb-3">😊</div>
+          <h3 className="font-bold text-gray-900 mb-2">No tasks yet?</h3>
+          <p className="text-gray-600 mb-4 text-sm">
+            Check in first, or add tasks to your parking lot
+          </p>
+          <div className="flex gap-2 justify-center">
+            <Link href="/checkin" className="btn-primary text-sm px-4 py-2">
+              <Sparkles className="w-4 h-4 inline mr-1" />
+              Check In
+            </Link>
+            <Link href="/tasks" className="btn-secondary text-sm px-4 py-2">
+              <CheckSquare className="w-4 h-4 inline mr-1" />
+              Add Task
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
