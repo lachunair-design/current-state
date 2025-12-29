@@ -201,8 +201,8 @@ export default function CheckinPage() {
           <div className="w-16 h-16 bg-gradient-to-br from-primary-100 to-primary-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
             <Sparkles className="w-8 h-8 text-primary-600" />
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">How are you right now?</h1>
-          <p className="text-lg text-gray-600">Quick check-in to find your perfect tasks</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-2">How are you right now?</h1>
+          <p className="text-lg text-text-secondary">Quick check-in to find your perfect tasks</p>
         </div>
 
         <div className="flex gap-2 mb-8 px-4">
@@ -221,11 +221,11 @@ export default function CheckinPage() {
         <div className="card p-8 md:p-10 shadow-lg animate-scale-in">
           <div className="text-center mb-10">
             <span className="text-6xl mb-6 block animate-scale-in">{question.icon}</span>
-            <h2 className="text-2xl font-bold text-gray-900 leading-tight">{question.question}</h2>
+            <h2 className="text-2xl font-bold text-text-primary leading-tight">{question.question}</h2>
           </div>
 
           <div className="space-y-6">
-            <div className="flex justify-between text-sm font-medium text-gray-500 px-2">
+            <div className="flex justify-between text-sm font-medium text-text-muted px-2">
               <span>{question.lowLabel}</span>
               <span>{question.highLabel}</span>
             </div>
@@ -237,7 +237,7 @@ export default function CheckinPage() {
                   className={clsx('flex-1 py-5 rounded-2xl text-xl font-bold transition-all duration-200 shadow-sm',
                     responses[question.id] === value
                       ? 'bg-gradient-to-br from-primary-600 to-primary-700 text-white scale-110 shadow-lg shadow-primary-500/50'
-                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100 hover:scale-105 hover:shadow-md'
+                      : 'bg-dark-card text-text-secondary hover:bg-dark-hover hover:scale-105 hover:shadow-md'
                   )}
                 >
                   {value}
@@ -277,7 +277,7 @@ export default function CheckinPage() {
           </div>
         </div>
 
-        <p className="text-center text-sm font-medium text-gray-500 mt-6">
+        <p className="text-center text-sm font-medium text-text-muted mt-6">
           Question {currentQuestion + 1} of {QUESTIONNAIRE_QUESTIONS.length}
         </p>
       </div>
@@ -290,15 +290,15 @@ export default function CheckinPage() {
         <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-green-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
           <Check className="w-8 h-8 text-green-600" />
         </div>
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Here's what matches your state</h1>
-        <p className="text-lg text-gray-600">The app chose these for you—no decisions needed.</p>
+        <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-2">Here's what matches your state</h1>
+        <p className="text-lg text-text-secondary">The app chose these for you—no decisions needed.</p>
       </div>
 
       {/* Mental Model Explainer */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+      <div className="bg-dark-card border border-dark-border rounded-lg p-4 mb-6">
         <div className="flex gap-3">
           <div className="text-2xl flex-shrink-0">🧭</div>
-          <div className="text-sm text-blue-900">
+          <div className="text-sm text-text-primary">
             <p className="font-semibold mb-1">How this app works:</p>
             <p>Check-ins guide you. The Tasks page is just a parking lot for later. Let your energy lead.</p>
           </div>
@@ -311,8 +311,8 @@ export default function CheckinPage() {
             {responses.energy_level <= 2 ? '😴' : responses.energy_level <= 4 ? '😊' : '⚡'}
           </div>
           <div>
-            <div className="text-sm font-medium text-gray-500 uppercase tracking-wide">Your current state</div>
-            <div className="font-semibold text-gray-900 text-lg mt-1">
+            <div className="text-sm font-medium text-text-muted uppercase tracking-wide">Your current state</div>
+            <div className="font-semibold text-text-primary text-lg mt-1">
               {responses.energy_level <= 2 ? 'Low energy - taking it easy' :
                responses.energy_level <= 4 ? 'Good energy - ready to work' : 'High energy - lets go!'}
             </div>
@@ -320,7 +320,7 @@ export default function CheckinPage() {
         </div>
         <button
           onClick={resetCheckin}
-          className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors font-medium"
+          className="text-sm text-text-muted hover:text-text-secondary flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-dark-hover transition-colors font-medium"
         >
           <RotateCcw className="w-4 h-4" /> Redo
         </button>
@@ -353,9 +353,9 @@ export default function CheckinPage() {
 
                 <div className="flex items-start justify-between gap-4 mb-4">
                   <div className="flex-1">
-                    <h3 className="font-bold text-gray-900 text-xl mb-1">{task.title}</h3>
+                    <h3 className="font-bold text-text-primary text-xl mb-1">{task.title}</h3>
                     {task.goals && (
-                      <p className="text-sm text-gray-500 font-medium">
+                      <p className="text-sm text-text-muted font-medium">
                         <span className="text-primary-600">→</span> {task.goals.title}
                       </p>
                     )}
@@ -371,10 +371,10 @@ export default function CheckinPage() {
                   <span className={`text-xs font-medium px-3 py-1.5 rounded-full ${energyConfig.color}`}>
                     {energyConfig.label}
                   </span>
-                  <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-gray-100 text-gray-700">
+                  <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-dark-hover text-text-secondary">
                     {workTypeConfig.icon} {workTypeConfig.label}
                   </span>
-                  <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-gray-100 text-gray-700">
+                  <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-dark-hover text-text-secondary">
                     ⏱️ {timeConfig.label}
                   </span>
                   <span className={`text-xs font-medium px-3 py-1.5 rounded-full ${priorityConfig.color}`}>
@@ -384,7 +384,7 @@ export default function CheckinPage() {
 
                 {reasons.length > 0 && (
                   <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-5">
-                    <div className="text-sm text-blue-900">
+                    <div className="text-sm text-text-primary">
                       <span className="font-bold">Why this task:</span>
                       <span className="ml-2">{reasons.join(' • ')}</span>
                     </div>
@@ -441,8 +441,8 @@ export default function CheckinPage() {
           <div className="w-20 h-20 bg-gradient-to-br from-yellow-100 to-yellow-50 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-5xl">🎉</span>
           </div>
-          <h3 className="font-bold text-gray-900 text-2xl mb-2">All clear!</h3>
-          <p className="text-gray-600 mb-6 text-lg">
+          <h3 className="font-bold text-text-primary text-2xl mb-2">All clear!</h3>
+          <p className="text-text-secondary mb-6 text-lg">
             You're all caught up, or you haven't added tasks yet.
           </p>
           <button
@@ -463,56 +463,56 @@ export default function CheckinPage() {
               <Timer className="w-5 h-5 text-indigo-600" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">Focus Work Suggestions</h3>
-              <p className="text-sm text-gray-600 mt-0.5">Based on your available time and energy</p>
+              <h3 className="font-semibold text-text-primary">Focus Work Suggestions</h3>
+              <p className="text-sm text-text-secondary mt-0.5">Based on your available time and energy</p>
             </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
             {/* Pomodoro Suggestion */}
-            <div className="bg-white rounded-lg p-4 border border-indigo-100">
+            <div className="bg-dark-card rounded-lg p-4 border border-indigo-100">
               <div className="flex items-center gap-2 mb-2">
                 <Clock className="w-4 h-4 text-indigo-600" />
-                <h4 className="font-medium text-gray-900">Pomodoro Technique</h4>
+                <h4 className="font-medium text-text-primary">Pomodoro Technique</h4>
               </div>
               {responses.available_time <= 2 ? (
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-text-secondary">
                   <strong>Quick sprint:</strong> Try 1-2 Pomodoros (25 min work, 5 min break)
                 </p>
               ) : responses.available_time <= 4 ? (
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-text-secondary">
                   <strong>Standard session:</strong> 3-4 Pomodoros with breaks (2 hours total)
                 </p>
               ) : (
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-text-secondary">
                   <strong>Deep work session:</strong> 4-6 Pomodoros with longer breaks (3-4 hours)
                 </p>
               )}
             </div>
 
             {/* Time Blocking Suggestion */}
-            <div className="bg-white rounded-lg p-4 border border-indigo-100">
+            <div className="bg-dark-card rounded-lg p-4 border border-indigo-100">
               <div className="flex items-center gap-2 mb-2">
                 <Calendar className="w-4 h-4 text-indigo-600" />
-                <h4 className="font-medium text-gray-900">Time Blocking</h4>
+                <h4 className="font-medium text-text-primary">Time Blocking</h4>
               </div>
               {responses.mental_clarity >= 4 ? (
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-text-secondary">
                   <strong>High clarity:</strong> Start with your hardest task while sharp
                 </p>
               ) : responses.mental_clarity >= 3 ? (
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-text-secondary">
                   <strong>Medium clarity:</strong> Tackle medium-effort tasks first
                 </p>
               ) : (
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-text-secondary">
                   <strong>Low clarity:</strong> Start with quick wins to build momentum
                 </p>
               )}
             </div>
           </div>
 
-          <div className="mt-4 text-xs text-gray-500 text-center">
+          <div className="mt-4 text-xs text-text-muted text-center">
             💡 Tip: Turn off notifications and set a timer to stay focused
           </div>
         </div>
@@ -526,8 +526,8 @@ export default function CheckinPage() {
               <CheckSquare className="w-5 h-5 text-purple-600" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 mb-1">Feeling ambitious?</h3>
-              <p className="text-sm text-gray-600 mb-3">
+              <h3 className="font-semibold text-text-primary mb-1">Feeling ambitious?</h3>
+              <p className="text-sm text-text-secondary mb-3">
                 You have high energy today. If none of these tasks feel right, you can browse your full task list and pick something yourself.
               </p>
               <button
@@ -542,7 +542,7 @@ export default function CheckinPage() {
       )}
 
       <div className="mt-8 text-center">
-        <button onClick={() => router.push('/dashboard')} className="text-gray-500 hover:text-gray-700">Back to dashboard</button>
+        <button onClick={() => router.push('/dashboard')} className="text-text-muted hover:text-text-secondary">Back to dashboard</button>
       </div>
 
       {/* Celebration Component */}
