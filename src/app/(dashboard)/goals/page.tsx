@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Plus, Target, Loader2, X, MoreVertical, Trash2, Edit2, Sparkles, CheckSquare, ChevronDown, ChevronRight, Check } from 'lucide-react'
-import { Goal, GoalCategory, GOAL_CATEGORY_CONFIG, CreateGoalInput, Task, ENERGY_LEVEL_CONFIG, PRIORITY_CONFIG } from '@/types/database'
-import { getSmartTaskSuggestions, TaskSuggestion } from '@/lib/goalTaskSuggestions'
+import { Plus, Loader2, X, MoreVertical, Trash2, Edit2, Rocket, Briefcase, Heart, DollarSign, Users, Home } from 'lucide-react'
+import { Goal, GoalCategory, GOAL_CATEGORY_CONFIG, CreateGoalInput } from '@/types/database'
 import clsx from 'clsx'
 
 export default function GoalsPage() {
@@ -14,14 +13,7 @@ export default function GoalsPage() {
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null)
   const [saving, setSaving] = useState(false)
   const [menuOpen, setMenuOpen] = useState<string | null>(null)
-  const [showTaskSuggestions, setShowTaskSuggestions] = useState(false)
-  const [suggestedTasks, setSuggestedTasks] = useState<TaskSuggestion[]>([])
-  const [newGoalId, setNewGoalId] = useState<string | null>(null)
-  const [addingTask, setAddingTask] = useState<string | null>(null)
-  const [expandedGoals, setExpandedGoals] = useState<Set<string>>(new Set())
-  const [goalTasks, setGoalTasks] = useState<Record<string, Task[]>>({})
-  const [loadingTasks, setLoadingTasks] = useState<Set<string>>(new Set())
-  const [showAllGoals, setShowAllGoals] = useState(false)
+  const [goalProgress, setGoalProgress] = useState<Record<string, { completed: number, total: number }>>({})
   const supabase = createClient()
 
   // Form state
@@ -31,6 +23,37 @@ export default function GoalsPage() {
   const [successMetric, setSuccessMetric] = useState('')
   const [incomeStream, setIncomeStream] = useState('')
   const [targetDate, setTargetDate] = useState('')
+
+  // Icon mapping for different goal types
+  const getGoalIcon = (category: GoalCategory, title: string) => {
+    // Check title for keywords first
+    const lowerTitle = title.toLowerCase()
+
+    if (lowerTitle.includes('launch') || lowerTitle.includes('start') || lowerTitle.includes('hustle')) {
+      return { icon: Rocket, color: 'bg-gradient-sunset', emoji: '🚀' }
+    }
+    if (lowerTitle.includes('promotion') || lowerTitle.includes('job') || lowerTitle.includes('career')) {
+      return { icon: Briefcase, color: 'bg-gradient-ocean', emoji: '💼' }
+    }
+    if (lowerTitle.includes('health') || lowerTitle.includes('fitness') || lowerTitle.includes('marathon') || lowerTitle.includes('training')) {
+      return { icon: Heart, color: 'bg-red-100', emoji: '❤️', textColor: 'text-red-600' }
+    }
+    if (lowerTitle.includes('save') || lowerTitle.includes('$') || lowerTitle.includes('money') || lowerTitle.includes('earn')) {
+      return { icon: DollarSign, color: 'bg-emerald-100', emoji: '💰', textColor: 'text-emerald-600' }
+    }
+    if (lowerTitle.includes('family') || lowerTitle.includes('trip') || lowerTitle.includes('vacation')) {
+      return { icon: Users, color: 'bg-orange-100', emoji: '👨‍👩‍👧‍👦', textColor: 'text-orange-600' }
+    }
+
+    // Fallback to category
+    const config = GOAL_CATEGORY_CONFIG[category]
+    return {
+      icon: Home,
+      color: config.color,
+      emoji: config.icon,
+      textColor: 'text-ocean-600'
+    }
+  }
 
   useEffect(() => {
     fetchGoals()
@@ -47,8 +70,31 @@ export default function GoalsPage() {
       .eq('is_active', true)
       .order('display_order')
 
-    setGoals(data || [])
+    if (data) {
+      setGoals(data)
+      // Fetch progress for each goal
+      await fetchAllGoalProgress(data, user.id)
+    }
     setLoading(false)
+  }
+
+  const fetchAllGoalProgress = async (goals: Goal[], userId: string) => {
+    const progressData: Record<string, { completed: number, total: number }> = {}
+
+    for (const goal of goals) {
+      const { data: tasks } = await supabase
+        .from('tasks')
+        .select('id, status')
+        .eq('user_id', userId)
+        .eq('goal_id', goal.id)
+        .in('status', ['active', 'completed'])
+
+      const total = tasks?.length || 0
+      const completed = tasks?.filter((t: any) => t.status === 'completed').length || 0
+      progressData[goal.id] = { completed, total }
+    }
+
+    setGoalProgress(progressData)
   }
 
   const resetForm = () => {
@@ -96,59 +142,16 @@ export default function GoalsPage() {
           .from('goals')
           .update(goalData as never)
           .eq('id', editingGoal.id)
-        await fetchGoals()
-        resetForm()
       } else {
-        // Insert new goal and get the ID
-        const { data: newGoalData } = await supabase
+        await supabase
           .from('goals')
           .insert({ ...goalData, user_id: user.id, display_order: goals.length } as never)
-          .select()
-          .single() as { data: any }
-
-        await fetchGoals()
-
-        // Show task suggestions for new goals
-        if (newGoalData) {
-          const suggestions = getSmartTaskSuggestions(title.trim(), category)
-          setSuggestedTasks(suggestions)
-          setNewGoalId(newGoalData.id)
-          setShowTaskSuggestions(true)
-        }
-
-        resetForm()
       }
+
+      await fetchGoals()
+      resetForm()
     } finally {
       setSaving(false)
-    }
-  }
-
-  const addSuggestedTask = async (suggestion: TaskSuggestion) => {
-    if (!newGoalId) return
-    setAddingTask(suggestion.title)
-
-    try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
-
-      await supabase
-        .from('tasks')
-        .insert({
-          user_id: user.id,
-          goal_id: newGoalId,
-          title: suggestion.title,
-          description: suggestion.description,
-          energy_required: suggestion.energy_required,
-          work_type: suggestion.work_type,
-          time_estimate: suggestion.time_estimate,
-          priority: suggestion.priority,
-          status: 'active',
-        } as never)
-
-      // Remove from suggestions list
-      setSuggestedTasks(suggestedTasks.filter(t => t.title !== suggestion.title))
-    } finally {
-      setAddingTask(null)
     }
   }
 
@@ -160,67 +163,27 @@ export default function GoalsPage() {
     setMenuOpen(null)
   }
 
-  const toggleGoalExpansion = async (goalId: string) => {
-    const newExpanded = new Set(expandedGoals)
-
-    if (expandedGoals.has(goalId)) {
-      // Collapse
-      newExpanded.delete(goalId)
-      setExpandedGoals(newExpanded)
-    } else {
-      // Expand and fetch tasks if not already loaded
-      newExpanded.add(goalId)
-      setExpandedGoals(newExpanded)
-
-      if (!goalTasks[goalId]) {
-        await fetchGoalTasks(goalId)
-      }
-    }
-  }
-
-  const fetchGoalTasks = async (goalId: string) => {
-    setLoadingTasks(new Set(loadingTasks).add(goalId))
-
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-
-    const { data } = await supabase
-      .from('tasks')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('goal_id', goalId)
-      .in('status', ['active', 'completed'])
-      .order('status')
-      .order('created_at', { ascending: false })
-
-    setGoalTasks(prev => ({ ...prev, [goalId]: data || [] }))
-    setLoadingTasks(prev => {
-      const newSet = new Set(prev)
-      newSet.delete(goalId)
-      return newSet
-    })
-  }
-
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-ocean-600" />
       </div>
     )
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-md mx-auto px-4">
+      {/* Header */}
       <div className="flex items-center justify-between mb-8 animate-fade-in">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-2">Destinations</h1>
-          <p className="text-lg text-text-secondary">What you're working toward</p>
+          <h1 className="text-3xl font-bold text-text-primary mb-1">Your Goals</h1>
+          <p className="text-sm text-text-secondary">Stay in your rhythm</p>
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="btn-primary inline-flex items-center gap-2 shadow-lg hover:shadow-xl"
+          className="w-12 h-12 bg-gradient-ocean text-white rounded-full flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all shadow-md"
         >
-          <Plus className="w-5 h-5" /> Add Goal
+          <Plus className="w-6 h-6" />
         </button>
       </div>
 
@@ -246,7 +209,7 @@ export default function GoalsPage() {
                   value={title}
                   onChange={e => setTitle(e.target.value)}
                   className="input"
-                  placeholder="e.g., Land a new job, Launch my business"
+                  placeholder="e.g., Launch Side Hustle, Get Promoted"
                   autoFocus
                 />
               </div>
@@ -331,295 +294,89 @@ export default function GoalsPage() {
         </div>
       )}
 
-      {/* Task Suggestions Modal */}
-      {showTaskSuggestions && suggestedTasks.length > 0 && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-8 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-primary-50 rounded-xl flex items-center justify-center">
-                  <Sparkles className="w-6 h-6 text-primary-600" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-bold text-text-primary">Suggested Tasks</h2>
-                  <p className="text-sm text-text-secondary">Get started faster with smart suggestions</p>
-                </div>
-              </div>
-              <button
-                onClick={() => {
-                  setShowTaskSuggestions(false)
-                  setNewGoalId(null)
-                  setSuggestedTasks([])
-                }}
-                className="text-text-muted hover:text-text-secondary p-2 hover:bg-surface-hover rounded-lg transition-colors"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-
-            <p className="text-text-secondary mb-6">
-              Based on your goal, here are some tasks to help you get started. Click to add any that are relevant:
-            </p>
-
-            <div className="space-y-3">
-              {suggestedTasks.map((suggestion, index) => (
-                <div
-                  key={index}
-                  className="card p-4 hover:shadow-md transition-all animate-slide-in"
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  <div className="flex items-start gap-4">
-                    <CheckSquare className="w-5 h-5 text-primary-600 mt-0.5 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-text-primary mb-1">{suggestion.title}</h3>
-                      {suggestion.description && (
-                        <p className="text-sm text-text-secondary mb-2">{suggestion.description}</p>
-                      )}
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
-                          {suggestion.energy_required} energy
-                        </span>
-                        <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full font-medium">
-                          {suggestion.time_estimate}
-                        </span>
-                        <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full font-medium">
-                          {suggestion.priority.replace('_', ' ')}
-                        </span>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => addSuggestedTask(suggestion)}
-                      disabled={addingTask === suggestion.title}
-                      className="btn-primary text-sm px-4 py-2 flex-shrink-0"
-                    >
-                      {addingTask === suggestion.title ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        'Add Task'
-                      )}
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-6 flex justify-end gap-3">
-              <button
-                onClick={() => {
-                  setShowTaskSuggestions(false)
-                  setNewGoalId(null)
-                  setSuggestedTasks([])
-                }}
-                className="btn-secondary"
-              >
-                Done
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Goals List */}
       {goals.length > 0 ? (
-        <div className="space-y-4">
-          {goals.length > 3 && !showAllGoals && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">💡</span>
-                <div className="flex-1 text-sm text-yellow-900">
-                  <p className="font-semibold mb-1">Focus mode: Showing 3 goals</p>
-                  <p>Too many goals can overwhelm. We're showing your first 3 to help you stay focused.</p>
-                </div>
-                <button
-                  onClick={() => setShowAllGoals(true)}
-                  className="text-sm text-yellow-700 hover:text-yellow-900 font-medium underline whitespace-nowrap"
-                >
-                  Show all {goals.length}
-                </button>
-              </div>
-            </div>
-          )}
-          {(showAllGoals ? goals : goals.slice(0, 3)).map((goal, index) => {
-            const config = GOAL_CATEGORY_CONFIG[goal.category]
-            const isExpanded = expandedGoals.has(goal.id)
-            const tasks = goalTasks[goal.id] || []
-            const activeTasks = tasks.filter(t => t.status === 'active')
-            const completedTasks = tasks.filter(t => t.status === 'completed')
+        <div className="space-y-4 pb-24">
+          {goals.map((goal, index) => {
+            const progress = goalProgress[goal.id] || { completed: 0, total: 0 }
+            const percentage = progress.total > 0 ? Math.round((progress.completed / progress.total) * 100) : 0
+            const iconConfig = getGoalIcon(goal.category, goal.title)
 
             return (
               <div
                 key={goal.id}
-                className="card overflow-hidden hover:shadow-lg transition-all animate-slide-in"
-                style={{ animationDelay: `${index * 50}ms` }}
+                className="bg-white rounded-2xl p-6 shadow-md hover:shadow-lg hover:scale-[1.02] transition-all animate-fade-in relative"
+                style={{ animationDelay: `${index * 100}ms` }}
               >
-                {/* Goal Header */}
-                <div className="p-6 flex items-center gap-5 group">
+                {/* Menu button */}
+                <div className="absolute top-4 right-4">
                   <button
-                    onClick={() => toggleGoalExpansion(goal.id)}
-                    className="flex-shrink-0 p-2 hover:bg-surface-hover rounded-lg transition-colors"
-                    title={isExpanded ? "Collapse tasks" : "Expand to see tasks"}
+                    onClick={() => setMenuOpen(menuOpen === goal.id ? null : goal.id)}
+                    className="p-2 text-text-muted hover:text-text-secondary rounded-lg hover:bg-surface-hover transition-colors"
                   >
-                    {isExpanded ? (
-                      <ChevronDown className="w-5 h-5 text-text-secondary" />
-                    ) : (
-                      <ChevronRight className="w-5 h-5 text-text-secondary" />
-                    )}
+                    <MoreVertical className="w-5 h-5" />
                   </button>
-
-                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${config.color} group-hover:scale-110 transition-transform shadow-sm`}>
-                    <span className="text-3xl">{config.icon}</span>
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-text-primary text-lg mb-1">{goal.title}</h3>
-                    <div className="flex items-center gap-2 mt-2 flex-wrap">
-                      <span className="text-sm font-medium text-text-muted">{config.label}</span>
-                      {goal.income_stream_name && (
-                        <span className="text-xs bg-green-100 text-green-800 px-3 py-1 rounded-full font-medium">
-                          💰 {goal.income_stream_name}
-                        </span>
-                      )}
-                      {goal.target_date && (
-                        <span className="text-xs bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">
-                          🎯 {new Date(goal.target_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                        </span>
-                      )}
-                      {tasks.length > 0 && (
-                        <span className="text-xs bg-surface-hover text-text-secondary px-3 py-1 rounded-full font-medium">
-                          {activeTasks.length} active / {completedTasks.length} done
-                        </span>
-                      )}
+                  {menuOpen === goal.id && (
+                    <div className="absolute right-0 top-full mt-2 bg-white border border-surface-border rounded-xl shadow-xl py-1 z-10 w-36 animate-scale-in">
+                      <button
+                        onClick={() => openEditForm(goal)}
+                        className="w-full px-4 py-2.5 text-left text-sm font-medium text-text-secondary hover:bg-surface-hover flex items-center gap-2 transition-colors"
+                      >
+                        <Edit2 className="w-4 h-4" /> Edit
+                      </button>
+                      <button
+                        onClick={() => deleteGoal(goal.id)}
+                        className="w-full px-4 py-2.5 text-left text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" /> Delete
+                      </button>
                     </div>
-                    {goal.description && (
-                      <p className="text-sm text-text-secondary mt-2 italic">{goal.description}</p>
-                    )}
-                    {goal.success_metric && (
-                      <div className="mt-2 inline-block">
-                        <p className="text-sm text-purple-700 bg-purple-50 px-3 py-1 rounded-lg">
-                          <span className="font-bold">Success:</span> {goal.success_metric}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="relative">
-                    <button
-                      onClick={() => setMenuOpen(menuOpen === goal.id ? null : goal.id)}
-                      className="p-2 text-text-muted hover:text-text-secondary rounded-lg hover:bg-surface-hover transition-colors"
-                    >
-                      <MoreVertical className="w-6 h-6" />
-                    </button>
-                    {menuOpen === goal.id && (
-                      <div className="absolute right-0 top-full mt-2 bg-white border border-surface-border rounded-xl shadow-xl py-1 z-10 w-36 animate-scale-in">
-                        <button
-                          onClick={() => openEditForm(goal)}
-                          className="w-full px-4 py-2.5 text-left text-sm font-medium text-text-secondary hover:bg-surface-hover flex items-center gap-2 transition-colors"
-                        >
-                          <Edit2 className="w-4 h-4" /> Edit
-                        </button>
-                        <button
-                          onClick={() => deleteGoal(goal.id)}
-                          className="w-full px-4 py-2.5 text-left text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors"
-                        >
-                          <Trash2 className="w-4 h-4" /> Delete
-                        </button>
-                      </div>
-                    )}
-                  </div>
+                  )}
                 </div>
 
-                {/* Expanded Tasks Section */}
-                {isExpanded && (
-                  <div className="border-t border-gray-100 bg-gray-50 p-6 animate-fade-in">
-                    {loadingTasks.has(goal.id) ? (
-                      <div className="flex items-center justify-center py-8">
-                        <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
-                      </div>
-                    ) : tasks.length > 0 ? (
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between mb-3">
-                          <h4 className="font-semibold text-text-primary">Linked Tasks ({tasks.length})</h4>
-                          <a
-                            href="/tasks"
-                            className="text-sm text-primary-600 hover:text-primary-700 font-medium"
-                          >
-                            View all tasks →
-                          </a>
-                        </div>
+                {/* Icon */}
+                <div className={`w-16 h-16 ${iconConfig.color} rounded-2xl flex items-center justify-center mb-4 shadow-sm`}>
+                  <span className="text-3xl">{iconConfig.emoji}</span>
+                </div>
 
-                        {/* Active Tasks */}
-                        {activeTasks.length > 0 && (
-                          <div>
-                            <h5 className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-2">
-                              Active ({activeTasks.length})
-                            </h5>
-                            {activeTasks.map(task => (
-                              <div key={task.id} className="bg-white rounded-lg p-3 mb-2 flex items-start gap-3">
-                                <div className="w-5 h-5 rounded-full border-2 border-surface-border flex-shrink-0 mt-0.5" />
-                                <div className="flex-1 min-w-0">
-                                  <p className="font-medium text-text-primary text-sm">{task.title}</p>
-                                  <div className="flex items-center gap-2 mt-1 flex-wrap">
-                                    <span className={`text-xs px-2 py-0.5 rounded-full ${ENERGY_LEVEL_CONFIG[task.energy_required].color}`}>
-                                      {ENERGY_LEVEL_CONFIG[task.energy_required].label}
-                                    </span>
-                                    <span className={`text-xs px-2 py-0.5 rounded-full ${PRIORITY_CONFIG[task.priority].color}`}>
-                                      {PRIORITY_CONFIG[task.priority].label}
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                {/* Title */}
+                <h3 className="text-xl font-bold text-text-primary mb-2 pr-8">{goal.title}</h3>
 
-                        {/* Completed Tasks */}
-                        {completedTasks.length > 0 && (
-                          <div>
-                            <h5 className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-2 mt-4">
-                              Completed ({completedTasks.length})
-                            </h5>
-                            {completedTasks.slice(0, 3).map(task => (
-                              <div key={task.id} className="bg-white rounded-lg p-3 mb-2 flex items-start gap-3 opacity-60">
-                                <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                  <Check className="w-3 h-3 text-green-600" />
-                                </div>
-                                <p className="font-medium text-text-secondary text-sm line-through">{task.title}</p>
-                              </div>
-                            ))}
-                            {completedTasks.length > 3 && (
-                              <p className="text-xs text-text-muted text-center mt-2">
-                                + {completedTasks.length - 3} more completed
-                              </p>
-                            )}
-                          </div>
-                        )}
+                {/* Progress Text */}
+                <p className="text-sm text-text-secondary mb-4">
+                  {progress.completed} of {progress.total} tasks complete
+                </p>
+
+                {/* Circular Progress Indicator */}
+                <div className="flex items-center justify-center">
+                  <div className="relative w-24 h-24">
+                    <div
+                      className="w-24 h-24 rounded-full"
+                      style={{
+                        background: `conic-gradient(
+                          #4FB3D4 ${percentage * 3.6}deg,
+                          #E8E5E0 ${percentage * 3.6}deg
+                        )`
+                      }}
+                    >
+                      <div className="absolute inset-2 bg-white rounded-full flex items-center justify-center">
+                        <span className="text-2xl font-bold text-ocean-600">{percentage}%</span>
                       </div>
-                    ) : (
-                      <div className="text-center py-8">
-                        <CheckSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                        <p className="text-text-secondary font-medium mb-1">No tasks linked to this goal yet</p>
-                        <p className="text-sm text-text-muted">
-                          <a href="/tasks" className="text-primary-600 hover:text-primary-700">
-                            Add tasks
-                          </a>{' '}
-                          to start making progress
-                        </p>
-                      </div>
-                    )}
+                    </div>
                   </div>
-                )}
+                </div>
               </div>
             )
           })}
         </div>
       ) : (
-        <div className="card p-16 text-center shadow-md">
-          <div className="w-20 h-20 bg-gradient-to-br from-primary-100 to-primary-50 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Target className="w-10 h-10 text-primary-600" />
+        <div className="bg-white rounded-2xl p-12 text-center shadow-md">
+          <div className="w-20 h-20 bg-gradient-ocean rounded-full flex items-center justify-center mx-auto mb-6">
+            <Plus className="w-10 h-10 text-white" />
           </div>
           <h3 className="text-2xl font-bold text-text-primary mb-3">No goals yet</h3>
-          <p className="text-text-secondary mb-8 text-lg max-w-md mx-auto">
-            Goals give your tasks meaning. Add 3-5 goals across different areas of your life.
+          <p className="text-text-secondary mb-8 text-base max-w-sm mx-auto">
+            Goals give your tasks meaning. Add your first goal to get started.
           </p>
           <button
             onClick={() => setShowForm(true)}

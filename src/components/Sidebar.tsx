@@ -27,7 +27,7 @@ interface SidebarProps {
 const navigation = [
   { name: 'Overview', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Current State', href: '/checkin', icon: Sparkles },
-  { name: 'Destinations', href: '/goals', icon: Target },
+  { name: 'Goals', href: '/goals', icon: Target },
   { name: 'Steps', href: '/tasks', icon: CheckSquare },
   { name: 'Rituals', href: '/habits', icon: Heart },
   { name: 'How It Works', href: '/how-it-works', icon: HelpCircle },
