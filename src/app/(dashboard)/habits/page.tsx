@@ -102,7 +102,7 @@ export default function HabitsPage() {
       .select('*')
       .eq('user_id', user.id)
       .eq('is_active', true)
-      .order('display_order')
+      .order('display_order') as { data: Habit[] | null }
 
     if (!freshHabits || freshHabits.length === 0) return
 
