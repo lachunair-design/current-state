@@ -286,12 +286,23 @@ export default function CheckinPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="text-center mb-8 animate-fade-in">
+      <div className="text-center mb-6 animate-fade-in">
         <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-green-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
           <Check className="w-8 h-8 text-green-600" />
         </div>
         <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Here's what matches your state</h1>
-        <p className="text-lg text-gray-600">Based on your check-in, these tasks fit your current energy and time.</p>
+        <p className="text-lg text-gray-600">The app chose these for you—no decisions needed.</p>
+      </div>
+
+      {/* Mental Model Explainer */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div className="flex gap-3">
+          <div className="text-2xl flex-shrink-0">🧭</div>
+          <div className="text-sm text-blue-900">
+            <p className="font-semibold mb-1">How this app works:</p>
+            <p>Check-ins guide you. The Tasks page is just a parking lot for later. Let your energy lead.</p>
+          </div>
+        </div>
       </div>
 
       <div className="card p-6 mb-8 flex items-center justify-between shadow-md hover:shadow-lg transition-all animate-slide-in">
@@ -381,27 +392,45 @@ export default function CheckinPage() {
                 )}
 
                 <div className="flex gap-3">
-                  <button
-                    onClick={() => handleTaskAction(task.id, 'completed')}
-                    disabled={submitting === task.id}
-                    className="btn-primary flex-1 shadow-md hover:shadow-lg disabled:opacity-50"
-                  >
-                    {submitting === task.id ? (
-                      <Loader2 className="w-5 h-5 animate-spin mx-auto" />
-                    ) : (
-                      <>
-                        <Check className="w-5 h-5 inline mr-2" />
-                        Mark Complete
-                      </>
-                    )}
-                  </button>
-                  <button
-                    onClick={() => handleTaskAction(task.id, 'deferred')}
-                    disabled={submitting === task.id}
-                    className="btn-secondary px-6 disabled:opacity-50"
-                  >
-                    Not today
-                  </button>
+                  {/* Low energy: Single "Skip" button to reduce decision fatigue */}
+                  {responses.energy_level <= 2 ? (
+                    <button
+                      onClick={() => handleTaskAction(task.id, 'deferred')}
+                      disabled={submitting === task.id}
+                      className="btn-secondary flex-1 disabled:opacity-50"
+                    >
+                      {submitting === task.id ? (
+                        <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+                      ) : (
+                        'Skip for now'
+                      )}
+                    </button>
+                  ) : (
+                    /* Medium/High energy: Show both options */
+                    <>
+                      <button
+                        onClick={() => handleTaskAction(task.id, 'completed')}
+                        disabled={submitting === task.id}
+                        className="btn-primary flex-1 shadow-md hover:shadow-lg disabled:opacity-50"
+                      >
+                        {submitting === task.id ? (
+                          <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+                        ) : (
+                          <>
+                            <Check className="w-5 h-5 inline mr-2" />
+                            Mark Complete
+                          </>
+                        )}
+                      </button>
+                      <button
+                        onClick={() => handleTaskAction(task.id, 'deferred')}
+                        disabled={submitting === task.id}
+                        className="btn-secondary px-6 disabled:opacity-50"
+                      >
+                        Not today
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             )
@@ -485,6 +514,29 @@ export default function CheckinPage() {
 
           <div className="mt-4 text-xs text-gray-500 text-center">
             💡 Tip: Turn off notifications and set a timer to stay focused
+          </div>
+        </div>
+      )}
+
+      {/* Manual Override for High Energy */}
+      {responses.energy_level >= 4 && (
+        <div className="mt-8 card p-6 bg-gradient-to-br from-purple-50 to-white border-purple-200">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
+              <CheckSquare className="w-5 h-5 text-purple-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-1">Feeling ambitious?</h3>
+              <p className="text-sm text-gray-600 mb-3">
+                You have high energy today. If none of these tasks feel right, you can browse your full task list and pick something yourself.
+              </p>
+              <button
+                onClick={() => router.push('/tasks')}
+                className="text-sm text-purple-700 hover:text-purple-900 font-medium underline"
+              >
+                Browse all tasks →
+              </button>
+            </div>
           </div>
         </div>
       )}

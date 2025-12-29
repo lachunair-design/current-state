@@ -21,6 +21,7 @@ export default function GoalsPage() {
   const [expandedGoals, setExpandedGoals] = useState<Set<string>>(new Set())
   const [goalTasks, setGoalTasks] = useState<Record<string, Task[]>>({})
   const [loadingTasks, setLoadingTasks] = useState<Set<string>>(new Set())
+  const [showAllGoals, setShowAllGoals] = useState(false)
   const supabase = createClient()
 
   // Form state
@@ -421,7 +422,24 @@ export default function GoalsPage() {
       {/* Goals List */}
       {goals.length > 0 ? (
         <div className="space-y-4">
-          {goals.map((goal, index) => {
+          {goals.length > 3 && !showAllGoals && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">💡</span>
+                <div className="flex-1 text-sm text-yellow-900">
+                  <p className="font-semibold mb-1">Focus mode: Showing 3 goals</p>
+                  <p>Too many goals can overwhelm. We're showing your first 3 to help you stay focused.</p>
+                </div>
+                <button
+                  onClick={() => setShowAllGoals(true)}
+                  className="text-sm text-yellow-700 hover:text-yellow-900 font-medium underline whitespace-nowrap"
+                >
+                  Show all {goals.length}
+                </button>
+              </div>
+            </div>
+          )}
+          {(showAllGoals ? goals : goals.slice(0, 3)).map((goal, index) => {
             const config = GOAL_CATEGORY_CONFIG[goal.category]
             const isExpanded = expandedGoals.has(goal.id)
             const tasks = goalTasks[goal.id] || []

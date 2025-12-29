@@ -27,6 +27,7 @@ export default function TasksPage() {
   const [workTypeFilter, setWorkTypeFilter] = useState<WorkType | 'all'>('all')
   const [priorityFilter, setPriorityFilter] = useState<PriorityLevel | 'all'>('all')
   const [menuOpen, setMenuOpen] = useState<string | null>(null)
+  const [showAdvanced, setShowAdvanced] = useState(false)
   const supabase = createClient()
   const { celebrate, CelebrationComponent } = useCelebration()
 
@@ -98,6 +99,7 @@ export default function TasksPage() {
   const resetForm = () => {
     setTitle('')
     setGoalId('')
+    setShowAdvanced(false)
     setEnergy('medium')
     setWorkType('admin')
     setTimeEstimate('medium')
@@ -188,14 +190,28 @@ export default function TasksPage() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Steps</h1>
-          <p className="text-gray-600 mt-1">Your work, tagged for energy matching</p>
+          <p className="text-gray-600 mt-1">Your task parking lot—not a to-do list</p>
         </div>
         <button onClick={() => setShowForm(true)} className="btn-primary inline-flex items-center gap-2">
           <Plus className="w-4 h-4" /> Add Task
         </button>
+      </div>
+
+      {/* Mental Model Explainer */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div className="flex gap-3">
+          <div className="text-2xl flex-shrink-0">💡</div>
+          <div className="text-sm text-blue-900">
+            <p className="font-semibold mb-1">How to use this page:</p>
+            <p className="mb-2">This is your <strong>parking lot</strong>—dump tasks here without overthinking. The app will recommend what to work on based on your energy during check-ins.</p>
+            <p className="text-xs text-blue-700">
+              ✨ <strong>Use Energy Check-In</strong> to let the app guide you → <strong>Use this page</strong> to capture tasks manually
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Filters */}
@@ -248,23 +264,6 @@ export default function TasksPage() {
               ))}
             </select>
           </div>
-
-          {/* Priority filter */}
-          <div className="flex-1">
-            <label className="label text-xs">Priority</label>
-            <select
-              value={priorityFilter}
-              onChange={(e) => setPriorityFilter(e.target.value as PriorityLevel | 'all')}
-              className="input text-sm py-1.5"
-            >
-              <option value="all">All Priorities</option>
-              {(Object.keys(PRIORITY_CONFIG) as PriorityLevel[]).map((priority) => (
-                <option key={priority} value={priority}>
-                  {PRIORITY_CONFIG[priority].label}
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
       </div>
 
@@ -280,83 +279,91 @@ export default function TasksPage() {
             </div>
 
             <div className="space-y-4">
+              {/* Primary field: Title only */}
               <div>
-                <label className="label">Task title</label>
-                <input type="text" value={title} onChange={e => setTitle(e.target.value)} className="input" placeholder="What needs to be done?" autoFocus />
+                <label className="label">What needs to be done?</label>
+                <input
+                  type="text"
+                  value={title}
+                  onChange={e => setTitle(e.target.value)}
+                  className="input"
+                  placeholder="Just dump it here—we'll help you match it to your energy"
+                  autoFocus
+                />
                 {title && <TaskVsHabitGuide title={title} />}
+                <p className="text-xs text-gray-500 mt-1">💡 Don't overthink it. Add details later if needed.</p>
               </div>
 
-              <div>
-                <label className="label">Linked goal (optional)</label>
-                <select value={goalId} onChange={e => setGoalId(e.target.value)} className="input">
-                  <option value="">No goal</option>
-                  {goals.map(g => (
-                    <option key={g.id} value={g.id}>{GOAL_CATEGORY_CONFIG[g.category].icon} {g.title}</option>
-                  ))}
-                </select>
-              </div>
+              {/* Expandable details */}
+              <button
+                type="button"
+                onClick={() => setShowAdvanced(!showAdvanced)}
+                className="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1"
+              >
+                {showAdvanced ? '▼' : '▶'} More details (optional)
+              </button>
 
-              <div>
-                <label className="label">Energy required</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {(Object.keys(ENERGY_LEVEL_CONFIG) as EnergyLevel[]).map(e => (
-                    <button key={e} type="button" onClick={() => setEnergy(e)}
-                      className={clsx('p-2 rounded-lg border text-sm transition-all',
-                        energy === e ? `${ENERGY_LEVEL_CONFIG[e].color} border-current` : 'border-gray-200 hover:border-gray-300'
-                      )}>
-                      {ENERGY_LEVEL_CONFIG[e].label}
-                    </button>
-                  ))}
+              {showAdvanced && (
+                <div className="space-y-4 pl-4 border-l-2 border-gray-200">
+                  <div>
+                    <label className="label">Linked goal (optional)</label>
+                    <select value={goalId} onChange={e => setGoalId(e.target.value)} className="input">
+                      <option value="">No goal</option>
+                      {goals.map(g => (
+                        <option key={g.id} value={g.id}>{GOAL_CATEGORY_CONFIG[g.category].icon} {g.title}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="label">Energy required</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {(Object.keys(ENERGY_LEVEL_CONFIG) as EnergyLevel[]).map(e => (
+                        <button key={e} type="button" onClick={() => setEnergy(e)}
+                          className={clsx('p-2 rounded-lg border text-sm transition-all',
+                            energy === e ? `${ENERGY_LEVEL_CONFIG[e].color} border-current` : 'border-gray-200 hover:border-gray-300'
+                          )}>
+                          {ENERGY_LEVEL_CONFIG[e].label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="label">Work type</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {(Object.keys(WORK_TYPE_CONFIG) as WorkType[]).map(w => (
+                        <button key={w} type="button" onClick={() => setWorkType(w)}
+                          className={clsx('p-2 rounded-lg border text-sm transition-all',
+                            workType === w ? 'bg-primary-100 text-primary-700 border-primary-300' : 'border-gray-200 hover:border-gray-300'
+                          )}>
+                          {WORK_TYPE_CONFIG[w].icon} {WORK_TYPE_CONFIG[w].label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="label">Time estimate</label>
+                    <div className="grid grid-cols-5 gap-2">
+                      {(Object.keys(TIME_ESTIMATE_CONFIG) as TimeEstimate[]).map(t => (
+                        <button key={t} type="button" onClick={() => setTimeEstimate(t)}
+                          className={clsx('p-2 rounded-lg border text-xs transition-all',
+                            timeEstimate === t ? 'bg-primary-100 text-primary-700 border-primary-300' : 'border-gray-200 hover:border-gray-300'
+                          )}>
+                          {TIME_ESTIMATE_CONFIG[t].label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="label">Estimated value $ (optional)</label>
+                    <input type="number" value={value} onChange={e => setValue(e.target.value)} className="input" placeholder="e.g., 500" />
+                    <p className="text-xs text-gray-500 mt-1">How much is completing this task worth?</p>
+                  </div>
                 </div>
-              </div>
-
-              <div>
-                <label className="label">Work type</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {(Object.keys(WORK_TYPE_CONFIG) as WorkType[]).map(w => (
-                    <button key={w} type="button" onClick={() => setWorkType(w)}
-                      className={clsx('p-2 rounded-lg border text-sm transition-all',
-                        workType === w ? 'bg-primary-100 text-primary-700 border-primary-300' : 'border-gray-200 hover:border-gray-300'
-                      )}>
-                      {WORK_TYPE_CONFIG[w].icon} {WORK_TYPE_CONFIG[w].label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="label">Time estimate</label>
-                <div className="grid grid-cols-5 gap-2">
-                  {(Object.keys(TIME_ESTIMATE_CONFIG) as TimeEstimate[]).map(t => (
-                    <button key={t} type="button" onClick={() => setTimeEstimate(t)}
-                      className={clsx('p-2 rounded-lg border text-xs transition-all',
-                        timeEstimate === t ? 'bg-primary-100 text-primary-700 border-primary-300' : 'border-gray-200 hover:border-gray-300'
-                      )}>
-                      {TIME_ESTIMATE_CONFIG[t].label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="label">Priority</label>
-                <div className="grid grid-cols-4 gap-2">
-                  {(Object.keys(PRIORITY_CONFIG) as PriorityLevel[]).map(p => (
-                    <button key={p} type="button" onClick={() => setPriority(p)}
-                      className={clsx('p-2 rounded-lg border text-xs transition-all',
-                        priority === p ? `${PRIORITY_CONFIG[p].color} border-current` : 'border-gray-200 hover:border-gray-300'
-                      )}>
-                      {PRIORITY_CONFIG[p].label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="label">Estimated value $ (optional)</label>
-                <input type="number" value={value} onChange={e => setValue(e.target.value)} className="input" placeholder="e.g., 500" />
-                <p className="text-xs text-gray-500 mt-1">How much is completing this task worth?</p>
-              </div>
+              )}
 
               <div className="flex gap-2 pt-4">
                 <button onClick={saveTask} disabled={saving || !title.trim()} className="btn-primary flex-1">

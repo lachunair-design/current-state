@@ -6,7 +6,7 @@ import { GOAL_CATEGORY_CONFIG } from '@/types/database'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
-  
+
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
@@ -20,6 +20,9 @@ export default async function DashboardPage() {
   if (!profile?.onboarding_completed) {
     redirect('/onboarding')
   }
+
+  // Energy is the default entry point - redirect to check-in
+  redirect('/checkin')
 
   // Fetch user's goals
   const { data: goals } = await supabase

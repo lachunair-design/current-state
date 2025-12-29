@@ -346,20 +346,9 @@ export default function HabitsPage() {
       // Manually refresh stats immediately after completion
       await fetchHabitStats()
 
-      // Check for milestone celebrations after refresh
-      const stats = await getHabitStatsForId(habitId)
-      if (stats) {
-        if (stats.currentStreak === 7) {
-          celebrate(`🎉 7-DAY STREAK! You completed "${habit?.title}" for a full week! Your brain is building new pathways! 🧠✨`)
-        } else if (stats.currentStreak === 14) {
-          celebrate(`🔥 2-WEEK STREAK! Incredible consistency on "${habit?.title}"! This is becoming automatic! 💪`)
-        } else if (stats.currentStreak === 30) {
-          celebrate(`🌟 30-DAY STREAK! A full month of "${habit?.title}"! This is now a SOLID habit! 🏆`)
-        } else if (habit) {
-          celebrate(`You completed "${habit.title}"! ${habit.why_this_helps ? habit.why_this_helps + ' 💚' : 'Keep it up! 💪'}`)
-        }
-      } else if (habit) {
-        celebrate(`You completed "${habit.title}"! ${habit.why_this_helps ? habit.why_this_helps + ' 💚' : 'Keep it up! 💪'}`)
+      // Simple completion celebration (no streak pressure)
+      if (habit) {
+        celebrate(`${habit.title} ✓ ${habit.why_this_helps ? habit.why_this_helps + ' 💚' : ''}`)
       }
     } finally {
       setCompletingHabit(null)
@@ -626,65 +615,42 @@ export default function HabitsPage() {
                       </div>
                     )}
 
-                    {/* Habit Stats - Compact Neuroscience-Optimized */}
+                    {/* Habit Stats - Neutral Pattern View */}
                     {habitStats[habit.id] && (
                       <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-100 rounded-lg p-3 mb-3">
-                        {/* Top Row: Streak + Total + Last 7 Days */}
-                        <div className="flex items-center gap-3 mb-2">
-                          {/* Streak */}
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-2xl">🔥</span>
-                            <div>
-                              <div className="flex items-baseline gap-0.5">
-                                <span className="text-xl font-bold text-orange-600">
-                                  {habitStats[habit.id].currentStreak}
-                                </span>
-                                <span className="text-xs text-gray-600 font-medium">day</span>
-                              </div>
+                        <div className="flex items-center gap-3">
+                          {/* 7-Day Pattern - No judgment */}
+                          <div className="flex-1">
+                            <div className="text-xs text-gray-600 mb-1.5">Last 7 days</div>
+                            <div className="flex gap-0.5">
+                              {habitStats[habit.id].last7Days.map((completed, i) => (
+                                <div
+                                  key={i}
+                                  className={clsx(
+                                    'flex-1 h-6 rounded transition-all',
+                                    completed ? 'bg-green-500' : 'bg-gray-200'
+                                  )}
+                                  title={`${7 - i} days ago`}
+                                />
+                              ))}
                             </div>
                           </div>
 
-                          {/* 7-Day Calendar - Compact */}
-                          <div className="flex gap-0.5 flex-1">
-                            {habitStats[habit.id].last7Days.map((completed, i) => (
-                              <div
-                                key={i}
-                                className={clsx(
-                                  'flex-1 h-6 rounded transition-all',
-                                  completed ? 'bg-green-500' : 'bg-gray-200'
-                                )}
-                                title={`${7 - i} days ago${completed ? ' - completed' : ' - missed'}`}
-                              />
-                            ))}
-                          </div>
-
-                          {/* Total */}
+                          {/* Simple Stats */}
                           <div className="text-right">
-                            <div className="text-xs text-gray-500">Total</div>
+                            <div className="text-xs text-gray-500">Completions</div>
                             <div className="text-sm font-bold text-gray-700">
                               {habitStats[habit.id].totalCompletions}
                             </div>
-                          </div>
-                        </div>
-
-                        {/* Bottom Row: Weekly % + Last Completed */}
-                        <div className="flex items-center justify-between text-xs text-gray-600">
-                          <div className="flex items-center gap-1.5">
-                            <span className="font-semibold text-blue-700">
-                              {habitStats[habit.id].weeklyRate}%
-                            </span>
-                            {habitStats[habit.id].weeklyRate >= 80 && (
-                              <span className="text-green-600">💪</span>
+                            {habitStats[habit.id].lastCompleted && (
+                              <div className="text-xs text-gray-500 mt-1">
+                                {new Date(habitStats[habit.id].lastCompleted!).toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                })}
+                              </div>
                             )}
                           </div>
-                          {habitStats[habit.id].lastCompleted && (
-                            <span className="text-gray-500">
-                              Last: {new Date(habitStats[habit.id].lastCompleted!).toLocaleDateString('en-US', {
-                                month: 'short',
-                                day: 'numeric',
-                              })}
-                            </span>
-                          )}
                         </div>
                       </div>
                     )}
