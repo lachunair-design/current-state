@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Sparkles, CheckSquare, Play, Clock } from 'lucide-react'
-import { GOAL_CATEGORY_CONFIG, ENERGY_LEVEL_CONFIG, WORK_TYPE_CONFIG, TIME_ESTIMATE_CONFIG } from '@/types/database'
+import { GOAL_CATEGORY_CONFIG, ENERGY_LEVEL_CONFIG, WORK_TYPE_CONFIG, TIME_ESTIMATE_CONFIG, TimeEstimate, WorkType, EnergyLevel } from '@/types/database'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -46,7 +46,7 @@ export default async function DashboardPage() {
     .eq('user_id', user.id)
     .gte('responded_at', `${today}T00:00:00`)
     .order('responded_at', { ascending: false })
-    .limit(1) as { data: any[] | null }
+    .limit(1) as { data: Array<{ energy_level: number }> | null }
 
   // Fetch completed tasks this week
   const weekAgo = new Date()
@@ -64,7 +64,7 @@ export default async function DashboardPage() {
 
   // Get energy emoji and message
   const getEnergyDisplay = () => {
-    if (!hasCheckedInToday) {
+    if (!hasCheckedInToday || !latestCheckin) {
       return { emoji: '🤔', message: "Haven't checked in yet", suggestion: "Start with a quick energy check" }
     }
     const level = latestCheckin.energy_level
@@ -135,11 +135,11 @@ export default async function DashboardPage() {
             <div className="flex items-center gap-2 mb-4">
               <div className="flex items-center gap-1.5 text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-md">
                 <Clock className="w-3.5 h-3.5" />
-                <span>{TIME_ESTIMATE_CONFIG[topTask.time_estimate]?.label || 'Unknown'}</span>
+                <span>{TIME_ESTIMATE_CONFIG[topTask.time_estimate as TimeEstimate]?.label || 'Unknown'}</span>
               </div>
               <div className="flex items-center gap-1.5 text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded-md">
-                <span>{WORK_TYPE_CONFIG[topTask.work_type]?.icon || '📋'}</span>
-                <span>{WORK_TYPE_CONFIG[topTask.work_type]?.label || 'Task'}</span>
+                <span>{WORK_TYPE_CONFIG[topTask.work_type as WorkType]?.icon || '📋'}</span>
+                <span>{WORK_TYPE_CONFIG[topTask.work_type as WorkType]?.label || 'Task'}</span>
               </div>
             </div>
 
@@ -193,14 +193,14 @@ export default async function DashboardPage() {
                       {task.title}
                     </p>
                     <p className="text-xs text-gray-500 mt-0.5">
-                      {task.goals?.title || 'No goal'} • {TIME_ESTIMATE_CONFIG[task.time_estimate]?.label || 'Unknown time'}
+                      {task.goals?.title || 'No goal'} • {TIME_ESTIMATE_CONFIG[task.time_estimate as TimeEstimate]?.label || 'Unknown time'}
                     </p>
                   </div>
                   <div
                     className={`w-2 h-2 rounded-full flex-shrink-0 ml-3 ${
-                      ENERGY_LEVEL_CONFIG[task.energy_required]?.color || 'bg-gray-400'
+                      ENERGY_LEVEL_CONFIG[task.energy_required as EnergyLevel]?.color || 'bg-gray-400'
                     }`}
-                    title={ENERGY_LEVEL_CONFIG[task.energy_required]?.label}
+                    title={ENERGY_LEVEL_CONFIG[task.energy_required as EnergyLevel]?.label}
                   />
                 </div>
               </div>
