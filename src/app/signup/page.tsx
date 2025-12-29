@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Zap, Loader2, Check } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+
 export default function SignupPage() {
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
@@ -14,7 +16,6 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const router = useRouter()
-  const supabase = createClient()
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -22,6 +23,7 @@ export default function SignupPage() {
     setLoading(true)
 
     try {
+      const supabase = createClient()
       const { error } = await supabase.auth.signUp({
         email,
         password,

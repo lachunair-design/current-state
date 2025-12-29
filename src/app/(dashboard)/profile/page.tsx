@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { User, Loader2, Camera, Save, Mail, MapPin, Globe, Bell, Lightbulb, Send } from 'lucide-react'
+import { User, Loader2, Camera, Save, Mail, MapPin, Globe, Bell, Lightbulb, Send, Trash2, AlertTriangle } from 'lucide-react'
 import { COUNTRIES, TIMEZONES, getTimezoneForCountry } from '@/lib/countries'
 import clsx from 'clsx'
 
@@ -24,6 +24,12 @@ export default function ProfilePage() {
   const [featureRequest, setFeatureRequest] = useState('')
   const [submittingRequest, setSubmittingRequest] = useState(false)
   const [requestSubmitted, setRequestSubmitted] = useState(false)
+
+  // Delete account state
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [deletePassword, setDeletePassword] = useState('')
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
 
   const handleCountryChange = (countryCode: string) => {
     setCountry(countryCode)
@@ -104,6 +110,52 @@ export default function ProfilePage() {
       setTimeout(() => setRequestSubmitted(false), 3000)
     } finally {
       setSubmittingRequest(false)
+    }
+  }
+
+  const deleteAccount = async () => {
+    if (!deletePassword) {
+      setDeleteError('Please enter your password to confirm')
+      return
+    }
+
+    setDeleting(true)
+    setDeleteError('')
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user || !user.email) {
+        setDeleteError('User not found')
+        return
+      }
+
+      // Verify password by attempting to sign in
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: deletePassword,
+      })
+
+      if (signInError) {
+        setDeleteError('Incorrect password. Please try again.')
+        setDeleting(false)
+        return
+      }
+
+      // Delete all user data manually (Supabase CASCADE will handle related data)
+      // Delete habits completions, habits, tasks, goals, daily_responses, profile
+      await supabase.from('habit_completions').delete().eq('user_id', user.id)
+      await supabase.from('habits').delete().eq('user_id', user.id)
+      await supabase.from('tasks').delete().eq('user_id', user.id)
+      await supabase.from('goals').delete().eq('user_id', user.id)
+      await supabase.from('daily_responses').delete().eq('user_id', user.id)
+      await supabase.from('profiles').delete().eq('id', user.id)
+
+      // Sign out and redirect with confirmation
+      await supabase.auth.signOut()
+      window.location.href = '/?deleted=true'
+    } catch (error) {
+      setDeleteError('An error occurred. Please try again.')
+      setDeleting(false)
     }
   }
 
@@ -335,6 +387,30 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        {/* Danger Zone - Delete Account */}
+        <div className="card p-8 animate-slide-in border-2 border-red-200 bg-red-50/50" style={{ animationDelay: '200ms' }}>
+          <h2 className="text-xl font-bold text-red-900 mb-4 flex items-center gap-2">
+            <AlertTriangle className="w-6 h-6 text-red-600" />
+            Danger Zone
+          </h2>
+          <p className="text-red-800 mb-4">
+            Once you delete your account, there is no going back. This will permanently delete:
+          </p>
+          <ul className="text-red-700 text-sm space-y-1 mb-6 ml-6 list-disc">
+            <li>Your profile and all personal information</li>
+            <li>All your goals, tasks, and habits</li>
+            <li>Your check-in history and progress data</li>
+            <li>Any feature requests you've submitted</li>
+          </ul>
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors"
+          >
+            <Trash2 className="w-4 h-4" />
+            Delete My Account
+          </button>
+        </div>
+
         {/* Save Button */}
         <div className="flex justify-end gap-3">
           <button
@@ -356,6 +432,73 @@ export default function ProfilePage() {
           </button>
         </div>
       </div>
+
+      {/* Delete Account Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl animate-slide-in">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                <AlertTriangle className="w-6 h-6 text-red-600" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900">Delete Account?</h3>
+            </div>
+
+            <p className="text-gray-700 mb-6">
+              This action <strong>cannot be undone</strong>. All your data will be permanently deleted from our servers.
+            </p>
+
+            {deleteError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm">
+                {deleteError}
+              </div>
+            )}
+
+            <div className="mb-6">
+              <label className="label">Enter your password to confirm</label>
+              <input
+                type="password"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                className="input"
+                placeholder="Your password"
+                autoFocus
+              />
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false)
+                  setDeletePassword('')
+                  setDeleteError('')
+                }}
+                disabled={deleting}
+                className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={deleteAccount}
+                disabled={deleting || !deletePassword}
+                className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+              >
+                {deleting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4" />
+                    Delete Forever
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

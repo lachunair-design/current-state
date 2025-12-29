@@ -14,7 +14,8 @@ import {
   LogOut,
   Menu,
   X,
-  User as UserIcon
+  User as UserIcon,
+  HelpCircle
 } from 'lucide-react'
 import { User } from '@supabase/supabase-js'
 import clsx from 'clsx'
@@ -29,6 +30,7 @@ const navigation = [
   { name: 'Destinations', href: '/goals', icon: Target },
   { name: 'Steps', href: '/tasks', icon: CheckSquare },
   { name: 'Rituals', href: '/habits', icon: Heart },
+  { name: 'How It Works', href: '/how-it-works', icon: HelpCircle },
 ]
 
 export function Sidebar({ user }: SidebarProps) {
