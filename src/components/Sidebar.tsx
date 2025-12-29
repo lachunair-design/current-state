@@ -52,7 +52,7 @@ export function Sidebar({ user }: SidebarProps) {
         <div className="w-8 h-8 bg-gradient-flow rounded-lg flex items-center justify-center shadow-md">
           <Zap className="w-5 h-5 text-white" />
         </div>
-        <span className="font-accent font-semibold text-lg text-text-primary">Current State</span>
+        <span className="font-semibold text-lg text-text-primary">Current State</span>
       </div>
 
       {/* Navigation */}
@@ -118,7 +118,7 @@ export function Sidebar({ user }: SidebarProps) {
             <div className="w-8 h-8 bg-gradient-flow rounded-lg flex items-center justify-center shadow-md">
               <Zap className="w-5 h-5 text-white" />
             </div>
-            <span className="font-accent font-semibold text-lg text-text-primary">Current State</span>
+            <span className="font-semibold text-lg text-text-primary">Current State</span>
           </div>
           <button
             onClick={() => setMobileOpen(!mobileOpen)}

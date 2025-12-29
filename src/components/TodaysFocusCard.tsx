@@ -115,7 +115,7 @@ export function TodaysFocusCard({ task }: TodaysFocusCardProps) {
     <>
       <div className="mb-6">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-base font-bold font-accent text-text-primary">Today's Focus</h3>
+          <h3 className="text-base font-bold font-semibold text-text-primary">Today's Focus</h3>
         </div>
 
         <div className="rounded-xl bg-dark-card border border-dark-border shadow-sm p-4">
@@ -156,7 +156,7 @@ export function TodaysFocusCard({ task }: TodaysFocusCardProps) {
                 </button>
               </div>
               <div className="text-center mb-3">
-                <div className="text-4xl font-bold font-accent text-accent-green">
+                <div className="text-4xl font-bold font-semibold text-accent-green">
                   {formatTime(timeLeft)}
                 </div>
               </div>

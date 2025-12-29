@@ -170,7 +170,7 @@ export default function ProfilePage() {
   return (
     <div className="max-w-3xl mx-auto">
       <div className="mb-8 animate-fade-in">
-        <h1 className="text-3xl md:text-4xl font-accent font-bold text-text-primary mb-2">Profile</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-2">Profile</h1>
         <p className="text-lg text-text-secondary">Manage your account settings and preferences</p>
       </div>
 

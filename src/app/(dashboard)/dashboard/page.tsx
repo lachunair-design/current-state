@@ -83,7 +83,7 @@ export default async function DashboardPage() {
     <div className="max-w-2xl mx-auto pb-8">
       {/* Compact Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold font-accent text-text-primary mb-1">
+        <h1 className="text-2xl font-bold font-semibold text-text-primary mb-1">
           Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'}, {firstName}
         </h1>
         <p className="text-base text-accent-ocean font-semibold flex items-center gap-2">
@@ -102,7 +102,7 @@ export default async function DashboardPage() {
             <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-accent-ocean text-black text-xs font-bold uppercase tracking-wider mb-2">
               {hasCheckedInToday ? 'Checked In' : 'Not Yet'}
             </span>
-            <h2 className="text-lg font-bold font-accent text-text-primary leading-tight">
+            <h2 className="text-lg font-bold font-semibold text-text-primary leading-tight">
               {energyDisplay.suggestion}
             </h2>
             <p className="text-sm text-text-secondary mt-1">
@@ -144,7 +144,7 @@ export default async function DashboardPage() {
       {tasks && tasks.length > 1 && (
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-base font-bold font-accent text-text-primary">Up Next</h3>
+            <h3 className="text-base font-bold font-semibold text-text-primary">Up Next</h3>
             <Link href="/tasks" className="text-sm font-medium text-accent-ocean hover:text-primary-500">
               See All
             </Link>
@@ -181,7 +181,7 @@ export default async function DashboardPage() {
       {(!tasks || tasks.length === 0) && (
         <div className="bg-white border border-surface-border rounded-xl p-8 text-center">
           <div className="text-5xl mb-3">😊</div>
-          <h3 className="font-bold font-accent text-text-primary mb-2">No tasks yet?</h3>
+          <h3 className="font-bold font-semibold text-text-primary mb-2">No tasks yet?</h3>
           <p className="text-text-secondary mb-4 text-sm">
             Check in first, or add tasks to your parking lot
           </p>

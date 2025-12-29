@@ -49,7 +49,7 @@ export default function LoginPage() {
             <Zap className="w-6 h-6 text-white" />
           </div>
         </Link>
-        <h2 className="mt-6 text-center text-3xl font-accent font-bold text-text-primary">
+        <h2 className="mt-6 text-center text-3xl font-bold text-text-primary">
           Welcome back
         </h2>
         <p className="mt-2 text-center text-text-secondary">

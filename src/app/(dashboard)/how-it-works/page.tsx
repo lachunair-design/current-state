@@ -64,7 +64,7 @@ export default function HowItWorksPage() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-accent-ocean rounded-2xl mb-6">
             <Zap className="w-8 h-8 text-black" />
           </div>
-          <h1 className="text-4xl md:text-5xl font-accent font-bold mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">
             How It Works
           </h1>
           <p className="text-xl text-text-secondary max-w-2xl mx-auto">
@@ -87,7 +87,7 @@ export default function HowItWorksPage() {
                   </div>
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-accent font-bold mb-3">{step.title}</h3>
+                  <h3 className="text-2xl font-bold mb-3">{step.title}</h3>
                   <p className="text-text-secondary text-lg mb-4 leading-relaxed">
                     {step.description}
                   </p>
@@ -104,7 +104,7 @@ export default function HowItWorksPage() {
 
         {/* Core Concepts */}
         <div className="mb-20">
-          <h2 className="text-3xl font-accent font-bold mb-8 text-center">Core Concepts</h2>
+          <h2 className="text-3xl font-bold mb-8 text-center">Core Concepts</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {coreConcepts.map((concept, index) => (
               <div
@@ -125,7 +125,7 @@ export default function HowItWorksPage() {
 
         {/* Task Attributes Guide */}
         <div className="bg-white border border-surface-border rounded-2xl p-8 mb-12">
-          <h2 className="text-2xl font-accent font-bold mb-6">Understanding Task Attributes</h2>
+          <h2 className="text-2xl font-bold mb-6">Understanding Task Attributes</h2>
 
           <div className="space-y-6">
             <div>
@@ -163,7 +163,7 @@ export default function HowItWorksPage() {
 
         {/* CTA */}
         <div className="text-center bg-gradient-to-br from-accent-ocean/10 to-accent-ocean/5 border border-accent-ocean/30 rounded-2xl p-10">
-          <h3 className="text-2xl font-accent font-bold mb-3">Ready to get started?</h3>
+          <h3 className="text-2xl font-bold mb-3">Ready to get started?</h3>
           <p className="text-text-secondary mb-6 max-w-md mx-auto">
             Do your first check-in and see what tasks match your current energy.
           </p>

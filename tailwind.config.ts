@@ -76,8 +76,16 @@ const config: Config = {
         'gradient-sunset-ocean': 'linear-gradient(to bottom, #FFD4A3 0%, #FFFFFF 50%, #A8E6CF 100%)',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        accent: ['Quicksand', 'Comfortaa', 'system-ui', 'sans-serif'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        display: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+      },
+      fontWeight: {
+        light: '300',
+        normal: '400',
+        medium: '500',
+        semibold: '600',
+        bold: '700',
+        extrabold: '800',
       },
     },
   },

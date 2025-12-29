@@ -8,7 +8,7 @@ export default function NotFound() {
     <div className="min-h-screen bg-gradient-to-b from-sunset-50 via-bg-primary to-ocean-50 text-text-primary flex items-center justify-center px-4">
       <div className="text-center max-w-md">
         <div className="mb-8">
-          <h1 className="text-8xl font-accent font-bold text-accent-ocean mb-4">404</h1>
+          <h1 className="text-8xl font-bold text-accent-ocean mb-4">404</h1>
           <h2 className="text-2xl font-bold text-text-primary mb-2">Page Not Found</h2>
           <p className="text-text-secondary">
             The page you're looking for doesn't exist or has been moved.

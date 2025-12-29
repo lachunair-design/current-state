@@ -60,7 +60,7 @@ export default function SignupPage() {
             <div className="w-16 h-16 bg-gradient-ocean rounded-full flex items-center justify-center mx-auto mb-4 shadow-md">
               <Check className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-2xl font-accent font-bold text-text-primary mb-2">You're in!</h2>
+            <h2 className="text-2xl font-bold text-text-primary mb-2">You're in!</h2>
             <p className="text-text-secondary">Setting up your workspace...</p>
           </div>
         </div>
@@ -76,7 +76,7 @@ export default function SignupPage() {
             <Zap className="w-6 h-6 text-white" />
           </div>
         </Link>
-        <h2 className="mt-6 text-center text-3xl font-accent font-bold text-text-primary">
+        <h2 className="mt-6 text-center text-3xl font-bold text-text-primary">
           Start working with your energy
         </h2>
         <p className="mt-2 text-center text-text-secondary">

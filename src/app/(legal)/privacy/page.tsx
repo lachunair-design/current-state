@@ -13,7 +13,7 @@ export default function PrivacyPolicyPage() {
           Back to Home
         </Link>
 
-        <h1 className="text-4xl font-accent font-bold mb-4">Privacy Policy</h1>
+        <h1 className="text-4xl font-bold mb-4">Privacy Policy</h1>
         <p className="text-text-muted mb-8">Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
 
         <div className="prose prose-invert max-w-none space-y-6 text-text-secondary">

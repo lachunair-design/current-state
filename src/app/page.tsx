@@ -11,7 +11,7 @@ export default function LandingPage() {
             <div className="w-10 h-10 bg-gradient-flow rounded-xl flex items-center justify-center shadow-md">
               <Zap className="w-6 h-6 text-white" />
             </div>
-            <span className="font-accent font-semibold text-xl text-text-primary">Current State</span>
+            <span className="font-semibold text-xl text-text-primary">Current State</span>
           </div>
           <div className="flex gap-3">
             <Link href="/login" className="px-4 py-2 rounded-lg font-medium text-text-secondary hover:text-text-primary hover:bg-surface-hover transition-colors">
@@ -33,7 +33,7 @@ export default function LandingPage() {
             <span className="text-sm font-semibold text-white">Free for a limited time • No credit card required</span>
           </div>
 
-          <h1 className="text-5xl md:text-6xl font-accent font-bold text-text-primary mb-6 leading-tight">
+          <h1 className="text-5xl md:text-6xl font-bold text-text-primary mb-6 leading-tight">
             Work with your energy,
             <br />
             <span className="bg-gradient-flow bg-clip-text text-transparent">
@@ -61,7 +61,7 @@ export default function LandingPage() {
       {/* Features */}
       <section className="container mx-auto px-4 py-20">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-accent font-bold text-text-primary mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-text-primary mb-4">
             Stop fighting yourself. Start working smarter.
           </h2>
           <p className="text-lg text-text-secondary max-w-2xl mx-auto">
@@ -113,7 +113,7 @@ export default function LandingPage() {
           <div className="w-16 h-16 bg-gradient-ocean rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
             <CheckCircle className="w-10 h-10 text-white" />
           </div>
-          <h2 className="text-3xl font-accent font-bold text-text-primary mb-4">
+          <h2 className="text-3xl font-bold text-text-primary mb-4">
             No "overdue" badges. No guilt.
           </h2>
           <p className="text-lg text-text-secondary mb-4">
@@ -133,7 +133,7 @@ export default function LandingPage() {
           <div className="w-16 h-16 bg-gradient-flow rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
             <Zap className="w-10 h-10 text-white" />
           </div>
-          <h2 className="text-4xl font-accent font-bold text-text-primary mb-4">
+          <h2 className="text-4xl font-bold text-text-primary mb-4">
             Ready to work with yourself?
           </h2>
           <p className="text-lg text-text-secondary mb-8">
@@ -153,7 +153,7 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
             <div className="w-6 h-6 bg-gradient-flow rounded-lg"></div>
-            <span className="font-accent font-semibold text-text-primary">Current State</span>
+            <span className="font-semibold text-text-primary">Current State</span>
           </div>
           <p className="text-text-muted text-sm mb-2">Built for humans with fluctuating everything.</p>
           <div className="flex items-center justify-center gap-4 text-sm text-text-secondary mb-2">

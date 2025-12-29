@@ -192,7 +192,7 @@ export default function TasksPage() {
     <div className="max-w-3xl mx-auto">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-2xl font-bold font-accent text-text-primary">Steps</h1>
+          <h1 className="text-2xl font-bold font-semibold text-text-primary">Steps</h1>
           <p className="text-text-secondary mt-1">Your task parking lot—not a to-do list</p>
         </div>
         <button onClick={() => setShowForm(true)} className="btn-primary inline-flex items-center gap-2">
@@ -460,7 +460,7 @@ export default function TasksPage() {
       ) : (
         <div className="card p-12 text-center">
           <CheckSquare className="w-16 h-16 text-text-muted mx-auto mb-4" />
-          <h3 className="text-lg font-semibold font-accent text-text-primary mb-2">
+          <h3 className="text-lg font-semibold font-semibold text-text-primary mb-2">
             {filter === 'active' ? 'No active tasks' : 'No completed tasks yet'}
           </h3>
           <p className="text-text-secondary mb-6">
