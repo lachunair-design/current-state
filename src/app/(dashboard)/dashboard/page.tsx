@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { Sparkles, CheckSquare } from 'lucide-react'
 import { GOAL_CATEGORY_CONFIG, ENERGY_LEVEL_CONFIG, TIME_ESTIMATE_CONFIG, TimeEstimate, EnergyLevel } from '@/types/database'
 import { TodaysFocusCard } from '@/components/TodaysFocusCard'
+import { FeedbackCard } from '@/components/FeedbackCard'
+import { FeatureRequestCTA } from '@/components/FeatureRequestCTA'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -115,6 +117,10 @@ export default async function DashboardPage() {
 
       {/* Top Task Card - Single Focus */}
       {topTask && <TodaysFocusCard task={topTask} />}
+
+      {/* Feedback & Feature Request */}
+      <FeedbackCard />
+      <FeatureRequestCTA />
 
       {/* Simple Stats - No Pressure */}
       <div className="mb-6">

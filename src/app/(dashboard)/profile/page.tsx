@@ -170,29 +170,29 @@ export default function ProfilePage() {
   return (
     <div className="max-w-3xl mx-auto">
       <div className="mb-8 animate-fade-in">
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">Profile</h1>
-        <p className="text-lg text-gray-600">Manage your account settings and preferences</p>
+        <h1 className="text-3xl md:text-4xl font-accent font-bold text-text-primary mb-2">Profile</h1>
+        <p className="text-lg text-text-secondary">Manage your account settings and preferences</p>
       </div>
 
       <div className="space-y-6">
         {/* Avatar Section */}
-        <div className="card p-8 animate-slide-in">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Profile Photo</h2>
+        <div className="bg-dark-card border border-dark-border rounded-2xl p-8 animate-slide-in">
+          <h2 className="text-xl font-bold text-text-primary mb-6">Profile Photo</h2>
           <div className="flex items-center gap-6">
             <div className="relative">
               {avatarUrl ? (
                 <img
                   src={avatarUrl}
                   alt="Profile"
-                  className="w-24 h-24 rounded-full object-cover border-4 border-gray-100"
+                  className="w-24 h-24 rounded-full object-cover border-4 border-dark-border"
                 />
               ) : (
-                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary-100 to-primary-50 flex items-center justify-center border-4 border-gray-100">
-                  <User className="w-12 h-12 text-primary-600" />
+                <div className="w-24 h-24 rounded-full bg-accent-green/10 flex items-center justify-center border-4 border-dark-border">
+                  <User className="w-12 h-12 text-accent-green" />
                 </div>
               )}
               <button
-                className="absolute bottom-0 right-0 w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center text-white hover:bg-primary-700 transition-colors shadow-lg"
+                className="absolute bottom-0 right-0 w-8 h-8 bg-accent-green rounded-full flex items-center justify-center text-black hover:bg-primary-600 transition-colors shadow-lg"
                 title="Change photo"
               >
                 <Camera className="w-4 h-4" />
@@ -207,18 +207,18 @@ export default function ProfilePage() {
                 className="input"
                 placeholder="https://example.com/photo.jpg"
               />
-              <p className="text-xs text-gray-500 mt-1">Paste a link to your profile photo</p>
+              <p className="text-xs text-text-muted mt-1">Paste a link to your profile photo</p>
             </div>
           </div>
         </div>
 
         {/* Basic Info */}
-        <div className="card p-8 animate-slide-in" style={{ animationDelay: '50ms' }}>
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Basic Information</h2>
+        <div className="bg-dark-card border border-dark-border rounded-2xl p-8 animate-slide-in" style={{ animationDelay: '50ms' }}>
+          <h2 className="text-xl font-bold text-text-primary mb-6">Basic Information</h2>
           <div className="space-y-4">
             <div>
               <label className="label flex items-center gap-2">
-                <User className="w-4 h-4 text-gray-500" />
+                <User className="w-4 h-4 text-text-muted" />
                 Full Name
               </label>
               <input
@@ -232,22 +232,22 @@ export default function ProfilePage() {
 
             <div>
               <label className="label flex items-center gap-2">
-                <Mail className="w-4 h-4 text-gray-500" />
+                <Mail className="w-4 h-4 text-text-muted" />
                 Email
               </label>
               <input
                 type="email"
                 value={profile?.email || ''}
-                className="input bg-gray-50 cursor-not-allowed"
+                className="input bg-dark-hover cursor-not-allowed opacity-60"
                 disabled
                 readOnly
               />
-              <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+              <p className="text-xs text-text-muted mt-1">Email cannot be changed</p>
             </div>
 
             <div>
               <label className="label flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-gray-500" />
+                <MapPin className="w-4 h-4 text-text-muted" />
                 Country
               </label>
               <select
@@ -262,14 +262,14 @@ export default function ProfilePage() {
                   </option>
                 ))}
               </select>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-text-muted mt-1">
                 🌍 Timezone will auto-update based on your country
               </p>
             </div>
 
             <div>
               <label className="label flex items-center gap-2">
-                <Globe className="w-4 h-4 text-gray-500" />
+                <Globe className="w-4 h-4 text-text-muted" />
                 Timezone
               </label>
               <select
@@ -283,7 +283,7 @@ export default function ProfilePage() {
                   </option>
                 ))}
               </select>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-text-muted mt-1">
                 Auto-detected from country, or select manually
               </p>
             </div>
@@ -291,9 +291,9 @@ export default function ProfilePage() {
         </div>
 
         {/* Notification Preferences */}
-        <div className="card p-8 animate-slide-in" style={{ animationDelay: '100ms' }}>
-          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <Bell className="w-6 h-6 text-primary-600" />
+        <div className="bg-dark-card border border-dark-border rounded-2xl p-8 animate-slide-in" style={{ animationDelay: '100ms' }}>
+          <h2 className="text-xl font-bold text-text-primary mb-6 flex items-center gap-2">
+            <Bell className="w-6 h-6 text-accent-green" />
             Notifications
           </h2>
           <div className="space-y-4">
@@ -305,13 +305,13 @@ export default function ProfilePage() {
                   ...notificationPreferences,
                   daily_checkin: e.target.checked
                 })}
-                className="mt-1 w-5 h-5 text-primary-600 rounded focus:ring-primary-500"
+                className="mt-1 w-5 h-5 accent-accent-green rounded"
               />
               <div className="flex-1">
-                <div className="font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
+                <div className="font-semibold text-text-primary group-hover:text-accent-green transition-colors">
                   Daily Check-in Reminders
                 </div>
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-text-secondary">
                   Get a gentle reminder to check in when you haven't done so today
                 </div>
               </div>
@@ -325,13 +325,13 @@ export default function ProfilePage() {
                   ...notificationPreferences,
                   gentle_reminders: e.target.checked
                 })}
-                className="mt-1 w-5 h-5 text-primary-600 rounded focus:ring-primary-500"
+                className="mt-1 w-5 h-5 accent-accent-green rounded"
               />
               <div className="flex-1">
-                <div className="font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
+                <div className="font-semibold text-text-primary group-hover:text-accent-green transition-colors">
                   Gentle Task Reminders
                 </div>
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-text-secondary">
                   Non-intrusive nudges when you have matched tasks waiting
                 </div>
               </div>
@@ -340,17 +340,17 @@ export default function ProfilePage() {
         </div>
 
         {/* Feature Request */}
-        <div className="card p-8 animate-slide-in" style={{ animationDelay: '150ms' }}>
-          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <Lightbulb className="w-6 h-6 text-yellow-600" />
+        <div id="feature-request" className="bg-dark-card border border-dark-border rounded-2xl p-8 animate-slide-in" style={{ animationDelay: '150ms' }}>
+          <h2 className="text-xl font-bold text-text-primary mb-6 flex items-center gap-2">
+            <Lightbulb className="w-6 h-6 text-accent-amber" />
             Request a Feature
           </h2>
-          <p className="text-gray-600 mb-4">
+          <p className="text-text-secondary mb-4">
             Have an idea to make Current State better? We'd love to hear it!
           </p>
 
           {requestSubmitted && (
-            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4 flex items-center gap-2 animate-fade-in">
+            <div className="bg-accent-green/10 border border-accent-green/30 text-accent-green px-4 py-3 rounded-lg mb-4 flex items-center gap-2 animate-fade-in">
               <Send className="w-4 h-4" />
               <span>Thank you! Your feature request has been submitted.</span>
             </div>
@@ -364,13 +364,13 @@ export default function ProfilePage() {
             maxLength={500}
           />
           <div className="flex items-center justify-between mt-2">
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-text-muted">
               {featureRequest.length} / 500 characters
             </span>
             <button
               onClick={submitFeatureRequest}
               disabled={submittingRequest || !featureRequest.trim()}
-              className="btn-secondary inline-flex items-center gap-2 text-sm mt-2"
+              className="px-4 py-2 bg-dark-hover border border-dark-border rounded-lg font-medium text-text-primary hover:border-accent-green/30 hover:text-accent-green transition-colors disabled:opacity-50 inline-flex items-center gap-2 text-sm mt-2"
             >
               {submittingRequest ? (
                 <>
@@ -388,15 +388,15 @@ export default function ProfilePage() {
         </div>
 
         {/* Danger Zone - Delete Account */}
-        <div className="card p-8 animate-slide-in border-2 border-red-200 bg-red-50/50" style={{ animationDelay: '200ms' }}>
-          <h2 className="text-xl font-bold text-red-900 mb-4 flex items-center gap-2">
-            <AlertTriangle className="w-6 h-6 text-red-600" />
+        <div className="bg-red-950/30 border-2 border-red-500/30 rounded-2xl p-8 animate-slide-in" style={{ animationDelay: '200ms' }}>
+          <h2 className="text-xl font-bold text-red-400 mb-4 flex items-center gap-2">
+            <AlertTriangle className="w-6 h-6 text-red-500" />
             Danger Zone
           </h2>
-          <p className="text-red-800 mb-4">
+          <p className="text-red-300 mb-4">
             Once you delete your account, there is no going back. This will permanently delete:
           </p>
-          <ul className="text-red-700 text-sm space-y-1 mb-6 ml-6 list-disc">
+          <ul className="text-red-200 text-sm space-y-1 mb-6 ml-6 list-disc">
             <li>Your profile and all personal information</li>
             <li>All your goals, tasks, and habits</li>
             <li>Your check-in history and progress data</li>
@@ -435,16 +435,16 @@ export default function ProfilePage() {
 
       {/* Delete Account Modal */}
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl animate-slide-in">
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50 animate-fade-in">
+          <div className="bg-dark-card border border-dark-border rounded-2xl p-8 max-w-md w-full shadow-2xl animate-slide-in">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
+              <div className="w-12 h-12 bg-red-950/50 rounded-full flex items-center justify-center">
+                <AlertTriangle className="w-6 h-6 text-red-500" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900">Delete Account?</h3>
+              <h3 className="text-2xl font-bold text-text-primary">Delete Account?</h3>
             </div>
 
-            <p className="text-gray-700 mb-6">
+            <p className="text-text-secondary mb-6">
               This action <strong>cannot be undone</strong>. All your data will be permanently deleted from our servers.
             </p>
 
@@ -474,7 +474,7 @@ export default function ProfilePage() {
                   setDeleteError('')
                 }}
                 disabled={deleting}
-                className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+                className="flex-1 px-4 py-3 bg-dark-hover border border-dark-border text-text-primary rounded-lg font-medium hover:bg-dark-bg transition-colors"
               >
                 Cancel
               </button>
