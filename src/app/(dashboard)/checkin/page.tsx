@@ -198,8 +198,8 @@ export default function CheckinPage() {
     return (
       <div className="max-w-xl mx-auto">
         <div className="text-center mb-8 animate-fade-in">
-          <div className="w-16 h-16 bg-gradient-to-br from-primary-100 to-primary-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <Sparkles className="w-8 h-8 text-primary-600" />
+          <div className="w-16 h-16 bg-accent-green/10 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <Sparkles className="w-8 h-8 text-accent-green" />
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-2">How are you right now?</h1>
           <p className="text-lg text-text-secondary">Quick check-in to find your perfect tasks</p>
@@ -210,9 +210,9 @@ export default function CheckinPage() {
             <div
               key={i}
               className={clsx('h-2 flex-1 rounded-full transition-all duration-300',
-                i < currentQuestion ? 'bg-gradient-to-r from-primary-600 to-primary-500' :
-                i === currentQuestion ? 'bg-primary-400 scale-110' :
-                'bg-gray-200'
+                i < currentQuestion ? 'bg-accent-green' :
+                i === currentQuestion ? 'bg-accent-green/60 scale-110' :
+                'bg-dark-border'
               )}
             />
           ))}
@@ -236,7 +236,7 @@ export default function CheckinPage() {
                   onClick={() => handleResponse(value)}
                   className={clsx('flex-1 py-5 rounded-2xl text-xl font-bold transition-all duration-200 shadow-sm',
                     responses[question.id] === value
-                      ? 'bg-gradient-to-br from-primary-600 to-primary-700 text-white scale-110 shadow-lg shadow-primary-500/50'
+                      ? 'bg-accent-green text-black scale-110 shadow-lg shadow-accent-green/20'
                       : 'bg-dark-card text-text-secondary hover:bg-dark-hover hover:scale-105 hover:shadow-md'
                   )}
                 >
@@ -246,7 +246,7 @@ export default function CheckinPage() {
             </div>
           </div>
 
-          <div className="flex justify-between mt-10 pt-6 border-t border-gray-100">
+          <div className="flex justify-between mt-10 pt-6 border-t border-dark-border">
             <button
               onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
               disabled={currentQuestion === 0}
@@ -287,8 +287,8 @@ export default function CheckinPage() {
   return (
     <div className="max-w-2xl mx-auto">
       <div className="text-center mb-6 animate-fade-in">
-        <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-green-50 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-          <Check className="w-8 h-8 text-green-600" />
+        <div className="w-16 h-16 bg-gradient-to-br bg-accent-green/10 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+          <Check className="w-8 h-8 text-accent-green" />
         </div>
         <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-2">Here's what matches your state</h1>
         <p className="text-lg text-text-secondary">The app chose these for you—no decisions needed.</p>
@@ -345,7 +345,7 @@ export default function CheckinPage() {
               >
                 {index === 0 && (
                   <div className="flex items-center gap-2 mb-3">
-                    <div className="text-xs font-bold text-primary-600 bg-primary-100 px-3 py-1 rounded-full uppercase tracking-wide">
+                    <div className="text-xs font-bold text-accent-green bg-primary-100 px-3 py-1 rounded-full uppercase tracking-wide">
                       ⭐ Top Match
                     </div>
                   </div>
@@ -356,7 +356,7 @@ export default function CheckinPage() {
                     <h3 className="font-bold text-text-primary text-xl mb-1">{task.title}</h3>
                     {task.goals && (
                       <p className="text-sm text-text-muted font-medium">
-                        <span className="text-primary-600">→</span> {task.goals.title}
+                        <span className="text-accent-green">→</span> {task.goals.title}
                       </p>
                     )}
                   </div>
