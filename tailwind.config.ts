@@ -9,6 +9,26 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Primary - Soft Sage
+        primary: {
+          DEFAULT: '#88B09D',
+          hover: '#769C8A',
+          50: '#F4F8F6',
+          100: '#D8E8E0',
+          200: '#C1E1C1',
+          300: '#A8D5BA',
+          400: '#98C5A9',
+          500: '#88B09D',
+          600: '#769C8A',
+          700: '#638775',
+          800: '#506E60',
+          900: '#3D554B',
+        },
+
+        // Backgrounds
+        'bg-cream': '#FDFCF8',
+        'bg-soft': '#F7F5F0',
+
         // Sunset to Ocean gradient palette (from logo)
         sunset: {
           50: '#FFF9F0',    // Lightest cream
@@ -34,6 +54,18 @@ const config: Config = {
           800: '#1D6678',   // Dark blue
           900: '#124A59',   // Very dark blue
         },
+
+        // Pastel Accents
+        pastel: {
+          blue: '#A7C7E7',
+          'blue-dark': '#89AECF',
+          peach: '#FFD1BA',
+          yellow: '#FDFD96',
+          lavender: '#CDB4DB',
+          sage: '#C1E1C1',
+          rose: '#FFB7B2',
+        },
+
         // Neutral backgrounds
         bg: {
           primary: '#FDFCFA',    // Warm off-white
@@ -42,6 +74,7 @@ const config: Config = {
         },
         // Card and surface colors
         surface: {
+          DEFAULT: '#FFFFFF',
           white: '#FFFFFF',
           cream: '#FFFBF7',
           light: '#F9F8F6',
@@ -50,9 +83,10 @@ const config: Config = {
         },
         // Text colors
         text: {
+          main: '#2C3036',       // Soft Black
           primary: '#124A59',    // Deep ocean (main text)
           secondary: '#2A8296',  // Medium ocean
-          muted: '#6B7280',      // Gray for subtle text
+          muted: '#757B85',      // Warm Gray
           light: '#9CA3AF',      // Light gray
         },
         // Accent colors from gradient
@@ -77,7 +111,20 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
-        display: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        display: ['Manrope', 'Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+      },
+      boxShadow: {
+        'soft': '0 4px 20px -2px rgba(200, 200, 190, 0.25)',
+        'soft-inner': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.02)',
+        'glow-soft': '0 0 15px rgba(136, 176, 157, 0.2)',
+      },
+      borderRadius: {
+        'DEFAULT': '0.5rem',
+        'lg': '1rem',
+        'xl': '1.5rem',
+        '2xl': '2rem',
+        '3xl': '2.5rem',
+        'full': '9999px',
       },
       fontWeight: {
         light: '300',
