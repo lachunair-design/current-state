@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Plus, Loader2, X, MoreVertical, Trash2, Edit2, Rocket, Briefcase, Heart, DollarSign, Users, Home } from 'lucide-react'
+import { Plus, Loader2, X, MoreVertical, Trash2, Edit2, Rocket, Briefcase, Heart, DollarSign, Users, Home, CheckCircle2 } from 'lucide-react'
 import { Goal, GoalCategory, GOAL_CATEGORY_CONFIG, CreateGoalInput } from '@/types/database'
+import { getSmartTaskSuggestions, TaskSuggestion } from '@/lib/goalTaskSuggestions'
 import clsx from 'clsx'
 
 export default function GoalsPage() {
@@ -14,6 +15,13 @@ export default function GoalsPage() {
   const [saving, setSaving] = useState(false)
   const [menuOpen, setMenuOpen] = useState<string | null>(null)
   const [goalProgress, setGoalProgress] = useState<Record<string, { completed: number, total: number }>>({})
+
+  // Task suggestions modal state
+  const [showTaskSuggestions, setShowTaskSuggestions] = useState(false)
+  const [newlyCreatedGoal, setNewlyCreatedGoal] = useState<Goal | null>(null)
+  const [selectedTaskIndices, setSelectedTaskIndices] = useState<number[]>([])
+  const [addingTasks, setAddingTasks] = useState(false)
+
   const supabase = createClient()
 
   // Form state
@@ -142,14 +150,28 @@ export default function GoalsPage() {
           .from('goals')
           .update(goalData as never)
           .eq('id', editingGoal.id)
+        await fetchGoals()
+        resetForm()
       } else {
-        await supabase
+        // Insert new goal and get the created goal back
+        const { data: createdGoal, error } = await supabase
           .from('goals')
           .insert({ ...goalData, user_id: user.id, display_order: goals.length } as never)
-      }
+          .select()
+          .single()
 
-      await fetchGoals()
-      resetForm()
+        if (!error && createdGoal) {
+          await fetchGoals()
+          resetForm()
+
+          // Show task suggestions modal
+          setNewlyCreatedGoal(createdGoal as Goal)
+          const suggestions = getSmartTaskSuggestions((createdGoal as Goal).title, (createdGoal as Goal).category)
+          // Pre-select all suggestions
+          setSelectedTaskIndices(suggestions.map((_, index) => index))
+          setShowTaskSuggestions(true)
+        }
+      }
     } finally {
       setSaving(false)
     }
@@ -163,6 +185,58 @@ export default function GoalsPage() {
     setMenuOpen(null)
   }
 
+  const toggleTaskSelection = (index: number) => {
+    if (selectedTaskIndices.includes(index)) {
+      setSelectedTaskIndices(selectedTaskIndices.filter(i => i !== index))
+    } else {
+      setSelectedTaskIndices([...selectedTaskIndices, index])
+    }
+  }
+
+  const addTasksFromSuggestions = async () => {
+    if (!newlyCreatedGoal || selectedTaskIndices.length === 0) return
+
+    setAddingTasks(true)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const suggestions = getSmartTaskSuggestions(newlyCreatedGoal.title, newlyCreatedGoal.category)
+      const selectedSuggestions = selectedTaskIndices.map(i => suggestions[i]).filter(Boolean)
+
+      // Create tasks from selected suggestions
+      const tasksToInsert = selectedSuggestions.map((suggestion: TaskSuggestion) => ({
+        user_id: user.id,
+        goal_id: newlyCreatedGoal.id,
+        title: suggestion.title,
+        description: suggestion.description || null,
+        energy_required: suggestion.energy_required,
+        work_type: suggestion.work_type,
+        time_estimate: suggestion.time_estimate,
+        priority: suggestion.priority,
+        status: 'active',
+      }))
+
+      await supabase.from('tasks').insert(tasksToInsert as never)
+
+      // Refresh goals to update progress
+      await fetchGoals()
+
+      // Close modal
+      setShowTaskSuggestions(false)
+      setNewlyCreatedGoal(null)
+      setSelectedTaskIndices([])
+    } finally {
+      setAddingTasks(false)
+    }
+  }
+
+  const skipTaskSuggestions = () => {
+    setShowTaskSuggestions(false)
+    setNewlyCreatedGoal(null)
+    setSelectedTaskIndices([])
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -172,7 +246,7 @@ export default function GoalsPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto px-4">
+    <div className="max-w-2xl mx-auto px-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-8 animate-fade-in">
         <div>
@@ -294,9 +368,93 @@ export default function GoalsPage() {
         </div>
       )}
 
+      {/* Task Suggestions Modal */}
+      {showTaskSuggestions && newlyCreatedGoal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-8 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="text-center mb-6">
+              <div className={`w-16 h-16 ${getGoalIcon(newlyCreatedGoal.category, newlyCreatedGoal.title).color} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md`}>
+                <span className="text-3xl">{getGoalIcon(newlyCreatedGoal.category, newlyCreatedGoal.title).emoji}</span>
+              </div>
+              <h2 className="text-2xl font-bold text-text-primary mb-2">Great! Let's break this down</h2>
+              <p className="text-text-secondary text-sm">
+                Here are some tasks to help you achieve <span className="font-semibold text-text-primary">"{newlyCreatedGoal.title}"</span>
+              </p>
+            </div>
+
+            {/* Task Suggestions List */}
+            <div className="space-y-3 mb-6">
+              {getSmartTaskSuggestions(newlyCreatedGoal.title, newlyCreatedGoal.category).slice(0, 5).map((suggestion, index) => (
+                <label
+                  key={index}
+                  className={clsx(
+                    'flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all hover:shadow-md',
+                    selectedTaskIndices.includes(index)
+                      ? 'border-primary bg-primary-50'
+                      : 'border-surface-border bg-white hover:border-primary-200'
+                  )}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedTaskIndices.includes(index)}
+                    onChange={() => toggleTaskSelection(index)}
+                    className="mt-1 w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-text-primary text-sm leading-snug">{suggestion.title}</p>
+                    {suggestion.description && (
+                      <p className="text-xs text-text-muted mt-1">{suggestion.description}</p>
+                    )}
+                    <div className="flex gap-2 mt-2 flex-wrap">
+                      <span className="text-xs px-2 py-0.5 bg-ocean-100 text-ocean-700 rounded-full">
+                        {suggestion.energy_required}
+                      </span>
+                      <span className="text-xs px-2 py-0.5 bg-surface-hover text-text-secondary rounded-full">
+                        {suggestion.time_estimate}
+                      </span>
+                    </div>
+                  </div>
+                </label>
+              ))}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={addTasksFromSuggestions}
+                disabled={addingTasks || selectedTaskIndices.length === 0}
+                className="btn-primary flex-1 flex items-center justify-center gap-2"
+              >
+                {addingTasks ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    <CheckCircle2 className="w-5 h-5" />
+                    Add {selectedTaskIndices.length} {selectedTaskIndices.length === 1 ? 'Task' : 'Tasks'}
+                  </>
+                )}
+              </button>
+              <button
+                onClick={skipTaskSuggestions}
+                disabled={addingTasks}
+                className="btn-secondary px-6"
+              >
+                Skip
+              </button>
+            </div>
+
+            {/* Helper text */}
+            <p className="text-xs text-text-muted text-center mt-4">
+              You can always add more tasks later from the Tasks page
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Goals List */}
       {goals.length > 0 ? (
-        <div className="space-y-4 pb-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-24">
           {goals.map((goal, index) => {
             const progress = goalProgress[goal.id] || { completed: 0, total: 0 }
             const percentage = progress.total > 0 ? Math.round((progress.completed / progress.total) * 100) : 0
@@ -305,7 +463,7 @@ export default function GoalsPage() {
             return (
               <div
                 key={goal.id}
-                className="bg-white rounded-2xl p-6 shadow-md hover:shadow-lg hover:scale-[1.02] transition-all animate-fade-in relative flex items-center gap-6"
+                className="bg-white rounded-2xl p-6 shadow-md hover:shadow-lg hover:scale-[1.01] transition-all animate-fade-in relative flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 {/* Left side content */}
@@ -325,7 +483,7 @@ export default function GoalsPage() {
                 </div>
 
                 {/* Right side: Circular Progress Indicator */}
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 self-center sm:self-auto">
                   <div className="relative w-24 h-24">
                     <div
                       className="w-24 h-24 rounded-full"

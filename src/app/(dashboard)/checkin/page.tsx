@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { ArrowRight, ArrowLeft, Check, Loader2, Sparkles, RotateCcw, Clock, Timer, Calendar, CheckSquare } from 'lucide-react'
+import { ArrowRight, ArrowLeft, Check, Loader2, CheckSquare } from 'lucide-react'
 import {
   QUESTIONNAIRE_QUESTIONS,
   Task,
@@ -12,7 +12,6 @@ import {
   WORK_TYPE_CONFIG,
   TIME_ESTIMATE_CONFIG,
   PRIORITY_CONFIG,
-  Database
 } from '@/types/database'
 import { useCelebration } from '@/components/Celebration'
 import clsx from 'clsx'
@@ -27,10 +26,17 @@ interface MatchedTask {
   reasons: string[]
 }
 
+type MetricKey = 'energy_level' | 'mental_clarity' | 'emotional_state' | 'available_time' | 'environment_quality'
+
 export default function CheckinPage() {
   const [step, setStep] = useState(0)
-  const [currentQuestion, setCurrentQuestion] = useState(0)
-  const [responses, setResponses] = useState<Record<string, number>>({})
+  const [responses, setResponses] = useState<Record<MetricKey, number>>({
+    energy_level: 3,
+    mental_clarity: 3,
+    emotional_state: 3,
+    available_time: 3,
+    environment_quality: 3,
+  })
   const [loading, setLoading] = useState(false)
   const [matchedTasks, setMatchedTasks] = useState<MatchedTask[]>([])
   const [submitting, setSubmitting] = useState<string | null>(null)
@@ -38,20 +44,50 @@ export default function CheckinPage() {
   const supabase = createClient()
   const { celebrate, CelebrationComponent } = useCelebration()
 
-  const question = QUESTIONNAIRE_QUESTIONS[currentQuestion]
-  const isLastQuestion = currentQuestion === QUESTIONNAIRE_QUESTIONS.length - 1
-  const allAnswered = Object.keys(responses).length === QUESTIONNAIRE_QUESTIONS.length
+  const handleResponse = (key: MetricKey, value: number) => {
+    setResponses({ ...responses, [key]: value })
+  }
 
-  const handleResponse = (value: number) => {
-    setResponses({ ...responses, [question.id]: value })
-    if (!isLastQuestion) {
-      setTimeout(() => setCurrentQuestion(currentQuestion + 1), 150)
-    }
+  const getEnergyLabel = (value: number): string => {
+    const percentage = value * 20
+    if (percentage >= 80) return '90%'
+    if (percentage >= 60) return '75%'
+    if (percentage >= 40) return '50%'
+    if (percentage >= 20) return '25%'
+    return '10%'
+  }
+
+  const getClarityLabel = (value: number): string => {
+    if (value >= 4) return 'Sharp'
+    if (value >= 3) return 'Finding Focus'
+    if (value === 2) return 'Hazy'
+    return 'Foggy'
+  }
+
+  const getWeatherLabel = (value: number): string => {
+    if (value >= 4) return 'Bright & Clear'
+    if (value >= 3) return 'Clearing Up'
+    if (value === 2) return 'Partly Cloudy'
+    return 'Stormy'
+  }
+
+  const getStressLabel = (value: number): string => {
+    if (value <= 2) return 'Zen'
+    if (value === 3) return 'Manageable'
+    if (value === 4) return 'Elevated'
+    return 'Overload'
+  }
+
+  const getSparkLabel = (value: number): string => {
+    if (value >= 4) return 'Blazing'
+    if (value >= 3) return 'Ignited'
+    if (value === 2) return 'Warming'
+    return 'Dull'
   }
 
   const matchTasks = (tasks: TaskWithGoal[], state: Record<string, number>): MatchedTask[] => {
     const compositeScore = (
-      state.energy_level + state.mental_clarity + state.emotional_state + 
+      state.energy_level + state.mental_clarity + state.emotional_state +
       state.available_time + state.environment_quality
     ) / 5
 
@@ -133,7 +169,6 @@ export default function CheckinPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('Not authenticated')
 
-      // Type assertion needed due to Supabase type inference issue
       await supabase.from('daily_responses').insert({
         user_id: user.id,
         energy_level: responses.energy_level,
@@ -152,7 +187,6 @@ export default function CheckinPage() {
       const matched = matchTasks(tasks || [], responses)
       setMatchedTasks(matched)
 
-      // Type assertion needed due to Supabase type inference issue
       await supabase.from('profiles').update({
         last_active_at: new Date().toISOString()
       } as never).eq('id', user.id)
@@ -172,7 +206,6 @@ export default function CheckinPage() {
       if (action === 'completed') {
         await supabase.from('tasks').update({ status: 'completed', completed_at: new Date().toISOString() } as never).eq('id', taskId)
 
-        // Celebrate completion!
         if (matchedTask) {
           celebrate(`You completed "${matchedTask.task.title}"! Keep building momentum! 💪`)
         }
@@ -189,101 +222,285 @@ export default function CheckinPage() {
 
   const resetCheckin = () => {
     setStep(0)
-    setCurrentQuestion(0)
-    setResponses({})
+    setResponses({
+      energy_level: 3,
+      mental_clarity: 3,
+      emotional_state: 3,
+      available_time: 3,
+      environment_quality: 3,
+    })
     setMatchedTasks([])
   }
 
   if (step === 0) {
+    const currentDate = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })
+
     return (
-      <div className="max-w-xl mx-auto">
-        <div className="text-center mb-8 animate-fade-in">
-          <div className="w-16 h-16 bg-accent-ocean/10 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-            <Sparkles className="w-8 h-8 text-accent-ocean" />
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-2">How are you right now?</h1>
-          <p className="text-lg text-text-secondary">Quick check-in to find your perfect tasks</p>
+      <div className="relative min-h-screen bg-bg-cream font-display text-text-main w-full lg:max-w-2xl mx-auto">
+        {/* Background Gradients */}
+        <div className="fixed inset-0 pointer-events-none z-0">
+          <div className="absolute top-[-10%] left-[-10%] w-[120%] h-[500px] bg-gradient-to-br from-pastel-peach/20 via-bg-cream to-transparent opacity-60 blur-3xl rounded-full"></div>
+          <div className="absolute bottom-[-10%] right-[-10%] w-[120%] h-[500px] bg-gradient-to-tl from-pastel-blue/10 via-pastel-sage/10 to-transparent opacity-60 blur-3xl rounded-full"></div>
         </div>
 
-        <div className="flex gap-2 mb-8 px-4">
-          {QUESTIONNAIRE_QUESTIONS.map((_, i) => (
-            <div
-              key={i}
-              className={clsx('h-2 flex-1 rounded-full transition-all duration-300',
-                i < currentQuestion ? 'bg-accent-ocean' :
-                i === currentQuestion ? 'bg-accent-ocean/60 scale-110' :
-                'bg-surface-border'
-              )}
-            />
-          ))}
+        {/* Header */}
+        <div className="relative z-10 flex items-center p-6 pb-2 justify-between">
+          <button
+            onClick={() => router.back()}
+            className="text-text-main flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-stone-100 transition-colors"
+          >
+            <span className="material-symbols-outlined text-[24px]">arrow_back</span>
+          </button>
+          <h2 className="text-text-main text-lg font-bold leading-tight tracking-[-0.015em] opacity-80">Daily Rhythm</h2>
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="flex h-10 px-3 items-center justify-center rounded-full hover:bg-stone-100 transition-colors"
+          >
+            <p className="text-text-muted text-sm font-bold leading-normal tracking-[0.015em]">Skip</p>
+          </button>
         </div>
 
-        <div className="card p-8 md:p-10 shadow-lg animate-scale-in">
-          <div className="text-center mb-10">
-            <span className="text-6xl mb-6 block animate-scale-in">{question.icon}</span>
-            <h2 className="text-2xl font-bold text-text-primary leading-tight">{question.question}</h2>
+        {/* Main Content */}
+        <div className="relative z-10 flex-1 overflow-y-auto no-scrollbar pb-32">
+          <div className="px-6 pt-4 pb-6">
+            <p className="text-primary text-sm font-bold tracking-wide uppercase mb-2 flex items-center gap-2 bg-primary/10 w-fit px-3 py-1 rounded-full">
+              <span className="material-symbols-outlined text-[16px]">spa</span>
+              {currentDate}
+            </p>
+            <h1 className="text-text-main text-3xl md:text-4xl font-bold leading-[1.2] tracking-tight">
+              How is your energy <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-pastel-blue-dark">unfolding</span> today?
+            </h1>
           </div>
 
-          <div className="space-y-6">
-            <div className="flex justify-between text-sm font-medium text-text-muted px-2">
-              <span>{question.lowLabel}</span>
-              <span>{question.highLabel}</span>
-            </div>
-            <div className="flex gap-3">
-              {[1, 2, 3, 4, 5].map((value) => (
-                <button
-                  key={value}
-                  onClick={() => handleResponse(value)}
-                  className={clsx('flex-1 py-5 rounded-2xl text-xl font-bold transition-all duration-200 shadow-sm',
-                    responses[question.id] === value
-                      ? 'bg-accent-ocean text-black scale-110 shadow-lg shadow-accent-ocean/20'
-                      : 'bg-white text-text-secondary hover:bg-surface-hover hover:scale-105 hover:shadow-md'
-                  )}
+          {/* Metrics */}
+          <div className="flex flex-col gap-5 px-6">
+            {/* Physical Battery */}
+            <div className="group glass-panel p-5 rounded-3xl transition-all duration-300 hover:shadow-md hover:border-primary/20 border border-transparent relative">
+              <div className="flex justify-between items-end mb-4">
+                <div className="flex flex-col gap-1">
+                  <span className="text-text-muted text-xs font-bold uppercase tracking-wider opacity-70">Body</span>
+                  <span className="text-text-main text-lg font-semibold flex items-center gap-2">
+                    <span className="material-symbols-outlined text-pastel-blue-dark">battery_charging_80</span>
+                    Physical Battery
+                  </span>
+                </div>
+                <span className="text-pastel-blue-dark font-bold text-xl">{getEnergyLabel(responses.energy_level)}</span>
+              </div>
+              <div className="relative h-12 w-full rounded-2xl bg-stone-100 border border-stone-200 p-1 flex items-center shadow-inner cursor-pointer">
+                <div className="absolute -right-[8px] top-1/2 -translate-y-1/2 w-1.5 h-4 bg-stone-300 rounded-r-md pointer-events-none"></div>
+                <div
+                  className="h-full bg-gradient-to-r from-pastel-blue/60 to-pastel-blue rounded-xl shadow-sm transition-all duration-500 relative overflow-hidden pointer-events-none"
+                  style={{ width: `${responses.energy_level * 20}%` }}
                 >
-                  {value}
-                </button>
-              ))}
+                  <div className="absolute top-0 left-0 right-0 h-[40%] bg-white/30 rounded-t-xl"></div>
+                  <div className="absolute bottom-2 right-4 w-1.5 h-1.5 bg-white/60 rounded-full animate-pulse"></div>
+                  <div className="absolute top-3 right-8 w-1 h-1 bg-white/50 rounded-full"></div>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="5"
+                  value={responses.energy_level}
+                  onChange={(e) => handleResponse('energy_level', parseInt(e.target.value))}
+                  className="absolute inset-0 w-full h-full bg-transparent appearance-none cursor-pointer z-10 opacity-0"
+                  style={{ margin: 0 }}
+                  aria-label="Physical Battery Level"
+                />
+              </div>
+            </div>
+
+            {/* Mental Clarity */}
+            <div className="group glass-panel p-5 rounded-3xl transition-all duration-300 hover:shadow-md border border-transparent">
+              <div className="flex justify-between items-end mb-4">
+                <div className="flex flex-col gap-1">
+                  <span className="text-text-muted text-xs font-bold uppercase tracking-wider opacity-70">Mind</span>
+                  <span className="text-text-main text-lg font-semibold flex items-center gap-2">
+                    <span className="material-symbols-outlined text-pastel-lavender">water_drop</span>
+                    Mental Clarity
+                  </span>
+                </div>
+                <span className="text-text-muted text-sm font-medium">{getClarityLabel(responses.mental_clarity)}</span>
+              </div>
+              <div className="relative h-10 flex items-center cursor-pointer">
+                <div className="absolute inset-0 h-3 my-auto rounded-full bg-gradient-to-r from-stone-200 via-pastel-lavender to-pastel-blue-dark opacity-40 pointer-events-none"></div>
+                <input
+                  type="range"
+                  min="1"
+                  max="5"
+                  value={responses.mental_clarity}
+                  onChange={(e) => handleResponse('mental_clarity', parseInt(e.target.value))}
+                  className="absolute inset-0 w-full h-full bg-transparent appearance-none cursor-pointer z-20 opacity-0"
+                  style={{ margin: 0 }}
+                  aria-label="Mental Clarity Level"
+                />
+                <div
+                  className="absolute -ml-3 flex flex-col items-center group-hover:scale-105 transition-transform pointer-events-none"
+                  style={{ left: `${(responses.mental_clarity - 1) * 25}%` }}
+                >
+                  <div className="w-8 h-8 bg-white rounded-full border border-stone-100 shadow-md flex items-center justify-center">
+                    <div className="w-3 h-3 bg-pastel-blue-dark rounded-full opacity-80"></div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-between mt-2 text-xs text-text-muted font-medium px-1">
+                <span>Foggy</span>
+                <span>Sharp</span>
+              </div>
+            </div>
+
+            {/* Inner Weather */}
+            <div className="group glass-panel p-5 rounded-3xl transition-all duration-300 hover:shadow-md border border-transparent">
+              <div className="flex justify-between items-end mb-4">
+                <div className="flex flex-col gap-1">
+                  <span className="text-text-muted text-xs font-bold uppercase tracking-wider opacity-70">Emotion</span>
+                  <span className="text-text-main text-lg font-semibold flex items-center gap-2">
+                    <span className="material-symbols-outlined text-pastel-peach">wb_sunny</span>
+                    Inner Weather
+                  </span>
+                </div>
+                <span className="text-text-muted text-sm font-medium">{getWeatherLabel(responses.emotional_state)}</span>
+              </div>
+              <div className="relative w-full h-14 flex items-center justify-between gap-3 bg-stone-50 rounded-full px-2 border border-stone-100/50 shadow-soft-inner cursor-pointer">
+                <span className="material-symbols-outlined text-stone-300 text-[20px] ml-2 pointer-events-none">cloud</span>
+                <div className="relative flex-1 h-2 bg-stone-200 rounded-full overflow-hidden pointer-events-none">
+                  <div
+                    className="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-stone-300 via-pastel-peach to-pastel-yellow opacity-80 transition-all duration-300"
+                    style={{ width: `${(responses.emotional_state - 1) * 25}%` }}
+                  ></div>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="5"
+                  value={responses.emotional_state}
+                  onChange={(e) => handleResponse('emotional_state', parseInt(e.target.value))}
+                  className="absolute inset-0 w-full h-full bg-transparent appearance-none cursor-pointer z-20 opacity-0"
+                  style={{ margin: 0 }}
+                  aria-label="Emotional State"
+                />
+                <div
+                  className="absolute top-1/2 -translate-y-1/2 -ml-5 w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center border border-stone-50 pointer-events-none"
+                  style={{ left: `${(responses.emotional_state - 1) * 25}%` }}
+                >
+                  <span className="material-symbols-outlined text-[20px] text-orange-300">sunny</span>
+                </div>
+                <span className="material-symbols-outlined text-orange-300 text-[20px] mr-2 pointer-events-none">sunny</span>
+              </div>
+            </div>
+
+            {/* Pressure Valve */}
+            <div className="group glass-panel p-5 rounded-3xl transition-all duration-300 hover:shadow-md border border-transparent">
+              <div className="flex justify-between items-end mb-4">
+                <div className="flex flex-col gap-1">
+                  <span className="text-text-muted text-xs font-bold uppercase tracking-wider opacity-70">Stress</span>
+                  <span className="text-text-main text-lg font-semibold flex items-center gap-2">
+                    <span className="material-symbols-outlined text-pastel-sage">filter_vintage</span>
+                    Pressure Valve
+                  </span>
+                </div>
+                <span className="text-text-muted text-sm font-medium">{getStressLabel(responses.available_time)}</span>
+              </div>
+              <div className="relative pt-4 pb-2 px-1 cursor-pointer">
+                <div className="h-3 w-full bg-gradient-to-r from-pastel-sage via-stone-200 to-pastel-rose rounded-full opacity-60 pointer-events-none"></div>
+                <div className="flex justify-between mt-2 px-1 opacity-40 pointer-events-none">
+                  <div className="w-px h-2 bg-text-main"></div>
+                  <div className="w-px h-2 bg-text-main"></div>
+                  <div className="w-px h-2 bg-text-main"></div>
+                  <div className="w-px h-2 bg-text-main"></div>
+                  <div className="w-px h-2 bg-text-main"></div>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="5"
+                  value={responses.available_time}
+                  onChange={(e) => handleResponse('available_time', parseInt(e.target.value))}
+                  className="absolute inset-0 w-full h-full bg-transparent appearance-none cursor-pointer z-20 opacity-0"
+                  style={{ margin: 0 }}
+                  aria-label="Available Time"
+                />
+                <div
+                  className="absolute top-2 -ml-3 w-7 h-7 bg-white border border-stone-100 rounded-full shadow-md flex items-center justify-center z-10 pointer-events-none"
+                  style={{ left: `${(responses.available_time - 1) * 25}%` }}
+                >
+                  <div className="w-2.5 h-2.5 bg-pastel-sage rounded-full"></div>
+                </div>
+              </div>
+              <div className="flex justify-between mt-2 text-xs text-text-muted font-medium px-1">
+                <span>Zen</span>
+                <span>Overload</span>
+              </div>
+            </div>
+
+            {/* Creative Spark */}
+            <div className="group glass-panel p-5 rounded-3xl transition-all duration-300 hover:shadow-md border border-transparent">
+              <div className="flex justify-between items-end mb-4">
+                <div className="flex flex-col gap-1">
+                  <span className="text-text-muted text-xs font-bold uppercase tracking-wider opacity-70">Drive</span>
+                  <span className="text-text-main text-lg font-semibold flex items-center gap-2">
+                    <span className="material-symbols-outlined text-orange-300">lightbulb</span>
+                    Creative Spark
+                  </span>
+                </div>
+                <span className="text-text-muted text-sm font-medium">{getSparkLabel(responses.environment_quality)}</span>
+              </div>
+              <div className="relative h-12 flex items-center cursor-pointer">
+                <div className="w-full h-2 bg-stone-100 rounded-full overflow-hidden shadow-inner pointer-events-none">
+                  <div
+                    className="h-full bg-gradient-to-r from-stone-200 to-orange-300 opacity-70 transition-all duration-300"
+                    style={{ width: `${responses.environment_quality * 20}%` }}
+                  ></div>
+                </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="5"
+                  value={responses.environment_quality}
+                  onChange={(e) => handleResponse('environment_quality', parseInt(e.target.value))}
+                  className="absolute inset-0 w-full h-full bg-transparent appearance-none cursor-pointer z-20 opacity-0"
+                  style={{ margin: 0 }}
+                  aria-label="Environment Quality"
+                />
+                <div
+                  className="absolute -ml-6 w-12 h-12 bg-gradient-to-br from-orange-100 to-white rounded-full shadow-md flex items-center justify-center text-orange-400 border border-white pointer-events-none"
+                  style={{ left: `${responses.environment_quality * 20}%` }}
+                >
+                  <span className="material-symbols-outlined text-[24px]">local_fire_department</span>
+                </div>
+              </div>
+              <div className="flex justify-between mt-0 text-xs text-text-muted font-medium px-1">
+                <span>Dull</span>
+                <span>Blazing</span>
+              </div>
             </div>
           </div>
 
-          <div className="flex justify-between mt-10 pt-6 border-t border-surface-border">
-            <button
-              onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
-              disabled={currentQuestion === 0}
-              className="btn-secondary inline-flex items-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed"
-            >
-              <ArrowLeft className="w-4 h-4" /> Back
-            </button>
-
-            {isLastQuestion && allAnswered && (
-              <button
-                onClick={submitCheckin}
-                disabled={loading}
-                className="btn-primary inline-flex items-center gap-2 shadow-lg hover:shadow-xl"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Finding tasks...
-                  </>
-                ) : (
-                  <>
-                    See my tasks
-                    <ArrowRight className="w-5 h-5" />
-                  </>
-                )}
-              </button>
-            )}
-          </div>
+          <div className="h-8"></div>
         </div>
 
-        <p className="text-center text-sm font-medium text-text-muted mt-6">
-          Question {currentQuestion + 1} of {QUESTIONNAIRE_QUESTIONS.length}
-        </p>
+        {/* Submit Button */}
+        <div className="absolute bottom-0 w-full p-6 bg-gradient-to-t from-bg-cream via-bg-cream/90 to-transparent pt-12 z-20 backdrop-blur-[2px]">
+          <button
+            onClick={submitCheckin}
+            disabled={loading}
+            className="w-full h-14 bg-primary hover:bg-primary-hover active:scale-[0.98] transition-all duration-200 rounded-2xl flex items-center justify-center gap-3 shadow-glow-soft group text-white disabled:opacity-50"
+          >
+            {loading ? (
+              <Loader2 className="w-6 h-6 animate-spin" />
+            ) : (
+              <>
+                <span className="text-lg font-bold tracking-wide">Log Check-In</span>
+                <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
     )
   }
 
+  // Results page (unchanged functionality)
   return (
     <div className="max-w-2xl mx-auto">
       <div className="text-center mb-6 animate-fade-in">
@@ -294,7 +511,6 @@ export default function CheckinPage() {
         <p className="text-lg text-text-secondary">The app chose these for you—no decisions needed.</p>
       </div>
 
-      {/* Mental Model Explainer */}
       <div className="bg-white border border-surface-border rounded-lg p-4 mb-6">
         <div className="flex gap-3">
           <div className="text-2xl flex-shrink-0">🧭</div>
@@ -322,7 +538,7 @@ export default function CheckinPage() {
           onClick={resetCheckin}
           className="text-sm text-text-muted hover:text-text-secondary flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-surface-hover transition-colors font-medium"
         >
-          <RotateCcw className="w-4 h-4" /> Redo
+          <ArrowLeft className="w-4 h-4" /> Redo
         </button>
       </div>
 
@@ -392,7 +608,6 @@ export default function CheckinPage() {
                 )}
 
                 <div className="flex gap-3">
-                  {/* Low energy: Single "Skip" button to reduce decision fatigue */}
                   {responses.energy_level <= 2 ? (
                     <button
                       onClick={() => handleTaskAction(task.id, 'deferred')}
@@ -406,7 +621,6 @@ export default function CheckinPage() {
                       )}
                     </button>
                   ) : (
-                    /* Medium/High energy: Show both options */
                     <>
                       <button
                         onClick={() => handleTaskAction(task.id, 'completed')}
@@ -455,97 +669,10 @@ export default function CheckinPage() {
         </div>
       )}
 
-      {/* Focus Work Suggestions */}
-      {matchedTasks.length > 0 && (
-        <div className="mt-8 card p-6 bg-gradient-to-br from-indigo-50 to-white border-indigo-100">
-          <div className="flex items-start gap-3 mb-4">
-            <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0">
-              <Timer className="w-5 h-5 text-indigo-600" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-text-primary">Focus Work Suggestions</h3>
-              <p className="text-sm text-text-secondary mt-0.5">Based on your available time and energy</p>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-4">
-            {/* Pomodoro Suggestion */}
-            <div className="bg-white rounded-lg p-4 border border-indigo-100">
-              <div className="flex items-center gap-2 mb-2">
-                <Clock className="w-4 h-4 text-indigo-600" />
-                <h4 className="font-medium text-text-primary">Pomodoro Technique</h4>
-              </div>
-              {responses.available_time <= 2 ? (
-                <p className="text-sm text-text-secondary">
-                  <strong>Quick sprint:</strong> Try 1-2 Pomodoros (25 min work, 5 min break)
-                </p>
-              ) : responses.available_time <= 4 ? (
-                <p className="text-sm text-text-secondary">
-                  <strong>Standard session:</strong> 3-4 Pomodoros with breaks (2 hours total)
-                </p>
-              ) : (
-                <p className="text-sm text-text-secondary">
-                  <strong>Deep work session:</strong> 4-6 Pomodoros with longer breaks (3-4 hours)
-                </p>
-              )}
-            </div>
-
-            {/* Time Blocking Suggestion */}
-            <div className="bg-white rounded-lg p-4 border border-indigo-100">
-              <div className="flex items-center gap-2 mb-2">
-                <Calendar className="w-4 h-4 text-indigo-600" />
-                <h4 className="font-medium text-text-primary">Time Blocking</h4>
-              </div>
-              {responses.mental_clarity >= 4 ? (
-                <p className="text-sm text-text-secondary">
-                  <strong>High clarity:</strong> Start with your hardest task while sharp
-                </p>
-              ) : responses.mental_clarity >= 3 ? (
-                <p className="text-sm text-text-secondary">
-                  <strong>Medium clarity:</strong> Tackle medium-effort tasks first
-                </p>
-              ) : (
-                <p className="text-sm text-text-secondary">
-                  <strong>Low clarity:</strong> Start with quick wins to build momentum
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div className="mt-4 text-xs text-text-muted text-center">
-            💡 Tip: Turn off notifications and set a timer to stay focused
-          </div>
-        </div>
-      )}
-
-      {/* Manual Override for High Energy */}
-      {responses.energy_level >= 4 && (
-        <div className="mt-8 card p-6 bg-gradient-to-br from-purple-50 to-white border-purple-200">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
-              <CheckSquare className="w-5 h-5 text-purple-600" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-text-primary mb-1">Feeling ambitious?</h3>
-              <p className="text-sm text-text-secondary mb-3">
-                You have high energy today. If none of these tasks feel right, you can browse your full task list and pick something yourself.
-              </p>
-              <button
-                onClick={() => router.push('/tasks')}
-                className="text-sm text-purple-700 hover:text-purple-900 font-medium underline"
-              >
-                Browse all tasks →
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       <div className="mt-8 text-center">
         <button onClick={() => router.push('/dashboard')} className="text-text-muted hover:text-text-secondary">Back to dashboard</button>
       </div>
 
-      {/* Celebration Component */}
       {CelebrationComponent}
     </div>
   )
