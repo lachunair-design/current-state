@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Plus, Loader2, X, MoreVertical, Trash2, Edit2, CheckCircle, Heart, Check } from 'lucide-react'
+import { Plus, Loader2, X, MoreVertical, Trash2, Edit2, CheckCircle, Heart, Check, Sparkles, ChevronDown, ChevronRight } from 'lucide-react'
 import {
   Habit,
   HabitType,
@@ -19,6 +19,136 @@ import {
 import { useCelebration } from '@/components/Celebration'
 import { TaskVsHabitGuide } from '@/components/TaskVsHabitGuide'
 import clsx from 'clsx'
+
+// Curated habit suggestions
+interface HabitSuggestion {
+  title: string
+  habitType: HabitType
+  frequency: FrequencyType
+  whyThisHelps: string
+  icon: string
+  category: 'morning' | 'energy' | 'health' | 'focus' | 'evening'
+}
+
+const HABIT_SUGGESTIONS: HabitSuggestion[] = [
+  // Morning rituals
+  {
+    title: '5-minute morning stretch',
+    habitType: 'foundational',
+    frequency: 'daily',
+    whyThisHelps: 'Wake up your body and improve energy',
+    icon: '🧘',
+    category: 'morning'
+  },
+  {
+    title: 'Drink water first thing',
+    habitType: 'foundational',
+    frequency: 'daily',
+    whyThisHelps: 'Rehydrate after sleep',
+    icon: '💧',
+    category: 'morning'
+  },
+  {
+    title: '10-minute morning walk',
+    habitType: 'foundational',
+    frequency: 'daily',
+    whyThisHelps: 'Boost energy and mental clarity',
+    icon: '🚶',
+    category: 'morning'
+  },
+  // Energy & Movement
+  {
+    title: '30-minute workout',
+    habitType: 'performance',
+    frequency: '3x/week',
+    whyThisHelps: 'Build strength and improve mood',
+    icon: '💪',
+    category: 'energy'
+  },
+  {
+    title: 'Take vitamins/supplements',
+    habitType: 'foundational',
+    frequency: 'daily',
+    whyThisHelps: 'Support overall health',
+    icon: '💊',
+    category: 'health'
+  },
+  {
+    title: '15-minute meditation',
+    habitType: 'restorative',
+    frequency: 'daily',
+    whyThisHelps: 'Reduce stress and improve focus',
+    icon: '🧘‍♀️',
+    category: 'focus'
+  },
+  // Focus & Productivity
+  {
+    title: 'Review daily priorities',
+    habitType: 'performance',
+    frequency: 'daily',
+    whyThisHelps: 'Stay aligned with goals',
+    icon: '📋',
+    category: 'focus'
+  },
+  {
+    title: 'Deep work session (90 min)',
+    habitType: 'performance',
+    frequency: '5x/week',
+    whyThisHelps: 'Make progress on important work',
+    icon: '🎯',
+    category: 'focus'
+  },
+  {
+    title: 'Email inbox zero',
+    habitType: 'performance',
+    frequency: 'daily',
+    whyThisHelps: 'Stay organized and responsive',
+    icon: '📧',
+    category: 'focus'
+  },
+  // Health
+  {
+    title: 'Healthy meal prep',
+    habitType: 'foundational',
+    frequency: 'when_needed',
+    whyThisHelps: 'Eat well throughout the week',
+    icon: '🥗',
+    category: 'health'
+  },
+  {
+    title: '8 hours of sleep',
+    habitType: 'restorative',
+    frequency: 'daily',
+    whyThisHelps: 'Restore energy and mental clarity',
+    icon: '😴',
+    category: 'evening'
+  },
+  // Evening routines
+  {
+    title: 'Evening journaling',
+    habitType: 'restorative',
+    frequency: 'daily',
+    whyThisHelps: 'Process thoughts and reduce anxiety',
+    icon: '📝',
+    category: 'evening'
+  },
+  {
+    title: 'No screens 1hr before bed',
+    habitType: 'restorative',
+    frequency: 'daily',
+    whyThisHelps: 'Improve sleep quality',
+    icon: '📱',
+    category: 'evening'
+  },
+  {
+    title: 'Read for 20 minutes',
+    habitType: 'restorative',
+    frequency: 'daily',
+    whyThisHelps: 'Relax mind before sleep',
+    icon: '📚',
+    category: 'evening'
+  },
+]
 
 interface HabitStats {
   totalCompletions: number
@@ -41,6 +171,8 @@ export default function HabitsPage() {
   const [menuOpen, setMenuOpen] = useState<string | null>(null)
   const [completingHabit, setCompletingHabit] = useState<string | null>(null)
   const [selectedVersion, setSelectedVersion] = useState<HabitVersion>('full')
+  const [showSuggestions, setShowSuggestions] = useState(true)
+  const [addingSuggestion, setAddingSuggestion] = useState<string | null>(null)
   const supabase = createClient()
   const { celebrate, CelebrationComponent } = useCelebration()
 
@@ -321,6 +453,45 @@ export default function HabitsPage() {
     setMenuOpen(null)
   }
 
+  const quickAddSuggestion = async (suggestion: HabitSuggestion) => {
+    setAddingSuggestion(suggestion.title)
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const habitData: CreateHabitInput = {
+        title: suggestion.title,
+        habit_type: suggestion.habitType,
+        full_version: suggestion.title,
+        scaled_version: undefined,
+        minimal_version: undefined,
+        target_frequency: suggestion.frequency,
+        linked_goal_id: undefined,
+        why_this_helps: suggestion.whyThisHelps,
+        best_time_of_day: undefined,
+      }
+
+      const result = await supabase
+        .from('habits')
+        .insert({ ...habitData, user_id: user.id, display_order: habits.length } as never)
+
+      if (result.error) {
+        console.error('Error adding habit:', result.error)
+        alert(`Error adding habit: ${result.error.message}`)
+        return
+      }
+
+      await fetchHabits()
+      celebrate(`Added "${suggestion.title}" to your rituals! ${suggestion.icon}`)
+    } catch (error) {
+      console.error('Error adding habit:', error)
+      alert(`Error adding habit: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    } finally {
+      setAddingSuggestion(null)
+    }
+  }
+
   const completeHabit = async (habitId: string) => {
     // Check if already completed today
     if (habitStats[habitId]?.completedToday) {
@@ -393,6 +564,77 @@ export default function HabitsPage() {
           <Plus className="w-5 h-5" /> Add Habit
         </button>
       </div>
+
+      {/* Habit Suggestions */}
+      {(habits.length === 0 || showSuggestions) && (
+        <div className="mb-8 bg-gradient-to-br from-ocean-50 to-sunset-50 border-2 border-ocean-200 rounded-2xl p-6 animate-fade-in">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-ocean-600" />
+              <h2 className="text-xl font-bold text-text-primary">Popular Habits</h2>
+            </div>
+            {habits.length > 0 && (
+              <button
+                onClick={() => setShowSuggestions(!showSuggestions)}
+                className="text-sm text-text-secondary hover:text-text-primary font-medium flex items-center gap-1"
+              >
+                {showSuggestions ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                {showSuggestions ? 'Hide' : 'Show'} suggestions
+              </button>
+            )}
+          </div>
+
+          {showSuggestions && (
+            <div className="grid md:grid-cols-2 gap-3">
+              {HABIT_SUGGESTIONS
+                .filter(s => !habits.some(h => h.title === s.title))
+                .slice(0, 8)
+                .map((suggestion, index) => (
+                  <div
+                    key={index}
+                    className="bg-white border-2 border-surface-border rounded-xl p-4 hover:border-ocean-300 hover:shadow-md transition-all group"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-2xl">{suggestion.icon}</span>
+                          <h3 className="font-semibold text-text-primary">{suggestion.title}</h3>
+                        </div>
+                        <p className="text-sm text-text-secondary mb-2">{suggestion.whyThisHelps}</p>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs bg-ocean-100 text-ocean-800 px-2 py-1 rounded-full font-medium">
+                            {FREQUENCY_CONFIG[suggestion.frequency].label}
+                          </span>
+                          <span className="text-xs bg-surface-hover text-text-secondary px-2 py-1 rounded-full font-medium">
+                            {HABIT_TYPE_CONFIG[suggestion.habitType].label}
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => quickAddSuggestion(suggestion)}
+                        disabled={addingSuggestion === suggestion.title}
+                        className="flex-shrink-0 w-8 h-8 bg-gradient-ocean text-white rounded-full flex items-center justify-center hover:shadow-lg hover:scale-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Quick add"
+                      >
+                        {addingSuggestion === suggestion.title ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Plus className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          )}
+
+          {habits.length === 0 && (
+            <p className="text-sm text-text-muted mt-4 text-center">
+              Click + to quickly add a habit, or create your own custom ritual above
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Form Modal */}
       {showForm && (
