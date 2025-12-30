@@ -236,7 +236,7 @@ export default function CheckinPage() {
     const currentDate = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })
 
     return (
-      <div className="relative min-h-screen bg-bg-cream font-display text-text-main max-w-md mx-auto">
+      <div className="relative min-h-screen bg-bg-cream font-display text-text-main w-full lg:max-w-2xl mx-auto">
         {/* Background Gradients */}
         <div className="fixed inset-0 pointer-events-none z-0">
           <div className="absolute top-[-10%] left-[-10%] w-[120%] h-[500px] bg-gradient-to-br from-pastel-peach/20 via-bg-cream to-transparent opacity-60 blur-3xl rounded-full"></div>
@@ -276,7 +276,7 @@ export default function CheckinPage() {
           {/* Metrics */}
           <div className="flex flex-col gap-5 px-6">
             {/* Physical Battery */}
-            <div className="group glass-panel p-5 rounded-3xl transition-all duration-300 hover:shadow-md hover:border-primary/20 border border-transparent">
+            <div className="group glass-panel p-5 rounded-3xl transition-all duration-300 hover:shadow-md hover:border-primary/20 border border-transparent relative">
               <div className="flex justify-between items-end mb-4">
                 <div className="flex flex-col gap-1">
                   <span className="text-text-muted text-xs font-bold uppercase tracking-wider opacity-70">Body</span>
@@ -287,26 +287,27 @@ export default function CheckinPage() {
                 </div>
                 <span className="text-pastel-blue-dark font-bold text-xl">{getEnergyLabel(responses.energy_level)}</span>
               </div>
-              <div className="relative h-12 w-full rounded-2xl bg-stone-100 border border-stone-200 p-1 flex items-center mb-2 shadow-inner">
-                <div className="absolute -right-[8px] top-1/2 -translate-y-1/2 w-1.5 h-4 bg-stone-300 rounded-r-md"></div>
+              <div className="relative h-12 w-full rounded-2xl bg-stone-100 border border-stone-200 p-1 flex items-center shadow-inner cursor-pointer">
+                <div className="absolute -right-[8px] top-1/2 -translate-y-1/2 w-1.5 h-4 bg-stone-300 rounded-r-md pointer-events-none"></div>
                 <div
-                  className="h-full bg-gradient-to-r from-pastel-blue/60 to-pastel-blue rounded-xl shadow-sm transition-all duration-500 relative overflow-hidden"
+                  className="h-full bg-gradient-to-r from-pastel-blue/60 to-pastel-blue rounded-xl shadow-sm transition-all duration-500 relative overflow-hidden pointer-events-none"
                   style={{ width: `${responses.energy_level * 20}%` }}
                 >
                   <div className="absolute top-0 left-0 right-0 h-[40%] bg-white/30 rounded-t-xl"></div>
                   <div className="absolute bottom-2 right-4 w-1.5 h-1.5 bg-white/60 rounded-full animate-pulse"></div>
                   <div className="absolute top-3 right-8 w-1 h-1 bg-white/50 rounded-full"></div>
                 </div>
+                <input
+                  type="range"
+                  min="1"
+                  max="5"
+                  value={responses.energy_level}
+                  onChange={(e) => handleResponse('energy_level', parseInt(e.target.value))}
+                  className="absolute inset-0 w-full h-full bg-transparent appearance-none cursor-pointer z-10 opacity-0"
+                  style={{ margin: 0 }}
+                  aria-label="Physical Battery Level"
+                />
               </div>
-              <input
-                type="range"
-                min="1"
-                max="5"
-                value={responses.energy_level}
-                onChange={(e) => handleResponse('energy_level', parseInt(e.target.value))}
-                className="w-full h-2 bg-transparent appearance-none cursor-pointer relative z-20 opacity-0 absolute top-0 left-0 right-0 bottom-0"
-                aria-label="Physical Battery Level"
-              />
             </div>
 
             {/* Mental Clarity */}
@@ -321,19 +322,20 @@ export default function CheckinPage() {
                 </div>
                 <span className="text-text-muted text-sm font-medium">{getClarityLabel(responses.mental_clarity)}</span>
               </div>
-              <div className="relative h-10 flex items-center">
-                <div className="absolute inset-0 h-3 my-auto rounded-full bg-gradient-to-r from-stone-200 via-pastel-lavender to-pastel-blue-dark opacity-40"></div>
+              <div className="relative h-10 flex items-center cursor-pointer">
+                <div className="absolute inset-0 h-3 my-auto rounded-full bg-gradient-to-r from-stone-200 via-pastel-lavender to-pastel-blue-dark opacity-40 pointer-events-none"></div>
                 <input
                   type="range"
                   min="1"
                   max="5"
                   value={responses.mental_clarity}
                   onChange={(e) => handleResponse('mental_clarity', parseInt(e.target.value))}
-                  className="w-full h-full bg-transparent appearance-none cursor-pointer relative z-20 opacity-0"
+                  className="absolute inset-0 w-full h-full bg-transparent appearance-none cursor-pointer z-20 opacity-0"
+                  style={{ margin: 0 }}
                   aria-label="Mental Clarity Level"
                 />
                 <div
-                  className="absolute -ml-3 flex flex-col items-center cursor-grab active:cursor-grabbing group-hover:scale-105 transition-transform pointer-events-none"
+                  className="absolute -ml-3 flex flex-col items-center group-hover:scale-105 transition-transform pointer-events-none"
                   style={{ left: `${(responses.mental_clarity - 1) * 25}%` }}
                 >
                   <div className="w-8 h-8 bg-white rounded-full border border-stone-100 shadow-md flex items-center justify-center">
@@ -359,9 +361,9 @@ export default function CheckinPage() {
                 </div>
                 <span className="text-text-muted text-sm font-medium">{getWeatherLabel(responses.emotional_state)}</span>
               </div>
-              <div className="relative w-full h-14 flex items-center justify-between gap-3 bg-stone-50 rounded-full px-2 border border-stone-100/50 shadow-soft-inner">
-                <span className="material-symbols-outlined text-stone-300 text-[20px] ml-2">cloud</span>
-                <div className="relative flex-1 h-2 bg-stone-200 rounded-full overflow-hidden">
+              <div className="relative w-full h-14 flex items-center justify-between gap-3 bg-stone-50 rounded-full px-2 border border-stone-100/50 shadow-soft-inner cursor-pointer">
+                <span className="material-symbols-outlined text-stone-300 text-[20px] ml-2 pointer-events-none">cloud</span>
+                <div className="relative flex-1 h-2 bg-stone-200 rounded-full overflow-hidden pointer-events-none">
                   <div
                     className="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-stone-300 via-pastel-peach to-pastel-yellow opacity-80 transition-all duration-300"
                     style={{ width: `${(responses.emotional_state - 1) * 25}%` }}
@@ -374,6 +376,7 @@ export default function CheckinPage() {
                   value={responses.emotional_state}
                   onChange={(e) => handleResponse('emotional_state', parseInt(e.target.value))}
                   className="absolute inset-0 w-full h-full bg-transparent appearance-none cursor-pointer z-20 opacity-0"
+                  style={{ margin: 0 }}
                   aria-label="Emotional State"
                 />
                 <div
@@ -382,7 +385,7 @@ export default function CheckinPage() {
                 >
                   <span className="material-symbols-outlined text-[20px] text-orange-300">sunny</span>
                 </div>
-                <span className="material-symbols-outlined text-orange-300 text-[20px] mr-2">sunny</span>
+                <span className="material-symbols-outlined text-orange-300 text-[20px] mr-2 pointer-events-none">sunny</span>
               </div>
             </div>
 
@@ -398,9 +401,9 @@ export default function CheckinPage() {
                 </div>
                 <span className="text-text-muted text-sm font-medium">{getStressLabel(responses.available_time)}</span>
               </div>
-              <div className="relative pt-4 pb-2 px-1">
-                <div className="h-3 w-full bg-gradient-to-r from-pastel-sage via-stone-200 to-pastel-rose rounded-full opacity-60"></div>
-                <div className="flex justify-between mt-2 px-1 opacity-40">
+              <div className="relative pt-4 pb-2 px-1 cursor-pointer">
+                <div className="h-3 w-full bg-gradient-to-r from-pastel-sage via-stone-200 to-pastel-rose rounded-full opacity-60 pointer-events-none"></div>
+                <div className="flex justify-between mt-2 px-1 opacity-40 pointer-events-none">
                   <div className="w-px h-2 bg-text-main"></div>
                   <div className="w-px h-2 bg-text-main"></div>
                   <div className="w-px h-2 bg-text-main"></div>
@@ -414,6 +417,7 @@ export default function CheckinPage() {
                   value={responses.available_time}
                   onChange={(e) => handleResponse('available_time', parseInt(e.target.value))}
                   className="absolute inset-0 w-full h-full bg-transparent appearance-none cursor-pointer z-20 opacity-0"
+                  style={{ margin: 0 }}
                   aria-label="Available Time"
                 />
                 <div
@@ -441,8 +445,8 @@ export default function CheckinPage() {
                 </div>
                 <span className="text-text-muted text-sm font-medium">{getSparkLabel(responses.environment_quality)}</span>
               </div>
-              <div className="relative h-12 flex items-center">
-                <div className="w-full h-2 bg-stone-100 rounded-full overflow-hidden shadow-inner">
+              <div className="relative h-12 flex items-center cursor-pointer">
+                <div className="w-full h-2 bg-stone-100 rounded-full overflow-hidden shadow-inner pointer-events-none">
                   <div
                     className="h-full bg-gradient-to-r from-stone-200 to-orange-300 opacity-70 transition-all duration-300"
                     style={{ width: `${responses.environment_quality * 20}%` }}
@@ -455,6 +459,7 @@ export default function CheckinPage() {
                   value={responses.environment_quality}
                   onChange={(e) => handleResponse('environment_quality', parseInt(e.target.value))}
                   className="absolute inset-0 w-full h-full bg-transparent appearance-none cursor-pointer z-20 opacity-0"
+                  style={{ margin: 0 }}
                   aria-label="Environment Quality"
                 />
                 <div
