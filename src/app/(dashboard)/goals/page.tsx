@@ -246,7 +246,7 @@ export default function GoalsPage() {
   }
 
   return (
-    <div className="max-w-md mx-auto px-4">
+    <div className="max-w-2xl mx-auto px-4">
       {/* Header */}
       <div className="flex items-center justify-between mb-8 animate-fade-in">
         <div>
@@ -454,7 +454,7 @@ export default function GoalsPage() {
 
       {/* Goals List */}
       {goals.length > 0 ? (
-        <div className="space-y-4 pb-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-24">
           {goals.map((goal, index) => {
             const progress = goalProgress[goal.id] || { completed: 0, total: 0 }
             const percentage = progress.total > 0 ? Math.round((progress.completed / progress.total) * 100) : 0
@@ -463,7 +463,7 @@ export default function GoalsPage() {
             return (
               <div
                 key={goal.id}
-                className="bg-white rounded-2xl p-6 shadow-md hover:shadow-lg hover:scale-[1.02] transition-all animate-fade-in relative flex items-center gap-6"
+                className="bg-white rounded-2xl p-6 shadow-md hover:shadow-lg hover:scale-[1.01] transition-all animate-fade-in relative flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 {/* Left side content */}
@@ -483,7 +483,7 @@ export default function GoalsPage() {
                 </div>
 
                 {/* Right side: Circular Progress Indicator */}
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 self-center sm:self-auto">
                   <div className="relative w-24 h-24">
                     <div
                       className="w-24 h-24 rounded-full"
