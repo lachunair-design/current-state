@@ -1,0 +1,15 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Disallow private pages
+Disallow: /dashboard
+Disallow: /checkin
+Disallow: /tasks
+Disallow: /goals
+Disallow: /habits
+Disallow: /profile
+Disallow: /onboarding
+
+# Sitemap
+Sitemap: https://currentstate.app/sitemap.xml

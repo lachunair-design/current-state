@@ -6,13 +6,14 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Zap, Loader2 } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-  const supabase = createClient()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -20,6 +21,7 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
+      const supabase = createClient()
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -40,26 +42,26 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50">
+    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gradient-to-b from-sunset-50 via-bg-primary to-ocean-50">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <Link href="/" className="flex items-center justify-center gap-2">
-          <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center">
+          <div className="w-10 h-10 bg-gradient-flow rounded-xl flex items-center justify-center shadow-md">
             <Zap className="w-6 h-6 text-white" />
           </div>
         </Link>
-        <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
+        <h2 className="mt-6 text-center text-3xl font-bold text-text-primary">
           Welcome back
         </h2>
-        <p className="mt-2 text-center text-gray-600">
+        <p className="mt-2 text-center text-text-secondary">
           Ready to match your energy to your tasks?
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow-sm sm:rounded-xl sm:px-10 border border-gray-200">
+        <div className="bg-white py-8 px-4 shadow-lg sm:rounded-2xl sm:px-10 border-2 border-surface-border">
           <form className="space-y-6" onSubmit={handleLogin}>
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              <div className="bg-sunset-50 border-2 border-sunset-300 text-sunset-800 px-4 py-3 rounded-lg text-sm">
                 {error}
               </div>
             )}
@@ -119,10 +121,10 @@ export default function LoginPage() {
           <div className="mt-6">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200" />
+                <div className="w-full border-t border-surface-border" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">New here?</span>
+                <span className="px-2 bg-white text-text-muted">New here?</span>
               </div>
             </div>
 

@@ -30,7 +30,9 @@ export default function OnboardingPage() {
   const [goalTitle, setGoalTitle] = useState('')
   const [goalCategory, setGoalCategory] = useState<GoalCategory>('career')
   const [goalDescription, setGoalDescription] = useState('')
+  const [goalSuccessMetric, setGoalSuccessMetric] = useState('')
   const [incomeStream, setIncomeStream] = useState('')
+  const [goalTargetDate, setGoalTargetDate] = useState('')
 
   const addGoal = () => {
     if (!goalTitle.trim()) return
@@ -40,7 +42,9 @@ export default function OnboardingPage() {
       title: goalTitle.trim(),
       category: goalCategory,
       description: goalDescription.trim() || undefined,
+      success_metric: goalSuccessMetric.trim() || undefined,
       income_stream_name: incomeStream.trim() || undefined,
+      target_date: goalTargetDate || undefined,
       display_order: goals.length,
     }
 
@@ -56,7 +60,9 @@ export default function OnboardingPage() {
     setGoalTitle('')
     setGoalCategory('career')
     setGoalDescription('')
+    setGoalSuccessMetric('')
     setIncomeStream('')
+    setGoalTargetDate('')
     setShowGoalForm(false)
   }
 
@@ -77,7 +83,7 @@ export default function OnboardingPage() {
 
         const { error: goalsError } = await supabase
           .from('goals')
-          .insert(goalsToInsert)
+          .insert(goalsToInsert as never[])
 
         if (goalsError) throw goalsError
       }
@@ -85,10 +91,10 @@ export default function OnboardingPage() {
       // Mark onboarding complete
       const { error: profileError } = await supabase
         .from('profiles')
-        .update({ 
+        .update({
           onboarding_completed: true,
           onboarding_step: 3,
-        })
+        } as never)
         .eq('id', user.id)
 
       if (profileError) throw profileError
@@ -107,14 +113,14 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
+    <div className="min-h-screen page-gradient py-12 px-4">
       <div className="max-w-2xl mx-auto">
         {/* Logo */}
         <div className="flex items-center justify-center gap-2 mb-8">
-          <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center">
+          <div className="w-10 h-10 bg-gradient-flow rounded-xl flex items-center justify-center">
             <Zap className="w-6 h-6 text-white" />
           </div>
-          <span className="font-semibold text-xl text-gray-900">Current State</span>
+          <span className="font-semibold text-xl text-text-primary">Current State</span>
         </div>
 
         {/* Progress */}
@@ -124,15 +130,15 @@ export default function OnboardingPage() {
               <div className={clsx(
                 'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium',
                 step >= s.id 
-                  ? 'bg-primary-600 text-white' 
-                  : 'bg-gray-200 text-gray-500'
+                  ? 'bg-gradient-flow text-white' 
+                  : 'bg-surface-hover text-text-muted'
               )}>
                 {step > s.id ? <Check className="w-4 h-4" /> : s.id}
               </div>
               {i < STEPS.length - 1 && (
                 <div className={clsx(
                   'w-12 h-1 mx-2',
-                  step > s.id ? 'bg-primary-600' : 'bg-gray-200'
+                  step > s.id ? 'bg-gradient-flow' : 'bg-surface-hover'
                 )} />
               )}
             </div>
@@ -144,17 +150,17 @@ export default function OnboardingPage() {
           {/* Step 1: Welcome */}
           {step === 1 && (
             <div className="text-center">
-              <h1 className="text-2xl font-bold text-gray-900 mb-4">
+              <h1 className="text-2xl font-bold text-text-primary mb-4">
                 Let's set up your workspace
               </h1>
-              <p className="text-gray-600 mb-8 max-w-md mx-auto">
+              <p className="text-text-secondary mb-8 max-w-md mx-auto">
                 Current State works by matching tasks to your energy. 
                 First, let's define what you're working toward.
               </p>
 
-              <div className="bg-gray-50 rounded-xl p-6 mb-8 text-left">
-                <h3 className="font-medium text-gray-900 mb-3">How this works:</h3>
-                <ul className="space-y-2 text-sm text-gray-600">
+              <div className="page-gradient rounded-xl p-6 mb-8 text-left">
+                <h3 className="font-medium text-text-primary mb-3">How this works:</h3>
+                <ul className="space-y-2 text-sm text-text-secondary">
                   <li className="flex items-start gap-2">
                     <span className="text-primary-600 font-bold">1.</span>
                     Set 3-5 goals across your life domains
@@ -183,10 +189,10 @@ export default function OnboardingPage() {
           {step === 2 && (
             <div>
               <div className="text-center mb-8">
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                <h1 className="text-2xl font-bold text-text-primary mb-2">
                   What are you working toward?
                 </h1>
-                <p className="text-gray-600">
+                <p className="text-text-secondary">
                   Add 3-5 goals across different areas of your life.
                   You can always add more later.
                 </p>
@@ -203,13 +209,13 @@ export default function OnboardingPage() {
                 {goals.map((goal) => {
                   const config = GOAL_CATEGORY_CONFIG[goal.category]
                   return (
-                    <div key={goal.id} className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
+                    <div key={goal.id} className="flex items-center gap-3 p-4 page-gradient rounded-xl">
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${config.color}`}>
                         <span>{config.icon}</span>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-gray-900 truncate">{goal.title}</h4>
-                        <p className="text-sm text-gray-500">{config.label}</p>
+                        <h4 className="font-medium text-text-primary truncate">{goal.title}</h4>
+                        <p className="text-sm text-text-muted">{config.label}</p>
                       </div>
                       {goal.income_stream_name && (
                         <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full hidden sm:block">
@@ -230,9 +236,38 @@ export default function OnboardingPage() {
               {/* Add goal form */}
               {showGoalForm ? (
                 <div className="border border-gray-200 rounded-xl p-4 mb-6">
+                  {/* SMART Goals Guide */}
+                  <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-4 mb-4">
+                    <h4 className="font-semibold text-text-primary mb-2 flex items-center gap-2">
+                      <span className="text-purple-600">🎯</span> SMART Goals Framework
+                    </h4>
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+                      <div className={clsx('p-2 rounded', goalTitle.trim() ? 'bg-green-100 text-green-800' : 'bg-white text-text-muted')}>
+                        <div className="font-medium">S - Specific</div>
+                        <div className="text-[10px]">Clear title ✓</div>
+                      </div>
+                      <div className={clsx('p-2 rounded', goalSuccessMetric.trim() ? 'bg-green-100 text-green-800' : 'bg-white text-text-muted')}>
+                        <div className="font-medium">M - Measurable</div>
+                        <div className="text-[10px]">How to measure?</div>
+                      </div>
+                      <div className={clsx('p-2 rounded', goalCategory ? 'bg-green-100 text-green-800' : 'bg-white text-text-muted')}>
+                        <div className="font-medium">A - Achievable</div>
+                        <div className="text-[10px]">Realistic ✓</div>
+                      </div>
+                      <div className={clsx('p-2 rounded', goalDescription.trim() || incomeStream.trim() ? 'bg-green-100 text-green-800' : 'bg-white text-text-muted')}>
+                        <div className="font-medium">R - Relevant</div>
+                        <div className="text-[10px]">Why it matters?</div>
+                      </div>
+                      <div className={clsx('p-2 rounded', goalTargetDate ? 'bg-green-100 text-green-800' : 'bg-white text-text-muted')}>
+                        <div className="font-medium">T - Time-bound</div>
+                        <div className="text-[10px]">By when?</div>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="space-y-4">
                     <div>
-                      <label className="label">Goal title</label>
+                      <label className="label">Goal title <span className="text-red-500">*</span></label>
                       <input
                         type="text"
                         value={goalTitle}
@@ -241,6 +276,7 @@ export default function OnboardingPage() {
                         placeholder="e.g., Land a new job, Launch my business"
                         autoFocus
                       />
+                      <p className="text-xs text-text-muted mt-1">✓ Specific: Be clear and concrete</p>
                     </div>
 
                     <div>
@@ -257,7 +293,7 @@ export default function OnboardingPage() {
                                 'p-2 rounded-lg border text-center transition-all',
                                 goalCategory === cat
                                   ? `${config.color} border-current`
-                                  : 'border-gray-200 hover:border-gray-300'
+                                  : 'border-gray-200 hover:border-surface-border'
                               )}
                             >
                               <span className="text-xl">{config.icon}</span>
@@ -266,17 +302,33 @@ export default function OnboardingPage() {
                           )
                         })}
                       </div>
+                      <p className="text-xs text-text-muted mt-1">✓ Achievable & Relevant: Choose the domain this goal belongs to</p>
                     </div>
 
                     <div>
-                      <label className="label">Why does this matter? (optional)</label>
+                      <label className="label">How will you know you succeeded? <span className="text-purple-600">(SMART: Measurable)</span></label>
+                      <input
+                        type="text"
+                        value={goalSuccessMetric}
+                        onChange={(e) => setGoalSuccessMetric(e.target.value)}
+                        className="input"
+                        placeholder="e.g., Receive job offer, First $1000 revenue, Publish 10 blog posts"
+                      />
+                      <p className="text-xs text-text-muted mt-1">
+                        💡 Examples: "Get promoted to Senior", "Save $10k", "Launch MVP to 100 users"
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="label">Why does this matter to you? <span className="text-purple-600">(SMART: Relevant)</span></label>
                       <input
                         type="text"
                         value={goalDescription}
                         onChange={(e) => setGoalDescription(e.target.value)}
                         className="input"
-                        placeholder="e.g., Financial freedom, career growth"
+                        placeholder="e.g., Financial freedom, career growth, health"
                       />
+                      <p className="text-xs text-text-muted mt-1">Connect to your deeper values</p>
                     </div>
 
                     <div>
@@ -288,10 +340,33 @@ export default function OnboardingPage() {
                         className="input"
                         placeholder="e.g., Freelance clients, GUTSY, Consulting"
                       />
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-text-muted mt-1">
                         Add this if this goal is tied to making money
                       </p>
                     </div>
+
+                    <div>
+                      <label className="label">Target date <span className="text-purple-600">(SMART: Time-bound)</span></label>
+                      <input
+                        type="date"
+                        value={goalTargetDate}
+                        onChange={(e) => setGoalTargetDate(e.target.value)}
+                        className="input"
+                      />
+                      <p className="text-xs text-text-muted mt-1">
+                        ⏰ Setting a deadline increases follow-through by 3x
+                      </p>
+                    </div>
+
+                    {/* Large Goal Warning */}
+                    {goalTitle.length > 30 && (
+                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm">
+                        <div className="font-medium text-amber-900 mb-1">💡 Pro tip: Break it down</div>
+                        <p className="text-amber-700 text-xs">
+                          This seems like a big goal! After adding it, consider breaking it into smaller sub-goals or creating specific tasks for the first steps.
+                        </p>
+                      </div>
+                    )}
 
                     <div className="flex gap-2">
                       <button
@@ -315,7 +390,7 @@ export default function OnboardingPage() {
               ) : (
                 <button
                   onClick={() => setShowGoalForm(true)}
-                  className="w-full p-4 border-2 border-dashed border-gray-200 rounded-xl text-gray-500 hover:border-primary-300 hover:text-primary-600 transition-colors flex items-center justify-center gap-2"
+                  className="w-full p-4 border-2 border-dashed border-gray-200 rounded-xl text-text-muted hover:border-primary-300 hover:text-primary-600 transition-colors flex items-center justify-center gap-2"
                 >
                   <Plus className="w-5 h-5" />
                   Add a goal
@@ -349,7 +424,7 @@ export default function OnboardingPage() {
                 </button>
               </div>
 
-              <p className="text-center text-sm text-gray-500 mt-4">
+              <p className="text-center text-sm text-text-muted mt-4">
                 {goals.length === 0 
                   ? "You can add goals later from your dashboard"
                   : `${goals.length} goal${goals.length === 1 ? '' : 's'} added`}
@@ -363,18 +438,18 @@ export default function OnboardingPage() {
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Check className="w-8 h-8 text-green-600" />
               </div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-4">
+              <h1 className="text-2xl font-bold text-text-primary mb-4">
                 You're all set!
               </h1>
-              <p className="text-gray-600 mb-8 max-w-md mx-auto">
+              <p className="text-text-secondary mb-8 max-w-md mx-auto">
                 {goals.length > 0 
                   ? `Great! You've set ${goals.length} goal${goals.length === 1 ? '' : 's'}. Now add some tasks and do your first check-in.`
                   : "Your workspace is ready. Start by adding goals and tasks, then check in to get matched work."}
               </p>
 
               <div className="bg-primary-50 rounded-xl p-6 mb-8 text-left">
-                <h3 className="font-medium text-gray-900 mb-3">Next steps:</h3>
-                <ul className="space-y-2 text-sm text-gray-600">
+                <h3 className="font-medium text-text-primary mb-3">Next steps:</h3>
+                <ul className="space-y-2 text-sm text-text-secondary">
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-primary-600" />
                     Add tasks to your goals

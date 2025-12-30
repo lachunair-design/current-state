@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Plus, Target, Loader2, X, MoreVertical, Trash2, Edit2 } from 'lucide-react'
+import { Plus, Loader2, X, MoreVertical, Trash2, Edit2, Rocket, Briefcase, Heart, DollarSign, Users, Home } from 'lucide-react'
 import { Goal, GoalCategory, GOAL_CATEGORY_CONFIG, CreateGoalInput } from '@/types/database'
 import clsx from 'clsx'
 
@@ -13,13 +13,47 @@ export default function GoalsPage() {
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null)
   const [saving, setSaving] = useState(false)
   const [menuOpen, setMenuOpen] = useState<string | null>(null)
+  const [goalProgress, setGoalProgress] = useState<Record<string, { completed: number, total: number }>>({})
   const supabase = createClient()
 
   // Form state
   const [title, setTitle] = useState('')
   const [category, setCategory] = useState<GoalCategory>('career')
   const [description, setDescription] = useState('')
+  const [successMetric, setSuccessMetric] = useState('')
   const [incomeStream, setIncomeStream] = useState('')
+  const [targetDate, setTargetDate] = useState('')
+
+  // Icon mapping for different goal types
+  const getGoalIcon = (category: GoalCategory, title: string) => {
+    // Check title for keywords first
+    const lowerTitle = title.toLowerCase()
+
+    if (lowerTitle.includes('launch') || lowerTitle.includes('start') || lowerTitle.includes('hustle')) {
+      return { icon: Rocket, color: 'bg-gradient-sunset', emoji: '🚀' }
+    }
+    if (lowerTitle.includes('promotion') || lowerTitle.includes('job') || lowerTitle.includes('career')) {
+      return { icon: Briefcase, color: 'bg-gradient-ocean', emoji: '💼' }
+    }
+    if (lowerTitle.includes('health') || lowerTitle.includes('fitness') || lowerTitle.includes('marathon') || lowerTitle.includes('training')) {
+      return { icon: Heart, color: 'bg-red-100', emoji: '❤️', textColor: 'text-red-600' }
+    }
+    if (lowerTitle.includes('save') || lowerTitle.includes('$') || lowerTitle.includes('money') || lowerTitle.includes('earn')) {
+      return { icon: DollarSign, color: 'bg-emerald-100', emoji: '💰', textColor: 'text-emerald-600' }
+    }
+    if (lowerTitle.includes('family') || lowerTitle.includes('trip') || lowerTitle.includes('vacation')) {
+      return { icon: Users, color: 'bg-orange-100', emoji: '👨‍👩‍👧‍👦', textColor: 'text-orange-600' }
+    }
+
+    // Fallback to category
+    const config = GOAL_CATEGORY_CONFIG[category]
+    return {
+      icon: Home,
+      color: config.color,
+      emoji: config.icon,
+      textColor: 'text-ocean-600'
+    }
+  }
 
   useEffect(() => {
     fetchGoals()
@@ -36,15 +70,40 @@ export default function GoalsPage() {
       .eq('is_active', true)
       .order('display_order')
 
-    setGoals(data || [])
+    if (data) {
+      setGoals(data)
+      // Fetch progress for each goal
+      await fetchAllGoalProgress(data, user.id)
+    }
     setLoading(false)
+  }
+
+  const fetchAllGoalProgress = async (goals: Goal[], userId: string) => {
+    const progressData: Record<string, { completed: number, total: number }> = {}
+
+    for (const goal of goals) {
+      const { data: tasks } = await supabase
+        .from('tasks')
+        .select('id, status')
+        .eq('user_id', userId)
+        .eq('goal_id', goal.id)
+        .in('status', ['active', 'completed'])
+
+      const total = tasks?.length || 0
+      const completed = tasks?.filter((t: any) => t.status === 'completed').length || 0
+      progressData[goal.id] = { completed, total }
+    }
+
+    setGoalProgress(progressData)
   }
 
   const resetForm = () => {
     setTitle('')
     setCategory('career')
     setDescription('')
+    setSuccessMetric('')
     setIncomeStream('')
+    setTargetDate('')
     setShowForm(false)
     setEditingGoal(null)
   }
@@ -54,7 +113,9 @@ export default function GoalsPage() {
     setTitle(goal.title)
     setCategory(goal.category)
     setDescription(goal.description || '')
+    setSuccessMetric(goal.success_metric || '')
     setIncomeStream(goal.income_stream_name || '')
+    setTargetDate(goal.target_date || '')
     setShowForm(true)
     setMenuOpen(null)
   }
@@ -71,18 +132,20 @@ export default function GoalsPage() {
         title: title.trim(),
         category,
         description: description.trim() || undefined,
+        success_metric: successMetric.trim() || undefined,
         income_stream_name: incomeStream.trim() || undefined,
+        target_date: targetDate || undefined,
       }
 
       if (editingGoal) {
         await supabase
           .from('goals')
-          .update(goalData)
+          .update(goalData as never)
           .eq('id', editingGoal.id)
       } else {
         await supabase
           .from('goals')
-          .insert({ ...goalData, user_id: user.id, display_order: goals.length })
+          .insert({ ...goalData, user_id: user.id, display_order: goals.length } as never)
       }
 
       await fetchGoals()
@@ -95,7 +158,7 @@ export default function GoalsPage() {
   const deleteGoal = async (goalId: string) => {
     if (!confirm('Delete this goal? Tasks linked to it will become unlinked.')) return
 
-    await supabase.from('goals').update({ is_active: false }).eq('id', goalId)
+    await supabase.from('goals').update({ is_active: false } as never).eq('id', goalId)
     setGoals(goals.filter(g => g.id !== goalId))
     setMenuOpen(null)
   }
@@ -103,31 +166,38 @@ export default function GoalsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-ocean-600" />
       </div>
     )
   }
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <div className="flex items-center justify-between mb-8">
+    <div className="max-w-md mx-auto px-4">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8 animate-fade-in">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Goals</h1>
-          <p className="text-gray-600 mt-1">What you're working toward</p>
+          <h1 className="text-3xl font-bold text-text-primary mb-1">Your Goals</h1>
+          <p className="text-sm text-text-secondary">Stay in your rhythm</p>
         </div>
-        <button onClick={() => setShowForm(true)} className="btn-primary inline-flex items-center gap-2">
-          <Plus className="w-4 h-4" /> Add Goal
+        <button
+          onClick={() => setShowForm(true)}
+          className="w-12 h-12 bg-gradient-ocean text-white rounded-full flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all shadow-md"
+        >
+          <Plus className="w-6 h-6" />
         </button>
       </div>
 
       {/* Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-lg w-full p-6" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-8 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold">{editingGoal ? 'Edit Goal' : 'Add New Goal'}</h2>
-              <button onClick={resetForm} className="text-gray-400 hover:text-gray-600">
-                <X className="w-5 h-5" />
+              <h2 className="text-2xl font-bold text-text-primary">{editingGoal ? 'Edit Goal' : 'Add New Goal'}</h2>
+              <button
+                onClick={resetForm}
+                className="text-text-muted hover:text-text-secondary p-2 hover:bg-surface-hover rounded-lg transition-colors"
+              >
+                <X className="w-6 h-6" />
               </button>
             </div>
 
@@ -139,7 +209,7 @@ export default function GoalsPage() {
                   value={title}
                   onChange={e => setTitle(e.target.value)}
                   className="input"
-                  placeholder="e.g., Land a new job, Launch my business"
+                  placeholder="e.g., Launch Side Hustle, Get Promoted"
                   autoFocus
                 />
               </div>
@@ -156,7 +226,7 @@ export default function GoalsPage() {
                         onClick={() => setCategory(cat)}
                         className={clsx(
                           'p-3 rounded-lg border text-center transition-all',
-                          category === cat ? `${config.color} border-current` : 'border-gray-200 hover:border-gray-300'
+                          category === cat ? `${config.color} border-current` : 'border-surface-border hover:border-surface-border'
                         )}
                       >
                         <span className="text-xl">{config.icon}</span>
@@ -165,6 +235,18 @@ export default function GoalsPage() {
                     )
                   })}
                 </div>
+              </div>
+
+              <div>
+                <label className="label">How will you measure success?</label>
+                <input
+                  type="text"
+                  value={successMetric}
+                  onChange={e => setSuccessMetric(e.target.value)}
+                  className="input"
+                  placeholder="e.g., Get promoted, Earn $50k, Lose 20 lbs"
+                />
+                <p className="text-xs text-text-muted mt-1">What does "done" look like?</p>
               </div>
 
               <div>
@@ -187,7 +269,18 @@ export default function GoalsPage() {
                   className="input"
                   placeholder="e.g., Freelance clients, Consulting"
                 />
-                <p className="text-xs text-gray-500 mt-1">Add this if this goal generates income</p>
+                <p className="text-xs text-text-muted mt-1">Add this if this goal generates income</p>
+              </div>
+
+              <div>
+                <label className="label">Target date (optional)</label>
+                <input
+                  type="date"
+                  value={targetDate}
+                  onChange={e => setTargetDate(e.target.value)}
+                  className="input"
+                />
+                <p className="text-xs text-text-muted mt-1">When do you want to achieve this goal?</p>
               </div>
 
               <div className="flex gap-2 pt-4">
@@ -203,46 +296,72 @@ export default function GoalsPage() {
 
       {/* Goals List */}
       {goals.length > 0 ? (
-        <div className="space-y-3">
-          {goals.map((goal) => {
-            const config = GOAL_CATEGORY_CONFIG[goal.category]
+        <div className="space-y-4 pb-24">
+          {goals.map((goal, index) => {
+            const progress = goalProgress[goal.id] || { completed: 0, total: 0 }
+            const percentage = progress.total > 0 ? Math.round((progress.completed / progress.total) * 100) : 0
+            const iconConfig = getGoalIcon(goal.category, goal.title)
+
             return (
-              <div key={goal.id} className="card p-4 flex items-center gap-4 group">
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${config.color}`}>
-                  <span className="text-2xl">{config.icon}</span>
-                </div>
+              <div
+                key={goal.id}
+                className="bg-white rounded-2xl p-6 shadow-md hover:shadow-lg hover:scale-[1.02] transition-all animate-fade-in relative flex items-center gap-6"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                {/* Left side content */}
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900">{goal.title}</h3>
-                  <div className="flex items-center gap-2 mt-1">
-                    <span className="text-sm text-gray-500">{config.label}</span>
-                    {goal.income_stream_name && (
-                      <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
-                        💰 {goal.income_stream_name}
-                      </span>
-                    )}
+                  {/* Icon */}
+                  <div className={`w-16 h-16 ${iconConfig.color} rounded-2xl flex items-center justify-center mb-4 shadow-sm`}>
+                    <span className="text-3xl">{iconConfig.emoji}</span>
                   </div>
-                  {goal.description && (
-                    <p className="text-sm text-gray-500 mt-1">{goal.description}</p>
-                  )}
+
+                  {/* Title */}
+                  <h3 className="text-xl font-bold text-text-primary mb-2 pr-8">{goal.title}</h3>
+
+                  {/* Progress Text */}
+                  <p className="text-sm text-text-secondary">
+                    {progress.completed} of {progress.total} tasks complete
+                  </p>
                 </div>
-                <div className="relative">
+
+                {/* Right side: Circular Progress Indicator */}
+                <div className="flex-shrink-0">
+                  <div className="relative w-24 h-24">
+                    <div
+                      className="w-24 h-24 rounded-full"
+                      style={{
+                        background: `conic-gradient(
+                          #4FB3D4 ${percentage * 3.6}deg,
+                          #E8E5E0 ${percentage * 3.6}deg
+                        )`
+                      }}
+                    >
+                      <div className="absolute inset-2 bg-white rounded-full flex items-center justify-center">
+                        <span className="text-2xl font-bold text-ocean-600">{percentage}%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Menu button */}
+                <div className="absolute top-4 right-4">
                   <button
                     onClick={() => setMenuOpen(menuOpen === goal.id ? null : goal.id)}
-                    className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                    className="p-2 text-text-muted hover:text-text-secondary rounded-lg hover:bg-surface-hover transition-colors"
                   >
                     <MoreVertical className="w-5 h-5" />
                   </button>
                   {menuOpen === goal.id && (
-                    <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10 w-32">
+                    <div className="absolute right-0 top-full mt-2 bg-white border border-surface-border rounded-xl shadow-xl py-1 z-10 w-36 animate-scale-in">
                       <button
                         onClick={() => openEditForm(goal)}
-                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                        className="w-full px-4 py-2.5 text-left text-sm font-medium text-text-secondary hover:bg-surface-hover flex items-center gap-2 transition-colors"
                       >
                         <Edit2 className="w-4 h-4" /> Edit
                       </button>
                       <button
                         onClick={() => deleteGoal(goal.id)}
-                        className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                        className="w-full px-4 py-2.5 text-left text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" /> Delete
                       </button>
@@ -254,14 +373,19 @@ export default function GoalsPage() {
           })}
         </div>
       ) : (
-        <div className="card p-12 text-center">
-          <Target className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No goals yet</h3>
-          <p className="text-gray-600 mb-6">
-            Goals give your tasks meaning. Add 3-5 goals across different areas of your life.
+        <div className="bg-white rounded-2xl p-12 text-center shadow-md">
+          <div className="w-20 h-20 bg-gradient-ocean rounded-full flex items-center justify-center mx-auto mb-6">
+            <Plus className="w-10 h-10 text-white" />
+          </div>
+          <h3 className="text-2xl font-bold text-text-primary mb-3">No goals yet</h3>
+          <p className="text-text-secondary mb-8 text-base max-w-sm mx-auto">
+            Goals give your tasks meaning. Add your first goal to get started.
           </p>
-          <button onClick={() => setShowForm(true)} className="btn-primary inline-flex items-center gap-2">
-            <Plus className="w-4 h-4" /> Add your first goal
+          <button
+            onClick={() => setShowForm(true)}
+            className="btn-primary inline-flex items-center gap-2 shadow-lg hover:shadow-xl"
+          >
+            <Plus className="w-5 h-5" /> Add your first goal
           </button>
         </div>
       )}

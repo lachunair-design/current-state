@@ -3,16 +3,18 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { ArrowRight, ArrowLeft, Check, Loader2, Sparkles, RotateCcw } from 'lucide-react'
-import { 
-  QUESTIONNAIRE_QUESTIONS, 
+import { ArrowRight, ArrowLeft, Check, Loader2, Sparkles, RotateCcw, Clock, Timer, Calendar, CheckSquare } from 'lucide-react'
+import {
+  QUESTIONNAIRE_QUESTIONS,
   Task,
   Goal,
   ENERGY_LEVEL_CONFIG,
   WORK_TYPE_CONFIG,
   TIME_ESTIMATE_CONFIG,
-  PRIORITY_CONFIG
+  PRIORITY_CONFIG,
+  Database
 } from '@/types/database'
+import { useCelebration } from '@/components/Celebration'
 import clsx from 'clsx'
 
 interface TaskWithGoal extends Task {
@@ -34,6 +36,7 @@ export default function CheckinPage() {
   const [submitting, setSubmitting] = useState<string | null>(null)
   const router = useRouter()
   const supabase = createClient()
+  const { celebrate, CelebrationComponent } = useCelebration()
 
   const question = QUESTIONNAIRE_QUESTIONS[currentQuestion]
   const isLastQuestion = currentQuestion === QUESTIONNAIRE_QUESTIONS.length - 1
@@ -130,14 +133,15 @@ export default function CheckinPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) throw new Error('Not authenticated')
 
+      // Type assertion needed due to Supabase type inference issue
       await supabase.from('daily_responses').insert({
         user_id: user.id,
-        energy_level: responses.energy_level as number,
-        mental_clarity: responses.mental_clarity as number,
-        emotional_state: responses.emotional_state as number,
-        available_time: responses.available_time as number,
-        environment_quality: responses.environment_quality as number,
-      } as any)
+        energy_level: responses.energy_level,
+        mental_clarity: responses.mental_clarity,
+        emotional_state: responses.emotional_state,
+        available_time: responses.available_time,
+        environment_quality: responses.environment_quality,
+      } as never)
 
       const { data: tasks } = await supabase
         .from('tasks')
@@ -148,7 +152,10 @@ export default function CheckinPage() {
       const matched = matchTasks(tasks || [], responses)
       setMatchedTasks(matched)
 
-      await supabase.from('profiles').update({ last_active_at: new Date().toISOString() } as any).eq('id', user.id)
+      // Type assertion needed due to Supabase type inference issue
+      await supabase.from('profiles').update({
+        last_active_at: new Date().toISOString()
+      } as never).eq('id', user.id)
       setStep(1)
     } catch (err) {
       console.error('Check-in error:', err)
@@ -160,12 +167,19 @@ export default function CheckinPage() {
   const handleTaskAction = async (taskId: string, action: 'completed' | 'deferred') => {
     setSubmitting(taskId)
     try {
+      const matchedTask = matchedTasks.find(m => m.task.id === taskId)
+
       if (action === 'completed') {
-        await supabase.from('tasks').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', taskId)
+        await supabase.from('tasks').update({ status: 'completed', completed_at: new Date().toISOString() } as never).eq('id', taskId)
+
+        // Celebrate completion!
+        if (matchedTask) {
+          celebrate(`You completed "${matchedTask.task.title}"! Keep building momentum! 💪`)
+        }
       } else {
         const tomorrow = new Date()
         tomorrow.setDate(tomorrow.getDate() + 1)
-        await supabase.from('tasks').update({ deferred_until: tomorrow.toISOString().split('T')[0] }).eq('id', taskId)
+        await supabase.from('tasks').update({ deferred_until: tomorrow.toISOString().split('T')[0] } as never).eq('id', taskId)
       }
       setMatchedTasks(matchedTasks.filter(m => m.task.id !== taskId))
     } finally {
@@ -183,42 +197,47 @@ export default function CheckinPage() {
   if (step === 0) {
     return (
       <div className="max-w-xl mx-auto">
-        <div className="text-center mb-8">
-          <div className="w-12 h-12 bg-primary-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Sparkles className="w-6 h-6 text-primary-600" />
+        <div className="text-center mb-8 animate-fade-in">
+          <div className="w-16 h-16 bg-accent-ocean/10 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <Sparkles className="w-8 h-8 text-accent-ocean" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">How are you right now?</h1>
-          <p className="text-gray-600 mt-1">Quick check-in to find your perfect tasks</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-2">How are you right now?</h1>
+          <p className="text-lg text-text-secondary">Quick check-in to find your perfect tasks</p>
         </div>
 
-        <div className="flex gap-1 mb-8">
+        <div className="flex gap-2 mb-8 px-4">
           {QUESTIONNAIRE_QUESTIONS.map((_, i) => (
-            <div key={i} className={clsx('h-1 flex-1 rounded-full transition-colors',
-              i < currentQuestion ? 'bg-primary-600' : i === currentQuestion ? 'bg-primary-400' : 'bg-gray-200'
-            )} />
+            <div
+              key={i}
+              className={clsx('h-2 flex-1 rounded-full transition-all duration-300',
+                i < currentQuestion ? 'bg-accent-ocean' :
+                i === currentQuestion ? 'bg-accent-ocean/60 scale-110' :
+                'bg-surface-border'
+              )}
+            />
           ))}
         </div>
 
-        <div className="card p-8">
-          <div className="text-center mb-8">
-            <span className="text-4xl mb-4 block">{question.icon}</span>
-            <h2 className="text-xl font-semibold text-gray-900">{question.question}</h2>
+        <div className="card p-8 md:p-10 shadow-lg animate-scale-in">
+          <div className="text-center mb-10">
+            <span className="text-6xl mb-6 block animate-scale-in">{question.icon}</span>
+            <h2 className="text-2xl font-bold text-text-primary leading-tight">{question.question}</h2>
           </div>
 
-          <div className="space-y-4">
-            <div className="flex justify-between text-sm text-gray-500 px-2">
+          <div className="space-y-6">
+            <div className="flex justify-between text-sm font-medium text-text-muted px-2">
               <span>{question.lowLabel}</span>
               <span>{question.highLabel}</span>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               {[1, 2, 3, 4, 5].map((value) => (
                 <button
                   key={value}
                   onClick={() => handleResponse(value)}
-                  className={clsx('flex-1 py-4 rounded-xl text-lg font-semibold transition-all',
+                  className={clsx('flex-1 py-5 rounded-2xl text-xl font-bold transition-all duration-200 shadow-sm',
                     responses[question.id] === value
-                      ? 'bg-primary-600 text-white scale-105'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      ? 'bg-accent-ocean text-black scale-110 shadow-lg shadow-accent-ocean/20'
+                      : 'bg-white text-text-secondary hover:bg-surface-hover hover:scale-105 hover:shadow-md'
                   )}
                 >
                   {value}
@@ -227,24 +246,38 @@ export default function CheckinPage() {
             </div>
           </div>
 
-          <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
+          <div className="flex justify-between mt-10 pt-6 border-t border-surface-border">
             <button
               onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
               disabled={currentQuestion === 0}
-              className="btn-secondary inline-flex items-center gap-2 disabled:opacity-50"
+              className="btn-secondary inline-flex items-center gap-2 disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <ArrowLeft className="w-4 h-4" /> Back
             </button>
-            
+
             {isLastQuestion && allAnswered && (
-              <button onClick={submitCheckin} disabled={loading} className="btn-primary inline-flex items-center gap-2">
-                {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Finding tasks...</> : <>See my tasks <ArrowRight className="w-4 h-4" /></>}
+              <button
+                onClick={submitCheckin}
+                disabled={loading}
+                className="btn-primary inline-flex items-center gap-2 shadow-lg hover:shadow-xl"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Finding tasks...
+                  </>
+                ) : (
+                  <>
+                    See my tasks
+                    <ArrowRight className="w-5 h-5" />
+                  </>
+                )}
               </button>
             )}
           </div>
         </div>
 
-        <p className="text-center text-sm text-gray-500 mt-4">
+        <p className="text-center text-sm font-medium text-text-muted mt-6">
           Question {currentQuestion + 1} of {QUESTIONNAIRE_QUESTIONS.length}
         </p>
       </div>
@@ -253,91 +286,267 @@ export default function CheckinPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <div className="text-center mb-8">
-        <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <Check className="w-6 h-6 text-green-600" />
+      <div className="text-center mb-6 animate-fade-in">
+        <div className="w-16 h-16 bg-gradient-to-br bg-accent-ocean/10 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+          <Check className="w-8 h-8 text-accent-ocean" />
         </div>
-        <h1 className="text-2xl font-bold text-gray-900">Here's what matches your state</h1>
-        <p className="text-gray-600 mt-1">Based on your check-in, these tasks fit your current energy and time.</p>
+        <h1 className="text-3xl md:text-4xl font-bold text-text-primary mb-2">Here's what matches your state</h1>
+        <p className="text-lg text-text-secondary">The app chose these for you—no decisions needed.</p>
       </div>
 
-      <div className="card p-4 mb-6 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="text-2xl">
+      {/* Mental Model Explainer */}
+      <div className="bg-white border border-surface-border rounded-lg p-4 mb-6">
+        <div className="flex gap-3">
+          <div className="text-2xl flex-shrink-0">🧭</div>
+          <div className="text-sm text-text-primary">
+            <p className="font-semibold mb-1">How this app works:</p>
+            <p>Check-ins guide you. The Tasks page is just a parking lot for later. Let your energy lead.</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="card p-6 mb-8 flex items-center justify-between shadow-md hover:shadow-lg transition-all animate-slide-in">
+        <div className="flex items-center gap-5">
+          <div className="text-4xl">
             {responses.energy_level <= 2 ? '😴' : responses.energy_level <= 4 ? '😊' : '⚡'}
           </div>
           <div>
-            <div className="text-sm text-gray-500">Your current state</div>
-            <div className="font-medium text-gray-900">
+            <div className="text-sm font-medium text-text-muted uppercase tracking-wide">Your current state</div>
+            <div className="font-semibold text-text-primary text-lg mt-1">
               {responses.energy_level <= 2 ? 'Low energy - taking it easy' :
                responses.energy_level <= 4 ? 'Good energy - ready to work' : 'High energy - lets go!'}
             </div>
           </div>
         </div>
-        <button onClick={resetCheckin} className="text-sm text-gray-500 hover:text-gray-700 flex items-center gap-1">
+        <button
+          onClick={resetCheckin}
+          className="text-sm text-text-muted hover:text-text-secondary flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-surface-hover transition-colors font-medium"
+        >
           <RotateCcw className="w-4 h-4" /> Redo
         </button>
       </div>
 
       {matchedTasks.length > 0 ? (
-        <div className="space-y-4">
+        <div className="space-y-5">
           {matchedTasks.map(({ task, reasons }, index) => {
             const energyConfig = ENERGY_LEVEL_CONFIG[task.energy_required]
             const workTypeConfig = WORK_TYPE_CONFIG[task.work_type]
             const timeConfig = TIME_ESTIMATE_CONFIG[task.time_estimate]
             const priorityConfig = PRIORITY_CONFIG[task.priority]
-            
+
             return (
-              <div key={task.id} className={clsx('card p-6', index === 0 && 'ring-2 ring-primary-500 ring-offset-2')}>
-                {index === 0 && <div className="text-xs font-medium text-primary-600 mb-2">TOP MATCH</div>}
-                
+              <div
+                key={task.id}
+                className={clsx(
+                  'card p-7 transition-all hover:shadow-xl',
+                  index === 0 && 'ring-2 ring-primary-500 ring-offset-2 shadow-lg bg-gradient-to-br from-white to-primary-50/30'
+                )}
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                {index === 0 && (
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="text-xs font-bold text-accent-ocean bg-primary-100 px-3 py-1 rounded-full uppercase tracking-wide">
+                      ⭐ Top Match
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex items-start justify-between gap-4 mb-4">
-                  <div>
-                    <h3 className="font-semibold text-gray-900 text-lg">{task.title}</h3>
-                    {task.goals && <p className="text-sm text-gray-500 mt-1">Goal: {task.goals.title}</p>}
+                  <div className="flex-1">
+                    <h3 className="font-bold text-text-primary text-xl mb-1">{task.title}</h3>
+                    {task.goals && (
+                      <p className="text-sm text-text-muted font-medium">
+                        <span className="text-accent-ocean">→</span> {task.goals.title}
+                      </p>
+                    )}
                   </div>
                   {task.estimated_value && (
-                    <span className="text-sm font-medium text-green-600 bg-green-50 px-2 py-1 rounded">${task.estimated_value}</span>
+                    <span className="text-sm font-bold text-green-700 bg-green-100 px-3 py-1.5 rounded-lg whitespace-nowrap">
+                      💰 ${task.estimated_value}
+                    </span>
                   )}
                 </div>
 
                 <div className="flex flex-wrap gap-2 mb-4">
-                  <span className={`text-xs px-2 py-1 rounded-full ${energyConfig.color}`}>{energyConfig.label}</span>
-                  <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">{workTypeConfig.icon} {workTypeConfig.label}</span>
-                  <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-700">⏱️ {timeConfig.label}</span>
-                  <span className={`text-xs px-2 py-1 rounded-full ${priorityConfig.color}`}>{priorityConfig.label}</span>
+                  <span className={`text-xs font-medium px-3 py-1.5 rounded-full ${energyConfig.color}`}>
+                    {energyConfig.label}
+                  </span>
+                  <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-surface-hover text-text-secondary">
+                    {workTypeConfig.icon} {workTypeConfig.label}
+                  </span>
+                  <span className="text-xs font-medium px-3 py-1.5 rounded-full bg-surface-hover text-text-secondary">
+                    ⏱️ {timeConfig.label}
+                  </span>
+                  <span className={`text-xs font-medium px-3 py-1.5 rounded-full ${priorityConfig.color}`}>
+                    {priorityConfig.label}
+                  </span>
                 </div>
 
                 {reasons.length > 0 && (
-                  <div className="text-sm text-gray-600 mb-4">
-                    <span className="font-medium">Why this task: </span>{reasons.join(' • ')}
+                  <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-5">
+                    <div className="text-sm text-text-primary">
+                      <span className="font-bold">Why this task:</span>
+                      <span className="ml-2">{reasons.join(' • ')}</span>
+                    </div>
                   </div>
                 )}
 
-                <div className="flex gap-2">
-                  <button onClick={() => handleTaskAction(task.id, 'completed')} disabled={submitting === task.id} className="btn-primary flex-1">
-                    {submitting === task.id ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Mark Complete'}
-                  </button>
-                  <button onClick={() => handleTaskAction(task.id, 'deferred')} disabled={submitting === task.id} className="btn-secondary">
-                    Not today
-                  </button>
+                <div className="flex gap-3">
+                  {/* Low energy: Single "Skip" button to reduce decision fatigue */}
+                  {responses.energy_level <= 2 ? (
+                    <button
+                      onClick={() => handleTaskAction(task.id, 'deferred')}
+                      disabled={submitting === task.id}
+                      className="btn-secondary flex-1 disabled:opacity-50"
+                    >
+                      {submitting === task.id ? (
+                        <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+                      ) : (
+                        'Skip for now'
+                      )}
+                    </button>
+                  ) : (
+                    /* Medium/High energy: Show both options */
+                    <>
+                      <button
+                        onClick={() => handleTaskAction(task.id, 'completed')}
+                        disabled={submitting === task.id}
+                        className="btn-primary flex-1 shadow-md hover:shadow-lg disabled:opacity-50"
+                      >
+                        {submitting === task.id ? (
+                          <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+                        ) : (
+                          <>
+                            <Check className="w-5 h-5 inline mr-2" />
+                            Mark Complete
+                          </>
+                        )}
+                      </button>
+                      <button
+                        onClick={() => handleTaskAction(task.id, 'deferred')}
+                        disabled={submitting === task.id}
+                        className="btn-secondary px-6 disabled:opacity-50"
+                      >
+                        Not today
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             )
           })}
         </div>
       ) : (
-        <div className="card p-8 text-center">
-          <div className="text-4xl mb-4">🎉</div>
-          <h3 className="font-semibold text-gray-900 mb-2">No tasks right now!</h3>
-          <p className="text-gray-600 mb-4">You're all caught up, or you haven't added tasks yet.</p>
-          <button onClick={() => router.push('/tasks')} className="btn-primary">Add some tasks</button>
+        <div className="card p-12 text-center shadow-md">
+          <div className="w-20 h-20 bg-gradient-to-br from-yellow-100 to-yellow-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-5xl">🎉</span>
+          </div>
+          <h3 className="font-bold text-text-primary text-2xl mb-2">All clear!</h3>
+          <p className="text-text-secondary mb-6 text-lg">
+            You're all caught up, or you haven't added tasks yet.
+          </p>
+          <button
+            onClick={() => router.push('/tasks')}
+            className="btn-primary inline-flex items-center gap-2 shadow-lg"
+          >
+            <CheckSquare className="w-5 h-5" />
+            Add some tasks
+          </button>
+        </div>
+      )}
+
+      {/* Focus Work Suggestions */}
+      {matchedTasks.length > 0 && (
+        <div className="mt-8 card p-6 bg-gradient-to-br from-indigo-50 to-white border-indigo-100">
+          <div className="flex items-start gap-3 mb-4">
+            <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center flex-shrink-0">
+              <Timer className="w-5 h-5 text-indigo-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-text-primary">Focus Work Suggestions</h3>
+              <p className="text-sm text-text-secondary mt-0.5">Based on your available time and energy</p>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            {/* Pomodoro Suggestion */}
+            <div className="bg-white rounded-lg p-4 border border-indigo-100">
+              <div className="flex items-center gap-2 mb-2">
+                <Clock className="w-4 h-4 text-indigo-600" />
+                <h4 className="font-medium text-text-primary">Pomodoro Technique</h4>
+              </div>
+              {responses.available_time <= 2 ? (
+                <p className="text-sm text-text-secondary">
+                  <strong>Quick sprint:</strong> Try 1-2 Pomodoros (25 min work, 5 min break)
+                </p>
+              ) : responses.available_time <= 4 ? (
+                <p className="text-sm text-text-secondary">
+                  <strong>Standard session:</strong> 3-4 Pomodoros with breaks (2 hours total)
+                </p>
+              ) : (
+                <p className="text-sm text-text-secondary">
+                  <strong>Deep work session:</strong> 4-6 Pomodoros with longer breaks (3-4 hours)
+                </p>
+              )}
+            </div>
+
+            {/* Time Blocking Suggestion */}
+            <div className="bg-white rounded-lg p-4 border border-indigo-100">
+              <div className="flex items-center gap-2 mb-2">
+                <Calendar className="w-4 h-4 text-indigo-600" />
+                <h4 className="font-medium text-text-primary">Time Blocking</h4>
+              </div>
+              {responses.mental_clarity >= 4 ? (
+                <p className="text-sm text-text-secondary">
+                  <strong>High clarity:</strong> Start with your hardest task while sharp
+                </p>
+              ) : responses.mental_clarity >= 3 ? (
+                <p className="text-sm text-text-secondary">
+                  <strong>Medium clarity:</strong> Tackle medium-effort tasks first
+                </p>
+              ) : (
+                <p className="text-sm text-text-secondary">
+                  <strong>Low clarity:</strong> Start with quick wins to build momentum
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-4 text-xs text-text-muted text-center">
+            💡 Tip: Turn off notifications and set a timer to stay focused
+          </div>
+        </div>
+      )}
+
+      {/* Manual Override for High Energy */}
+      {responses.energy_level >= 4 && (
+        <div className="mt-8 card p-6 bg-gradient-to-br from-purple-50 to-white border-purple-200">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
+              <CheckSquare className="w-5 h-5 text-purple-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-text-primary mb-1">Feeling ambitious?</h3>
+              <p className="text-sm text-text-secondary mb-3">
+                You have high energy today. If none of these tasks feel right, you can browse your full task list and pick something yourself.
+              </p>
+              <button
+                onClick={() => router.push('/tasks')}
+                className="text-sm text-purple-700 hover:text-purple-900 font-medium underline"
+              >
+                Browse all tasks →
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
       <div className="mt-8 text-center">
-        <button onClick={() => router.push('/dashboard')} className="text-gray-500 hover:text-gray-700">Back to dashboard</button>
+        <button onClick={() => router.push('/dashboard')} className="text-text-muted hover:text-text-secondary">Back to dashboard</button>
       </div>
+
+      {/* Celebration Component */}
+      {CelebrationComponent}
     </div>
   )
 }

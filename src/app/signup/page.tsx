@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Zap, Loader2, Check } from 'lucide-react'
 
+export const dynamic = 'force-dynamic'
+
 export default function SignupPage() {
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
@@ -14,7 +16,6 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const router = useRouter()
-  const supabase = createClient()
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -22,6 +23,7 @@ export default function SignupPage() {
     setLoading(true)
 
     try {
+      const supabase = createClient()
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -52,14 +54,14 @@ export default function SignupPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50">
+      <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gradient-to-b from-sunset-50 via-bg-primary to-ocean-50">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="bg-white py-12 px-4 shadow-sm sm:rounded-xl sm:px-10 border border-gray-200 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Check className="w-8 h-8 text-green-600" />
+          <div className="bg-white py-12 px-4 shadow-lg sm:rounded-2xl sm:px-10 border-2 border-ocean-300 text-center">
+            <div className="w-16 h-16 bg-gradient-ocean rounded-full flex items-center justify-center mx-auto mb-4 shadow-md">
+              <Check className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">You're in!</h2>
-            <p className="text-gray-600">Setting up your workspace...</p>
+            <h2 className="text-2xl font-bold text-text-primary mb-2">You're in!</h2>
+            <p className="text-text-secondary">Setting up your workspace...</p>
           </div>
         </div>
       </div>
@@ -67,26 +69,26 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gray-50">
+    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-gradient-to-b from-sunset-50 via-bg-primary to-ocean-50">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <Link href="/" className="flex items-center justify-center gap-2">
-          <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center">
+          <div className="w-10 h-10 bg-gradient-flow rounded-xl flex items-center justify-center shadow-md">
             <Zap className="w-6 h-6 text-white" />
           </div>
         </Link>
-        <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
+        <h2 className="mt-6 text-center text-3xl font-bold text-text-primary">
           Start working with your energy
         </h2>
-        <p className="mt-2 text-center text-gray-600">
+        <p className="mt-2 text-center text-text-secondary">
           Free forever. No credit card required.
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow-sm sm:rounded-xl sm:px-10 border border-gray-200">
+        <div className="bg-white py-8 px-4 shadow-lg sm:rounded-2xl sm:px-10 border-2 border-surface-border">
           <form className="space-y-6" onSubmit={handleSignup}>
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              <div className="bg-sunset-50 border-2 border-sunset-300 text-sunset-800 px-4 py-3 rounded-lg text-sm">
                 {error}
               </div>
             )}
@@ -161,16 +163,16 @@ export default function SignupPage() {
             </div>
           </form>
 
-          <p className="mt-6 text-center text-sm text-gray-500">
+          <p className="mt-6 text-center text-sm text-text-muted">
             Already have an account?{' '}
-            <Link href="/login" className="text-primary-600 hover:text-primary-700 font-medium">
+            <Link href="/login" className="text-ocean-600 hover:text-ocean-700 font-semibold">
               Sign in
             </Link>
           </p>
         </div>
 
         {/* Social proof */}
-        <p className="mt-6 text-center text-sm text-gray-500">
+        <p className="mt-6 text-center text-sm text-text-secondary">
           Built for freelancers, solopreneurs & multi-hyphenates
           <br />
           who've quit every other productivity app.
