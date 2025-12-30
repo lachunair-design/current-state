@@ -68,12 +68,48 @@ export default async function DashboardPage() {
   // Get energy emoji and message
   const getEnergyDisplay = () => {
     if (!hasCheckedInToday || !latestCheckin) {
-      return { emoji: '🤔', message: "Haven't checked in yet", suggestion: "Start with a quick energy check" }
+      return {
+        emoji: '🤔',
+        message: "Haven't checked in yet",
+        suggestion: "Start with a quick energy check",
+        readyFor: "Check your rhythm",
+        color: 'bg-gray-100 text-gray-800',
+        gradientFrom: 'from-gray-100',
+        gradientTo: 'to-gray-50'
+      }
     }
     const level = latestCheckin.energy_level
-    if (level <= 2) return { emoji: '😴', message: 'Low energy today', suggestion: 'Easy tasks are waiting' }
-    if (level <= 4) return { emoji: '😊', message: 'Good energy today', suggestion: 'Ready for steady work' }
-    return { emoji: '⚡', message: 'High energy today', suggestion: 'Great time for deep work' }
+    if (level <= 2) {
+      return {
+        emoji: '😴',
+        message: 'Your energy is low right now',
+        suggestion: 'Easy tasks are waiting',
+        readyFor: 'Light tasks',
+        color: 'bg-orange-100 text-orange-800',
+        gradientFrom: 'from-orange-50',
+        gradientTo: 'to-sunset-50'
+      }
+    }
+    if (level <= 4) {
+      return {
+        emoji: '😊',
+        message: 'Your energy is good',
+        suggestion: 'Ready for steady work',
+        readyFor: 'Steady work',
+        color: 'bg-ocean-100 text-ocean-800',
+        gradientFrom: 'from-ocean-50',
+        gradientTo: 'to-white'
+      }
+    }
+    return {
+      emoji: '⚡',
+      message: 'Your energy is high today',
+      suggestion: 'Great time for deep work',
+      readyFor: 'Deep work',
+      color: 'bg-sunset-100 text-sunset-800',
+      gradientFrom: 'from-sunset-50',
+      gradientTo: 'to-ocean-50'
+    }
   }
 
   const energyDisplay = getEnergyDisplay()
@@ -81,42 +117,58 @@ export default async function DashboardPage() {
 
   return (
     <div className="max-w-2xl mx-auto pb-8">
-      {/* Compact Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold font-semibold text-text-primary mb-1">
+      {/* Energy-First Header */}
+      <div className="mb-6 animate-fade-in">
+        <h1 className="text-3xl font-bold text-text-primary mb-2">
           Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'}, {firstName}
         </h1>
-        <p className="text-base text-accent-ocean font-semibold flex items-center gap-2">
-          <span className="text-xl">{energyDisplay.emoji}</span>
-          {energyDisplay.message}
+        <p className="text-lg text-text-secondary flex items-center gap-2">
+          <span className="text-2xl">{energyDisplay.emoji}</span>
+          <span className="font-semibold">{energyDisplay.message}</span>
         </p>
       </div>
 
-      {/* Energy State Card - Compact */}
-      <Link
-        href="/checkin"
-        className="block mb-6 rounded-xl bg-white border border-surface-border p-4 hover:bg-surface-hover hover:shadow-lg transition-all group"
-      >
-        <div className="flex items-center justify-between">
-          <div>
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-accent-ocean text-black text-xs font-bold uppercase tracking-wider mb-2">
-              {hasCheckedInToday ? 'Checked In' : 'Not Yet'}
-            </span>
-            <h2 className="text-lg font-bold font-semibold text-text-primary leading-tight">
-              {energyDisplay.suggestion}
+      {/* Hero Energy Card */}
+      <div className={`mb-6 rounded-2xl bg-gradient-to-br ${energyDisplay.gradientFrom} ${energyDisplay.gradientTo} border-2 border-ocean-200 p-6 shadow-md animate-slide-in`}>
+        <div className="flex items-center justify-between mb-4">
+          <span className={`inline-flex items-center px-3 py-1 rounded-full ${energyDisplay.color} text-sm font-bold uppercase tracking-wider`}>
+            {hasCheckedInToday ? 'Daily Rhythm' : 'Check In'}
+          </span>
+          <Link
+            href="/checkin"
+            className="text-sm font-semibold text-ocean-600 hover:text-ocean-700 underline"
+          >
+            {hasCheckedInToday ? 'Update' : 'Check In Now'}
+          </Link>
+        </div>
+
+        <div className="flex items-center gap-6">
+          <div className="flex-shrink-0">
+            <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-md">
+              <span className="text-5xl">{energyDisplay.emoji}</span>
+            </div>
+          </div>
+          <div className="flex-1">
+            <h2 className="text-2xl font-bold text-text-primary mb-1">
+              Ready for<br />{energyDisplay.readyFor}
             </h2>
-            <p className="text-sm text-text-secondary mt-1">
-              {hasCheckedInToday ? 'Tap to update' : 'Quick 30-second check-in'}
+            <p className="text-sm text-text-secondary">
+              {hasCheckedInToday ? energyDisplay.suggestion : 'Check in to see personalized task recommendations'}
             </p>
           </div>
-          <div className="text-4xl group-hover:scale-110 transition-transform">
-            {energyDisplay.emoji}
-          </div>
         </div>
-      </Link>
+      </div>
 
-      {/* Top Task Card - Single Focus */}
-      {topTask && <TodaysFocusCard task={topTask} />}
+      {/* Today's Top Task - Energy Matched */}
+      {topTask && hasCheckedInToday && (
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <CheckSquare className="w-5 h-5 text-ocean-600" />
+            <h3 className="text-lg font-bold text-text-primary">Today's Top Task</h3>
+          </div>
+          <TodaysFocusCard task={topTask} />
+        </div>
+      )}
 
       {/* Feedback & Feature Request */}
       <FeedbackCard />
