@@ -1,49 +1,24 @@
-# Product Requirements Document (PRD)
-## Current State - Energy-Aware Productivity Platform
+# Product Requirements Document: Energy-Based Productivity App
 
-**Version**: 1.0
-**Last Updated**: December 28, 2025
-**Status**: Living Document
-**Product Owner**: Current State Team
-
----
-
-## Table of Contents
-
-1. [Executive Summary](#executive-summary)
-2. [Product Vision & Mission](#product-vision--mission)
-3. [Target Users](#target-users)
-4. [Core Value Proposition](#core-value-proposition)
-5. [Completed Features (MVP)](#completed-features-mvp)
-6. [Future Roadmap](#future-roadmap)
-7. [Technical Architecture](#technical-architecture)
-8. [User Stories](#user-stories)
-9. [Success Metrics](#success-metrics)
-10. [Implementation Timeline](#implementation-timeline)
-11. [Non-Functional Requirements](#non-functional-requirements)
-12. [Open Questions](#open-questions)
+**Version**: 2.0
+**Last Updated**: December 31, 2025
+**Status**: Production Ready
 
 ---
 
 ## Executive Summary
 
-**Current State** is a productivity platform designed specifically for multi-income professionals, entrepreneurs, and knowledge workers who juggle multiple goals and revenue streams. Unlike traditional task managers, Current State uses **energy-aware matching** to recommend the right tasks at the right time based on the user's current mental, emotional, and physical state.
+An energy-first productivity application that helps users align their tasks with their natural energy patterns. Unlike traditional productivity apps that focus solely on time management, this app emphasizes energy management, emotional awareness, and sustainable work habits.
 
-### Key Differentiators
-- **Energy-aware task matching**: Daily check-ins assess 5 dimensions of user state
-- **Multi-goal support**: Designed for people with 3-5+ concurrent goals across life domains
-- **Anti-burnout philosophy**: Encourages breaks, realistic planning, and overload detection
-- **SMART goal framework**: Built-in validation and guidance for effective goal setting
-- **Habit tracking with flexibility**: Energy-adaptive habit completion (removed rigid version tracking)
-
-### Current Status
-- **MVP Launched**: Core features operational
-- **Active Development**: High-priority enhancements in progress
-- **User Feedback**: Positive reception on UX simplification and energy matching
+### Core Philosophy
+- **Energy-first approach**: Match tasks to energy levels, not just schedules
+- **Holistic wellbeing**: Track physical, mental, and emotional states
+- **Beautiful simplicity**: Soft sage theme with custom visualizations
+- **Smart assistance**: Context-aware suggestions for tasks and habits
 
 ---
 
-## Product Vision & Mission
+## 1. Product Vision & Mission
 
 ### Vision
 To become the #1 productivity platform for multi-passionate professionals who want to achieve ambitious goals without burning out.
@@ -51,207 +26,645 @@ To become the #1 productivity platform for multi-passionate professionals who wa
 ### Mission
 Help users make meaningful progress on what truly matters by matching their energy levels, available time, and mental state with the right work at the right moment.
 
-### Core Philosophy
-1. **Energy First**: Productivity is not about doing more—it's about doing the right thing when you're in the right state
-2. **Anti-Overwhelm**: Detect and prevent overload before it happens
-3. **Progress Over Perfection**: Celebrate small wins and flexible completion
-4. **Human-Centered**: Acknowledge that people have varying energy, emotions, and physical states
+### Current Status
+- **Version 2.0 Launched**: Complete UI redesign with soft sage theme
+- **Production Ready**: All core features operational and tested
+- **User Experience**: Single-page check-in with custom visualizations
+- **Smart Onboarding**: Task suggestions after goal creation
 
 ---
 
-## Target Users
-
-### Primary Persona: "The Multi-Passionate Professional"
-
-**Demographics**:
-- Age: 25-45
-- Occupation: Freelancers, entrepreneurs, side hustlers, knowledge workers
-- Income: Multiple revenue streams (2-5+ sources)
-- Location: Global, primarily US, UK, Canada, Australia
-
-**Characteristics**:
-- Manages 3-8 active goals simultaneously
-- Juggles career + business + health + personal projects
-- Struggles with traditional task managers (too rigid, not context-aware)
-- Values flexibility but needs structure
-- Prone to overcommitment and burnout
-- Wants financial clarity (revenue tracking per goal)
-
-**Pain Points**:
-- "I never know which task to work on first"
-- "I plan too much and then feel overwhelmed"
-- "My to-do list doesn't consider that I'm exhausted today"
-- "I lose track of which tasks actually move the needle on my goals"
-- "I need to see all my projects and income streams in one place"
-
-**Goals**:
-- Achieve ambitious professional goals without sacrificing health
-- Make consistent progress across multiple life domains
-- Feel in control of time and priorities
-- Increase revenue while maintaining work-life balance
-
----
-
-## Core Value Proposition
+## 2. Core Value Proposition
 
 ### The "Current State" Promise
 > "Know what to work on right now, based on how you feel right now."
 
 ### How We Deliver
-1. **Daily Check-In** → Assess your current state (energy, clarity, emotions, time, environment)
-2. **Smart Matching** → Get 3-5 task recommendations perfectly suited to your state
-3. **Flexible Execution** → Complete tasks when they fit, defer when they don't
-4. **Progress Tracking** → See meaningful progress on goals that matter
-5. **Burnout Prevention** → Alerts when you're overcommitted, suggests breaks
+1. **Beautiful Check-In** → Assess your state with 5 custom visualizations
+2. **Smart Matching** → Get task recommendations suited to your energy
+3. **Guided Goal Setting** → See 5 smart task suggestions after creating goals
+4. **Flexible Execution** → Complete tasks when they fit, defer when they don't
+5. **Progress Tracking** → Visual progress on goals that matter
 
 ---
 
-## Completed Features (MVP)
+## 3. Design System (Version 2.0)
 
-### 1. User Authentication & Onboarding
+### 3.1 Color Palette
 
-**Status**: ✅ Complete
+**Primary (Soft Sage)**:
+```
+DEFAULT: #88B09D
+hover: #769C8A
+50: #F4F8F6
+100: #D8E8E0
+200: #C1E1C1
+300: #A9D4C2
+400: #99C4AD
+500: #88B09D (base)
+600: #6D9580
+700: #537162
+800: #394D44
+900: #1F2926
+```
+
+**Pastel Accents**:
+- Blue: #A7C7E7 (battery, energy)
+- Blue-dark: #89AECF
+- Peach: #FFD1BA (warmth, creativity)
+- Yellow: #FDFD96 (optimism, energy)
+- Lavender: #CDB4DB (calm, mindfulness)
+- Sage: #C1E1C1 (growth, balance)
+- Rose: #FFB7B2 (wellness, care)
+
+**Backgrounds**:
+- Cream: #FEF8EF (main background)
+- Gradient: Linear from white to cream
+
+**Text**:
+- Primary: #2D2D2D
+- Secondary: #6B7280
+- Tertiary: #9CA3AF
+
+### 3.2 Typography
+
+**Font Families**:
+- Display: Manrope (200-800 weight)
+- Body: Inter
+- System fallbacks: -apple-system, BlinkMacSystemFont, sans-serif
+
+**Font Sources**:
+- Google Fonts (Manrope)
+- Preconnect for performance optimization
+
+### 3.3 Icons
+
+**Systems Used**:
+- **Material Symbols Outlined**: Primary icon system from Google Fonts
+- **Lucide React**: Supplementary icons for UI elements
+- **Emoji Icons**: Goal category indicators
+
+### 3.4 Components
+
+**Glass Panels**:
+```css
+.glass-panel {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 4px 20px -2px rgba(200, 200, 190, 0.25);
+}
+```
+
+**Shadows**:
+- soft: `0 4px 20px -2px rgba(200, 200, 190, 0.25)`
+- soft-inner: `inset 0 2px 4px 0 rgba(0, 0, 0, 0.02)`
+- glow-soft: `0 0 15px rgba(136, 176, 157, 0.2)`
+
+**Border Radius**:
+- Standard: `rounded-xl` (12px)
+- Large: `rounded-2xl` (16px)
+- Extra large: `rounded-3xl` (40px)
+
+### 3.5 Animations
+
+**Transitions**:
+- Standard: `transition-all duration-300`
+- Hover effects: `hover:scale-[1.02]`, `hover:shadow-lg`
+- Fade in: `animate-fade-in`
+- Scale in: `animate-scale-in`
+
+**Custom Animations**:
+- Battery charging shimmer
+- Fire pulse for creativity
+- Progress circle fills
+- Modal slide-up
+- Cloud-to-sun transitions
+
+---
+
+## 4. Features & Functionality
+
+### 4.1 Dashboard (Energy Hub)
+
+**Purpose**: Central command center showing personalized, energy-matched recommendations
+
+**Design**: Max-width 672px (max-w-2xl), centered layout
+
+**Components**:
+- **Current energy display**: Shows latest check-in with battery visualization
+- **Suggested tasks section**:
+  - 3-5 tasks matched to current energy level
+  - Empty state when no tasks match
+  - Quick actions: Mark complete, view details
+- **Rituals section**:
+  - Active habits for today
+  - Quick check-in for completion
+  - Suggestion system for new habits
+- **Today's progress**:
+  - Tasks completed counter
+  - Habits maintained counter
+  - Check-ins completed indicator
+
+**Navigation**: Bottom navigation bar (fixed position)
+- Dashboard, Check-in, Tasks, Goals, Habits, Profile
+- Icons with labels for clarity
+- Mobile-first, works on desktop too
+
+---
+
+### 4.2 Check-in System (Version 2.0)
+
+**Purpose**: Daily energy and mood tracking with beautiful visualizations
+
+**Design Philosophy**:
+- Single-page view (no multi-step flow)
+- All 5 metrics visible at once
+- Custom visualizations for each metric
+- Responsive: max-w-2xl on desktop
+
+**Visualizations** (5 custom sliders):
+
+#### 1. Physical Battery (energy_level: 1-5)
+- **Visual**: Battery icon with animated fill
+- **Elements**:
+  - Battery container with terminal
+  - Gradient fill (pastel blue)
+  - Charging shimmer effect
+  - Pulse indicator dot
+- **Labels**: 10%, 25%, 50%, 75%, 90%
+- **Technical**: Range input overlay with `pointer-events-none` on visuals
+
+#### 2. Mental Clarity (focus_level: 1-5)
+- **Visual**: Droplet slider with fill effect
+- **Elements**:
+  - Droplet icon
+  - Fill level indicator
+  - Subtle wave animation
+- **Labels**: Foggy → Hazy → Finding Focus → Sharp
+- **Colors**: Stone gray to blue gradient
+
+#### 3. Inner Weather (emotional_state: 1-5)
+- **Visual**: Cloud-to-sun gradient slider
+- **Elements**:
+  - Cloud icon (left)
+  - Sun icon (right)
+  - Draggable sun indicator
+  - Gradient progress bar
+- **Labels**: Stormy → Cloudy → Partly Cloudy → Mostly Sunny → Radiant
+- **Colors**: Gray → peach → yellow gradient
+
+#### 4. Pressure Valve (stress_level: 1-5)
+- **Visual**: Semi-circle gauge with tick marks
+- **Elements**:
+  - Gauge with 5 tick marks
+  - Color gradient (green → orange → red)
+  - Rotating indicator
+- **Labels**: Zen → Calm → Balanced → Tense → Overwhelmed
+- **Technical**: CSS rotation transforms
+
+#### 5. Creative Spark (creativity_level: 1-5)
+- **Visual**: Fire icon with gradient intensity
+- **Elements**:
+  - Fire icon
+  - Intensity gradient fill
+  - Pulsing animation at high levels
+  - Glow effect
+- **Labels**: Dormant → Flickering → Glowing → Burning → Blazing
+- **Colors**: Gray → orange → red gradient
+
+**Technical Implementation**:
+- All sliders use layered design pattern:
+  - Visual elements with `pointer-events-none`
+  - Invisible range input with `absolute inset-0`
+  - `style={{ margin: 0 }}` for perfect coverage
+  - `z-index` layering for proper interaction
+
+**Task Matching Logic**:
+- Energy levels mapped to task `energy_required` field
+- Automatically generates personalized task suggestions
+- Updates dashboard recommendations in real-time
+
+**File**: `src/app/(dashboard)/checkin/page.tsx`
+
+---
+
+### 4.3 Goals System (Version 2.0)
+
+**Purpose**: Organize work into meaningful categories with progress tracking
+
+**Design**:
+- Max-width: 672px (max-w-2xl)
+- Mobile: Single column layout
+- Desktop: 2-column grid (`md:grid-cols-2`)
+- Cards: Vertical on mobile, horizontal on tablet+
 
 **Features**:
-- Email/password authentication via Supabase Auth
-- Secure password reset flow
-- Automatic profile creation on signup
-- Multi-step onboarding wizard:
-  - Welcome screen
-  - Goal setting (SMART framework)
-  - Task creation guidance
-  - Daily check-in introduction
+- **Goal categories**: Health, Learning, Career, Creative, Financial, Relationships, Personal
+- **Progress tracking**: Visual circles showing task completion %
+- **Task management**: Click to expand and view all tasks
+- **Smart icons**: Emoji-based icons matched to category
+- **Due dates**: Optional date tracking with visual indicators
+
+#### NEW: Task Suggestions Flow
+
+**When**: After creating a new goal (not when editing)
+
+**Process**:
+1. User fills goal form (title, category, due date)
+2. Clicks "Save Goal"
+3. Modal appears with task suggestions
+4. Shows 5 context-aware task suggestions
+5. All suggestions pre-selected by default
+6. User can toggle checkboxes to customize
+7. Clicks "Add X Tasks" or "Skip"
+8. Tasks created and automatically linked to goal
+9. Returns to goals view
+
+**Smart Suggestion System**:
+
+Function: `getSmartTaskSuggestions(goalTitle, category)`
+
+**Matching Logic**:
+1. **Keyword Analysis**: Scans goal title for specific keywords
+   - "fitness" → exercise, workout tasks
+   - "meditation" → mindfulness tasks
+   - "coding" → programming tasks
+   - "business" → entrepreneurship tasks
+2. **Category Mapping**: Maps goal category to relevant task types
+   - Learning → study, research, practice tasks
+   - Health → exercise, nutrition, sleep tasks
+   - Creative → writing, design, art tasks
+3. **Metadata Assignment**:
+   - Energy levels based on task type
+   - Time estimates (15min - 2h+)
+   - Work type (Deep, Light, Creative, Admin)
+   - Priority suggestions
+
+**Example Output**:
+```typescript
+Goal: "Get fit and healthy"
+Category: Health
+
+Suggestions:
+1. "30-minute cardio workout (3x/week)"
+   - Energy: High, Time: 30min, Type: Physical
+2. "Meal prep for the week"
+   - Energy: Medium, Time: 2h, Type: Admin
+3. "Track daily water intake"
+   - Energy: Low, Time: 5min, Type: Admin
+4. "Research healthy recipes"
+   - Energy: Medium, Time: 30min, Type: Learning
+5. "Schedule annual checkup"
+   - Energy: Low, Time: 15min, Type: Admin
+```
+
+**Modal UI Components**:
+- Header with goal icon and title
+- Encouraging message
+- 5 checkbox cards with:
+  - Task title
+  - Energy badge (color-coded)
+  - Time estimate badge
+- Footer buttons:
+  - "Add X Tasks" (primary, shows count)
+  - "Skip" (secondary)
+- Loading state during insertion
 
 **Technical Details**:
-- Row-level security (RLS) enforced
-- Server-side session management
-- Automatic profile creation via database trigger
-- Onboarding state tracking (`onboarding_completed`, `onboarding_step`)
+- State: `showTaskSuggestions`, `newlyCreatedGoal`, `selectedTaskIndices`
+- Bulk insert with `supabase.from('tasks').insert(tasksToInsert)`
+- Automatic `goal_id` linking
+- No suggestions shown when editing existing goals
 
-**User Flow**:
-1. User signs up with email/password
-2. Profile created automatically
-3. Guided through 4-step onboarding
-4. Lands on dashboard ready to use
+**File**: `src/app/(dashboard)/goals/page.tsx:397-523`
 
 ---
 
-### 2. SMART Goals Framework
+### 4.4 Tasks System
 
-**Status**: ✅ Complete
+**Purpose**: Granular task management with energy awareness
 
-**Features**:
-- **Goal Categories**: Career, Business, Finance, Health, Relationships, Personal
-- **SMART Validation**: Real-time feedback on goal quality
-  - Specific: Clear title and description
-  - Measurable: Success metric defined
-  - Achievable: Realistic scope assessment
-  - Relevant: Category alignment
-  - Time-bound: Target date set
-- **Financial Tracking**: Estimated value, income stream name
-- **Goal Management**: Create, edit, archive, complete goals
-- **Expandable Goal View** (NEW): Click to expand and see all linked tasks
-- **Task Count Badges**: Visual indicator of active/completed tasks per goal
+**Design**: Max-width 768px (max-w-3xl) for data density
 
-**Data Model**:
-```sql
-goals (
-  id UUID PRIMARY KEY,
-  user_id UUID REFERENCES profiles(id),
-  title TEXT NOT NULL,
-  category TEXT CHECK (category IN ('career', 'business', ...)),
-  description TEXT,
-  success_metric TEXT,
-  target_date DATE,
-  estimated_value NUMERIC,
-  income_stream_name TEXT,
-  is_active BOOLEAN DEFAULT TRUE,
-  completed_at TIMESTAMPTZ
-)
-```
+**Task Properties**:
+- Title and description
+- Energy required: Low, Medium, High, Very High
+- Work type: Deep Work, Light Work, Creative, Admin
+- Time estimate: 15min, 30min, 1h, 2h, 3h+
+- Priority: Low, Medium, High, Urgent
+- Goal linkage (optional)
+- Status: Active, Completed, Archived
 
-**User Stories**:
-- As a user, I want to create goals that follow the SMART framework so I can ensure they're achievable
-- As a user, I want to see all tasks linked to a goal so I can understand what work contributes to that goal
-- As a user, I want to track estimated financial value so I can prioritize revenue-generating goals
+**Views**:
+- All Tasks (complete list with filters)
+- By Energy (grouped by requirement)
+- By Goal (organized under goals)
 
-**Success Metrics**:
-- 85%+ of users create at least 1 goal during onboarding
-- Average user has 3-5 active goals
-- SMART validation score average: 4.2/5
+**Interactions**:
+- Quick complete with checkbox
+- Edit inline or in modal
+- Archive completed tasks
+- Restore accidentally completed tasks
 
 ---
 
-### 3. Energy-Aware Task Management
+### 4.5 Habits (Rituals) System
 
-**Status**: ✅ Complete
+**Purpose**: Build sustainable daily routines
+
+**Design**: Max-width 896px (max-w-4xl) for calendar views
+
+**Habit Properties**:
+- Title and description
+- Frequency: Daily, Weekdays, Weekends, Custom
+- Time of day: Morning, Afternoon, Evening, Anytime
+- Category: Health, Learning, Creative, Mindfulness
+- Streak tracking
+- Active/Paused status
 
 **Features**:
-- **Task Attributes**:
-  - Energy required: Low / Medium / High
-  - Work type: Deep Work, Creative, Admin, Communication, Physical, Learning
-  - Time estimate: Tiny (5-15m), Short (15-30m), Medium (30-60m), Long (1-2h), Extended (2h+)
-  - Priority: Must Do, Should Do, Could Do, Someday
-- **Smart Defaults**: Pre-filled based on task title keywords
-- **Goal Linking**: Tasks automatically linked to relevant goals
-- **Task Filters** (NEW): Filter by status, work type, priority
-- **Restore Completed Tasks** (NEW): Undo accidental completions
-- **Task Status Management**: Active, In Progress, Completed, Deferred, Archived
-
-**Advanced Features**:
-- Billable tracking (hourly rate equivalent)
-- Preferred time of day / day of week
-- Ideal context notes
-- Recurring task patterns (future)
-
-**Data Model**:
-```sql
-tasks (
-  id UUID PRIMARY KEY,
-  user_id UUID REFERENCES profiles(id),
-  goal_id UUID REFERENCES goals(id),
-  title TEXT NOT NULL,
-  energy_required TEXT CHECK (energy_required IN ('low', 'medium', 'high')),
-  work_type TEXT CHECK (work_type IN ('deep_work', 'creative', 'admin', ...)),
-  time_estimate TEXT CHECK (time_estimate IN ('tiny', 'short', ...)),
-  priority TEXT CHECK (priority IN ('must_do', 'should_do', ...)),
-  status TEXT CHECK (status IN ('active', 'in_progress', 'completed', ...)),
-  estimated_value NUMERIC,
-  is_billable BOOLEAN,
-  completed_at TIMESTAMPTZ
-)
-```
-
-**User Stories**:
-- As a user, I want to tag tasks with energy requirements so the system can match them to my state
-- As a user, I want to filter tasks by status and priority so I can focus on what matters now
-- As a user, I want to undo completed tasks so I can fix mistakes
-
-**Success Metrics**:
-- 90%+ task completion accuracy (users don't frequently restore)
-- Average task completion time matches estimates within 20%
-- 75%+ of tasks have goal linkage
+- Today's rituals quick view
+- Streak tracking with visual indicators
+- One-click completion from dashboard
+- Habit suggestions based on goals
+- Quick-add functionality
 
 ---
 
-### 4. Daily Check-In System
+### 4.6 Profile & Settings
 
-**Status**: ✅ Complete
+**Purpose**: User preferences and account management
 
-**Features**:
-- **5-Dimensional Assessment**:
-  1. Energy Level (1-5): Physical energy and alertness
-  2. Mental Clarity (1-5): Focus, cognitive sharpness
-  3. Emotional State (1-5): Mood, emotional resilience
-  4. Available Time (1-5): Hours of uninterrupted work time
-  5. Environment Quality (1-5): Workspace setup, distractions
-- **Composite Score**: Auto-calculated average (1-5)
-- **Optional Notes**: Freeform context
-- **Task Recommendations**: 3-5 tasks matched to current state
-- **Historical Tracking**: View past check-ins and patterns
+**Design**: Max-width 768px (max-w-3xl)
 
-**Matching Algorithm**:
+**Settings**:
+- Display name and email
+- Country selection
+- Timezone (auto-detected)
+- Notification preferences
+- Feature request form (500 chars)
+- Account stats (streaks, completions)
+- Data export
+- Account deletion
+
+---
+
+## 5. Responsive Design Strategy
+
+### 5.1 Breakpoints
+- **Mobile**: < 640px (default, mobile-first)
+- **Tablet**: 640px - 1024px (sm:, md:)
+- **Desktop**: > 1024px (lg:, xl:)
+
+### 5.2 Layout Standards
+
+**Max-width by Page**:
+| Page | Max-width | Reasoning |
+|------|-----------|-----------|
+| Dashboard | max-w-2xl (672px) | Focus, centered content |
+| Check-in | max-w-2xl (672px) | Immersive experience |
+| Tasks | max-w-3xl (768px) | More data density needed |
+| Goals | max-w-2xl (672px) | Visual balance |
+| Habits | max-w-4xl (896px) | Calendar/grid views |
+| Profile | max-w-3xl (768px) | Form layouts |
+
+### 5.3 Pattern: Goals Page
+
+**Mobile** (< 768px):
+- Single column: `grid-cols-1`
+- Vertical cards: `flex-col`
+- Full-width layout
+- Stacked elements
+
+**Desktop** (≥ 768px):
+- Two columns: `md:grid-cols-2`
+- Horizontal cards: `sm:flex-row`
+- Better hover effects: `hover:scale-[1.01]`
+- Grid gaps: `gap-4`
+
+**Card Structure**:
+```tsx
+<div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+  {/* Icon - centered on mobile, left on desktop */}
+  <div className="flex-shrink-0 self-center sm:self-auto">
+    {icon}
+  </div>
+
+  {/* Content - full width on mobile, flex-1 on desktop */}
+  <div className="flex-1 min-w-0">
+    {content}
+  </div>
+
+  {/* Progress - centered on mobile, right on desktop */}
+  <div className="flex-shrink-0 self-center sm:self-auto">
+    {progress}
+  </div>
+</div>
 ```
+
+### 5.4 Navigation
+
+**Bottom Navigation Bar**:
+- Fixed position: `fixed bottom-0`
+- Full width: `w-full`
+- Safe area padding for mobile: `pb-safe`
+- 6 tabs with icons + labels
+- Active state highlighting
+- Works on all screen sizes
+
+---
+
+## 6. User Flows
+
+### 6.1 First-Time User Onboarding
+1. Sign up / Sign in (Supabase Auth)
+2. Welcome screen explaining energy-first approach
+3. First check-in to establish baseline
+4. Create first goal
+5. **NEW**: See task suggestions modal
+6. Add 2-3 suggested tasks
+7. Dashboard shows personalized recommendations
+
+### 6.2 Daily Check-in Flow (Version 2.0)
+1. User navigates to Check-in tab
+2. Sees single-page view with 5 visualizations
+3. Interacts with each custom slider:
+   - **Physical Battery**: Drag to set energy (1-5)
+   - **Mental Clarity**: Drag droplet fill (1-5)
+   - **Inner Weather**: Slide cloud-to-sun (1-5)
+   - **Pressure Valve**: Rotate gauge (1-5)
+   - **Creative Spark**: Set fire intensity (1-5)
+4. All changes update in real-time
+5. Clicks "Save Check-in" button
+6. Redirected to Dashboard
+7. Sees tasks matched to current energy
+
+### 6.3 Goal Creation + Task Setup Flow (Version 2.0)
+1. Navigate to Goals tab
+2. Click "New Goal" button
+3. Fill in goal form:
+   - Title (e.g., "Get fit and healthy")
+   - Category (e.g., Health)
+   - Due date (optional)
+4. Click "Save Goal"
+5. **NEW**: Task suggestions modal appears
+6. See 5 smart suggestions (all pre-selected)
+7. Review suggestions:
+   - Each shows energy level, time estimate
+   - Toggle checkboxes to customize selection
+8. Click "Add X Tasks" (e.g., "Add 5 Tasks")
+   - Or click "Skip" to create goal without tasks
+9. Tasks created in database
+10. Automatic linking: `goal_id` set on all tasks
+11. Return to Goals view
+12. Expand goal to see newly added tasks
+
+### 6.4 Task Completion Flow
+1. View suggested tasks on Dashboard
+2. Tasks matched to current energy level
+3. Click task to view details
+4. Mark as complete with checkbox
+5. Task moves to completed section
+6. Progress updates on linked goal
+7. Dashboard refreshes with new suggestions
+
+---
+
+## 7. Technical Architecture
+
+### 7.1 Tech Stack
+
+**Frontend**:
+- Next.js 14 (App Router)
+- React 18
+- TypeScript
+- Tailwind CSS 3.4 (custom config)
+
+**Styling**:
+- Google Fonts (Manrope, Material Symbols)
+- Lucide React icons
+- Custom Tailwind utilities
+
+**Backend**:
+- Supabase (PostgreSQL database)
+- Supabase Auth (authentication)
+- Edge Functions (future: AI suggestions)
+
+**Deployment**:
+- Vercel (production hosting)
+- GitHub (version control)
+- Automatic deployments from main
+
+### 7.2 Database Schema
+
+**Core Tables**:
+1. `profiles` - User profiles and settings
+2. `daily_responses` - Check-in data (5 dimensions)
+3. `goals` - User goals with categories
+4. `tasks` - Tasks with energy/time/priority metadata
+5. `habits` - Recurring rituals
+6. `habit_completions` - Habit completion log
+
+**Key Relationships**:
+- tasks → goals (many-to-one, optional via `goal_id`)
+- tasks → users (many-to-one via `user_id`)
+- daily_responses → users (many-to-one)
+- habits → users (many-to-one)
+
+**Security**:
+- Row-level security (RLS) on all tables
+- Users can only access their own data
+- Server-side validation
+
+### 7.3 File Structure
+
+```
+src/
+├── app/
+│   ├── (auth)/              # Auth pages
+│   ├── (dashboard)/         # Main app
+│   │   ├── page.tsx         # Dashboard/Energy Hub
+│   │   ├── checkin/         # Check-in with visualizations
+│   │   ├── tasks/           # Task management
+│   │   ├── goals/           # Goals + suggestions
+│   │   ├── habits/          # Habit tracking
+│   │   └── profile/         # Settings
+│   ├── layout.tsx           # Root (fonts, body)
+│   └── globals.css          # Global styles, utilities
+├── lib/
+│   └── supabase.ts          # Supabase client
+└── types/                   # TypeScript types
+```
+
+### 7.4 Key Files (Version 2.0)
+
+**Configuration**:
+- `tailwind.config.ts` - Soft sage theme, custom utilities
+- `src/app/layout.tsx` - Font loading, body classes
+- `src/app/globals.css` - Glass panel utility, Material Symbols
+
+**Core Features**:
+- `src/app/(dashboard)/checkin/page.tsx` - Custom visualizations
+- `src/app/(dashboard)/goals/page.tsx` - Task suggestions modal
+- `src/app/(dashboard)/page.tsx` - Energy hub dashboard
+
+---
+
+## 8. Progressive Web App (PWA)
+
+### 8.1 Features
+- Installable on mobile and desktop
+- Offline-ready (future)
+- Native app-like experience
+- Custom splash screens
+
+### 8.2 Icons & Assets
+- Favicon: 32x32, 16x16
+- PWA icons: 192x192, 512x512
+- Apple touch icon: 180x180
+- Soft sage gradient background
+
+### 8.3 Manifest
+```json
+{
+  "name": "Current State",
+  "short_name": "Energy",
+  "theme_color": "#88B09D",
+  "background_color": "#FEF8EF",
+  "display": "standalone"
+}
+```
+
+---
+
+## 9. Key Algorithms
+
+### 9.1 Task Matching Algorithm
+
+**Input**: Current check-in state (5 dimensions)
+**Output**: Sorted list of task recommendations
+
+**Matching Logic**:
+```javascript
+function getMatchedTasks(currentEnergy: number, tasks: Task[]) {
+  const energyMap = {
+    1: 'Low',
+    2: 'Low',
+    3: 'Medium',
+    4: 'High',
+    5: 'Very High'
+  }
+
+  return tasks.filter(task =>
+    task.energy_required === energyMap[currentEnergy] &&
+    task.status === 'active'
+  )
+}
+```
+
+**Score Calculation**:
+```javascript
 Match Score =
   (Energy Match × 0.3) +
   (Time Availability × 0.25) +
@@ -260,1011 +673,254 @@ Match Score =
   (Mental Clarity × 0.1)
 ```
 
-**Data Model**:
-```sql
-daily_responses (
-  id UUID PRIMARY KEY,
-  user_id UUID REFERENCES profiles(id),
-  energy_level INTEGER CHECK (energy_level >= 1 AND <= 5),
-  mental_clarity INTEGER CHECK (mental_clarity >= 1 AND <= 5),
-  emotional_state INTEGER CHECK (emotional_state >= 1 AND <= 5),
-  available_time INTEGER CHECK (available_time >= 1 AND <= 5),
-  environment_quality INTEGER CHECK (environment_quality >= 1 AND <= 5),
-  composite_score NUMERIC GENERATED ALWAYS AS (...)
-)
-```
+### 9.2 Smart Task Suggestions
 
-**User Stories**:
-- As a user, I want to check in daily so the system understands my current state
-- As a user, I want task recommendations that match my energy so I'm not overwhelmed
-- As a user, I want to see how my energy patterns change over time
+**Function**: `getSmartTaskSuggestions(goalTitle, category)`
 
----
+**Process**:
+1. Analyze goal title for keywords
+2. Map category to task templates
+3. Assign energy levels based on task type
+4. Set work type and time estimates
+5. Return 5 most relevant suggestions
 
-### 5. Habit Tracking (Simplified)
+**Example Categories**:
 
-**Status**: ✅ Complete (Recently Simplified)
+**Health Goals**:
+- Exercise tasks (High energy, Physical)
+- Meal prep (Medium energy, Admin)
+- Sleep tracking (Low energy, Admin)
+- Medical appointments (Low energy, Admin)
 
-**Features**:
-- **Single-Input Creation**: Just define the habit title (removed annoying 3-version system!)
-- **Habit Types**: Build (positive habits) / Break (negative habits)
-- **Flexible Completion**: Single "Done" button (removed Full/Scaled/Minimal buttons)
-- **Goal Linking**: Connect habits to goals
-- **Motivation Tracking**: "Why this helps" field
-- **Best Time**: Preferred time of day
-- **Target Frequency**: Daily, 3x/week, etc.
-- **Celebration**: Encouraging messages on completion
+**Learning Goals**:
+- Study sessions (Medium energy, Deep Work)
+- Research topics (Medium energy, Learning)
+- Practice exercises (Medium energy, Learning)
+- Course enrollment (Low energy, Admin)
 
-**What Changed** (User Feedback):
-- ❌ REMOVED: Manual scaled_version and minimal_version inputs (too annoying!)
-- ❌ REMOVED: 3-button completion UI (Full/Scaled/Minimal)
-- ✅ NEW: Single "Done" button for simplicity
-- ✅ NEW: App will auto-suggest lighter versions based on energy (future)
-
-**Data Model**:
-```sql
-habits (
-  id UUID PRIMARY KEY,
-  user_id UUID REFERENCES profiles(id),
-  title TEXT NOT NULL,
-  habit_type TEXT CHECK (habit_type IN ('build', 'break')),
-  full_version TEXT,
-  scaled_version TEXT, -- Now auto-generated (undefined for manual entries)
-  minimal_version TEXT, -- Now auto-generated (undefined for manual entries)
-  target_frequency TEXT,
-  linked_goal_id UUID REFERENCES goals(id),
-  why_this_helps TEXT,
-  best_time_of_day TEXT
-)
-```
-
-**User Stories**:
-- As a user, I want to create habits quickly without complex inputs
-- As a user, I want to mark habits complete with one tap
-- As a user, I want the app to suggest easier versions when I'm low energy (coming soon)
+**Career Goals**:
+- Resume updates (Medium energy, Admin)
+- Job applications (Medium energy, Admin)
+- Skill development (High energy, Learning)
+- Networking (Medium energy, Communication)
 
 ---
 
-### 6. User Profile & Settings
+## 10. Success Metrics
 
-**Status**: ✅ Complete
-
-**Features**:
-- **Personal Information**:
-  - Full name
-  - Email (read-only)
-  - **Country Dropdown** (NEW): 50+ countries
-  - **Auto-Timezone Detection** (NEW): Based on country selection
-- **Notification Preferences**:
-  - Daily check-in reminders
-  - Gentle task reminders
-  - Celebration notifications
-- **Feature Request Form** (NEW):
-  - 500-character textarea
-  - Submit ideas directly to team
-  - Success confirmation message
-- **Account Stats**:
-  - Current streak
-  - Longest streak
-  - Total tasks completed
-
-**User Stories**:
-- As a user, I want to set my country so my timezone is correct
-- As a user, I want to request features so I can shape the product
-- As a user, I want to control notifications so I'm not overwhelmed
-
----
-
-### 7. Visual Enhancements
-
-**Status**: ✅ Complete
-
-**Features**:
-- **Floating Background Shapes** (NEW):
-  - 3 gradient circles with gentle float animation
-  - Staggered timing for organic movement
-  - Low opacity (0.1) for subtlety
-- **Page Gradients**: Soft gray-to-white background
-- **Celebration Confetti**: Animated confetti on task/habit completion
-- **Slide-In Animations**: Content animates in on page load
-- **Responsive Design**: Mobile-first, works on all screen sizes
-
-**Design Philosophy**:
-- Modern, clean aesthetic
-- Not distracting or overwhelming
-- Professional yet approachable
-- Accessibility-first (WCAG AA compliant)
-
----
-
-### 8. Dashboard & Navigation
-
-**Status**: ✅ Complete
-
-**Features**:
-- **Top Navigation**:
-  - Logo + App name
-  - Dashboard, Tasks, Goals, Habits, Check-in, Profile
-  - User avatar + logout
-- **Dashboard Widgets**:
-  - Today's check-in status
-  - Recommended tasks (3-5 based on latest check-in)
-  - Active goals summary
-  - Recent habit completions
-  - Streak tracker
-- **Quick Actions**: Floating action buttons for common tasks
-
----
-
-## Future Roadmap
-
-### Phase 1: High Priority (Next 2-4 Weeks)
-
-#### 1.1 Check-In Enhancement: "Anything Affecting You?"
-
-**Problem**: Current check-in doesn't capture physical/mental blockers
-
-**Solution**: Add multi-select question to daily check-in
-
-**Features**:
-- Checkbox options:
-  - 😤 Bloated
-  - 😡 Angry
-  - 😰 Anxious
-  - 😬 Nervous
-  - 🤕 Headache
-  - 😴 Tired
-  - 🤒 Sick
-  - ✍️ Other (text input)
-- Store in `physical_mental_state` JSONB column
-- Use data to filter out high-intensity tasks when user is struggling
-- Show empathy messages: "You're feeling tired today. Here are some lighter tasks..."
-
-**Technical Requirements**:
-- Migration: Add `physical_mental_state JSONB` to `daily_responses` table
-- Update check-in UI component
-- Modify matching algorithm to penalize high-energy tasks when user is affected
-- Add analytics: Track most common blockers
-
-**Success Metrics**:
-- 60%+ of users report at least one blocker per week
-- Task completion rate increases by 15% when matched to affected state
-- User satisfaction score increases on "task recommendations" question
-
-**User Stories**:
-- As a user, I want to indicate when I have a headache so I don't get intense tasks
-- As a user, I want the app to understand when I'm anxious and suggest calming work
-- As a user, I want to see patterns in what affects me over time
-
-**Estimated Effort**: 3 days (1 day backend, 1 day frontend, 1 day testing)
-
----
-
-#### 1.2 Task Intensity Levels
-
-**Problem**: Current `work_type` doesn't capture cognitive load intensity
-
-**Solution**: Add `intensity_level` field to tasks
-
-**Features**:
-- **Intensity Levels**:
-  - 🪶 **Light Lift**: Low cognitive load, can do when tired
-    - Examples: Responding to emails, scheduling meetings, filing documents
-  - ⚖️ **Steady Focus**: Medium intensity, sustained attention
-    - Examples: Research, planning, reviewing content
-  - 🧠 **Deep Work**: High focus, high energy required
-    - Examples: Writing, coding, strategic planning, creative work
-- UI: Badge on task cards showing intensity
-- Smart defaults based on work_type
-- Filter tasks by intensity level
-- Matching algorithm heavily weights intensity vs energy level
-
-**Matching Logic**:
-```javascript
-if (userEnergy >= 4 && mentalClarity >= 4) {
-  // Recommend Deep Work tasks
-} else if (userEnergy >= 3) {
-  // Recommend Steady Focus tasks
-} else {
-  // Recommend Light Lift tasks only
-}
-```
-
-**Technical Requirements**:
-- Migration: Add `intensity_level TEXT CHECK (intensity_level IN ('light_lift', 'steady_focus', 'deep_work'))` to tasks table
-- Update task creation form
-- Add intensity filter to Tasks page
-- Modify matching algorithm with intensity weighting (0.35 weight)
-- Backfill existing tasks with smart defaults
-
-**Success Metrics**:
-- 90%+ of new tasks have intensity level set
-- Task acceptance rate increases by 20% when matched by intensity
-- Users report "tasks feel more doable" in feedback
-
-**User Stories**:
-- As a user, I want to mark tasks as "light lift" so I can do them when I'm exhausted
-- As a user, I want deep work tasks only recommended when I have high energy
-- As a user, I want to filter tasks by intensity so I can batch similar work
-
-**Estimated Effort**: 4 days (1 day migration, 2 days frontend, 1 day algorithm update)
-
----
-
-#### 1.3 Evening Planning Reminder
-
-**Problem**: Users forget to plan tomorrow's work
-
-**Solution**: Daily reminder at user-specified time (e.g., 7 PM)
-
-**Features**:
-- **Settings**: User sets preferred reminder time
-- **Notification Methods**:
-  - Browser notification (primary)
-  - Email reminder (optional)
-- **Planning Interface**:
-  - Review today's completions
-  - Select 3-5 priority tasks for tomorrow
-  - Check calendar availability (future: calendar integration)
-  - Set tomorrow's focus theme
-- **Smart Suggestions**: Recommend tasks based on:
-  - Overdue must-do items
-  - Goal deadlines approaching
-  - Unfinished high-value tasks
-
-**Technical Requirements**:
-- Add `evening_reminder_time TIME` to profiles table
-- Implement browser Notifications API
-- Create planning dashboard page (`/planning`)
-- Email reminder via Supabase Edge Functions + Resend
-- Background job scheduler (cron) for reminder triggers
-
-**Success Metrics**:
-- 40%+ of users enable evening reminders
-- 65%+ response rate to reminders (user opens planning interface)
-- Users who plan ahead complete 25% more tasks next day
-
-**User Stories**:
-- As a user, I want a reminder to plan tomorrow so I start the day focused
-- As a user, I want to review today's work before planning tomorrow
-- As a user, I want to set my preferred reminder time
-
-**Estimated Effort**: 5 days (2 days notifications, 2 days UI, 1 day backend)
-
----
-
-### Phase 2: Medium Priority (Weeks 5-8)
-
-#### 2.1 Pomodoro Timer Integration
-
-**Problem**: Users want time tracking and focused work sessions
-
-**Solution**: Built-in Pomodoro timer on each task
-
-**Features**:
-- **Start/Park Button** on each task card
-- **Timer Display**: Visual countdown (25:00 → 00:00)
-- **Work Cycles**:
-  - 25 minutes work
-  - 5 minutes short break
-  - 15 minutes long break (after 4 cycles)
-- **Timer Controls**:
-  - Pause/resume
-  - Skip break
-  - End session early
-- **Session Tracking**:
-  - Total pomodoros completed per task
-  - Actual time spent vs estimated time
-  - Completion stats (# sessions today/this week)
-- **Notifications**:
-  - Browser notification on break start
-  - Sound alert (optional, user configurable)
-- **Break Suggestions**: Recommended activities during breaks
-
-**Data Model**:
-```sql
-CREATE TABLE pomodoro_sessions (
-  id UUID PRIMARY KEY,
-  user_id UUID REFERENCES profiles(id),
-  task_id UUID REFERENCES tasks(id),
-  started_at TIMESTAMPTZ,
-  ended_at TIMESTAMPTZ,
-  work_duration INTEGER, -- minutes
-  break_duration INTEGER,
-  cycles_completed INTEGER,
-  was_interrupted BOOLEAN DEFAULT FALSE
-);
-```
-
-**Technical Requirements**:
-- Client-side timer with Web Workers (doesn't block UI)
-- Notifications API permission request
-- Persist timer state to localStorage (survive page refresh)
-- Background tab detection (pause or continue?)
-- Database logging for analytics
-
-**Success Metrics**:
-- 35%+ of users try Pomodoro timer
-- 15%+ of active users use timer daily
-- Tasks with timer usage have 30% higher completion rate
-
-**User Stories**:
-- As a user, I want to start a focused work session on a task
-- As a user, I want to be reminded to take breaks
-- As a user, I want to see how much time I actually spend on tasks
-
-**Estimated Effort**: 7 days (3 days timer logic, 2 days UI, 2 days backend tracking)
-
----
-
-#### 2.2 Break Time Suggestions
-
-**Problem**: Users schedule too many back-to-back intensive tasks
-
-**Solution**: Algorithm detects overload and suggests breaks
-
-**Features**:
-- **Detection Logic**:
-  - User has 3+ Deep Work tasks scheduled consecutively
-  - Total estimated work time > 4 hours without breaks
-  - User's check-in shows declining energy over multiple days
-- **Suggestions**:
-  - "You have 6 hours of deep work planned. Consider adding a 15-minute break after task 3."
-  - "Your energy has been below 3 for 3 days. Take a longer break today?"
-- **Break Types**:
-  - Short break (5-15 min): Walk, stretch, hydrate
-  - Medium break (30 min): Lunch, exercise, meditation
-  - Long break (1-2 hours): Exercise, social time, hobby
-- **Educational Content**: Tips on why breaks improve focus
-
-**Technical Requirements**:
-- Task scheduling analyzer
-- Energy trend analysis (daily_responses table)
-- In-app notification system
-- Break scheduling tool (add "Break" task type)
-
-**Success Metrics**:
-- 50%+ of users accept at least one break suggestion
-- Users who take recommended breaks have 12% higher next-task completion
-- Average daily energy score increases by 0.3 points
-
-**User Stories**:
-- As a user, I want to be warned when I'm planning too much intensive work
-- As a user, I want suggestions for when to take breaks
-- As a user, I want to understand why breaks matter
-
-**Estimated Effort**: 4 days (2 days detection logic, 1 day UI, 1 day content)
-
----
-
-#### 2.3 Calendar Integration (Google Calendar)
-
-**Problem**: Users have calendars separate from task list
-
-**Solution**: Two-way sync with Google Calendar
-
-**Features**:
-- **OAuth Connection**: One-click Google Calendar authorization
-- **Side-by-Side View**:
-  - Left pane: Task list with time estimates
-  - Right pane: Calendar (day/week view)
-- **Drag-and-Drop Timeblocking**:
-  - Drag task from list → Drop on calendar slot
-  - Creates calendar event with task title + notes
-  - Task marked as "scheduled"
-- **Smart Scheduling Assistant**:
-  - Analyzes calendar free slots
-  - Suggests optimal times based on:
-    - Task energy requirements
-    - User's typical energy patterns by time of day
-    - Calendar availability
-- **Overload Detection**:
-  - "You have 8 hours of tasks but only 4 hours free on your calendar"
-  - Recommendations: Defer tasks, reschedule, block focus time
-- **Sync Behavior**:
-  - Task completion → Mark calendar event as done
-  - Calendar event completion → Mark task as completed
-  - Two-way sync every 5 minutes
-
-**Data Model**:
-```sql
-ALTER TABLE tasks ADD COLUMN calendar_event_id TEXT;
-ALTER TABLE tasks ADD COLUMN scheduled_start TIMESTAMPTZ;
-ALTER TABLE tasks ADD COLUMN scheduled_end TIMESTAMPTZ;
-
-CREATE TABLE calendar_connections (
-  id UUID PRIMARY KEY,
-  user_id UUID REFERENCES profiles(id),
-  provider TEXT CHECK (provider IN ('google', 'outlook', 'apple')),
-  access_token TEXT ENCRYPTED,
-  refresh_token TEXT ENCRYPTED,
-  calendar_id TEXT,
-  last_synced_at TIMESTAMPTZ
-);
-```
-
-**Technical Requirements**:
-- Google Calendar API integration
-- OAuth 2.0 flow (google-auth-library)
-- Webhook subscriptions for calendar changes
-- Conflict resolution logic (if calendar event deleted but task still active)
-- Rate limiting (Google Calendar API: 1000 requests/day)
-
-**Success Metrics**:
-- 50%+ of users connect Google Calendar
-- 30%+ of tasks get timeblocked to calendar
-- Task completion rate increases 18% when scheduled on calendar
-
-**User Stories**:
-- As a user, I want to see my tasks and calendar together
-- As a user, I want to drag tasks onto my calendar to timeblock
-- As a user, I want alerts when my calendar is overbooked
-- As a user, I want task completion to sync with my calendar
-
-**Estimated Effort**: 12 days (4 days OAuth, 4 days sync logic, 3 days UI, 1 day testing)
-
----
-
-#### 2.4 Weekly Planning & Review Dashboard
-
-**Problem**: Users lack weekly visibility into progress
-
-**Solution**: Dedicated dashboard for planning and reviewing weeks
-
-**Features**:
-
-**A. Weekly Planning (Sunday evening / Monday morning)**:
-- Set 1-3 weekly focus goals
-- Allocate tasks across the week
-- Visual preview: Weekly calendar with task distribution
-- Capacity check: "You have 25 hours of tasks and ~20 hours available"
-
-**B. Weekly Review (Friday evening / Sunday)**:
-- **What Got Done**:
-  - Tasks completed count + full list
-  - Completion rate (vs planned)
-- **Time Breakdown**:
-  - Pie chart: Hours spent by work type
-  - Deep work: 12h, Admin: 8h, Meetings: 5h
-- **Goal Progress**:
-  - % progress on each active goal
-  - "Goal 'Launch business' moved from 40% → 55%"
-- **Energy Insights**:
-  - Average daily energy levels
-  - Chart: Energy by time of day (heatmap)
-  - "You're most productive Tuesday/Wednesday mornings"
-- **Achievements & Wins**:
-  - Longest streak this week
-  - High-value tasks completed
-  - Encouraging summary
-
-**Data Model**:
-```sql
-CREATE TABLE weekly_plans (
-  id UUID PRIMARY KEY,
-  user_id UUID REFERENCES profiles(id),
-  week_start_date DATE,
-  focus_goals TEXT[],
-  planned_task_ids UUID[],
-  estimated_hours NUMERIC
-);
-
--- Leverage existing daily_summaries table for review data
-```
-
-**Technical Requirements**:
-- Date range queries (start of week, end of week)
-- Aggregation queries on task completions
-- Chart.js for visualizations (pie chart, heatmap)
-- Weekly summary generator (Edge Function, runs Sundays)
-
-**Success Metrics**:
-- 40%+ of users view weekly review at least once
-- Users who do weekly planning complete 22% more tasks
-- Engagement with insights: 60%+ of users expand at least one insight
-
-**User Stories**:
-- As a user, I want to plan my week so I feel organized
-- As a user, I want to see what I accomplished this week
-- As a user, I want to understand my energy patterns
-- As a user, I want to celebrate my progress
-
-**Estimated Effort**: 8 days (3 days planning UI, 3 days review + analytics, 2 days charts)
-
----
-
-### Phase 3: Long-Term Vision (Months 3-6)
-
-#### 3.1 Social Login (Gmail, Apple, Microsoft)
-
-**Problem**: Email/password signup has friction
-
-**Solution**: One-click social login
-
-**Features**:
-- Sign in with Google
-- Sign in with Apple
-- Sign in with Microsoft
-- Link multiple providers to one account
-
-**Technical Requirements**:
-- Supabase Auth providers configuration
-- OAuth consent screens
-- Email verification bypass for social logins
-
-**Estimated Effort**: 5 days
-
----
-
-#### 3.2 Import from Other Apps
-
-**Problem**: Users have existing tasks in other tools
-
-**Solution**: One-time import wizard
-
-**Supported Platforms**:
-- Todoist (via API)
-- Notion (via API)
-- Google Tasks
-- Trello
-- Apple Reminders (CSV export)
-
-**Features**:
-- OAuth connection to source platform
-- Mapping wizard (map columns to Current State fields)
-- Preview before import
-- Bulk import with progress indicator
-
-**Estimated Effort**: 10 days (2 days per platform)
-
----
-
-#### 3.3 Needle-Moving Task Insights
-
-**Problem**: Not all tasks are equally impactful
-
-**Solution**: AI/algorithm highlights high-impact tasks
-
-**Features**:
-- ⚡ "High Impact" badge on tasks that:
-  - Link to goals with tight deadlines
-  - Have high estimated value
-  - Block other tasks (dependencies)
-  - User marked as "must do"
-- Dedicated filter: "Show needle-movers only"
-- Weekly summary: "Your top 3 needle-moving tasks this week"
-
-**Estimated Effort**: 6 days
-
----
-
-#### 3.4 Smart Task Deferral
-
-**Problem**: Users keep deferring certain tasks indefinitely
-
-**Solution**: Auto-detect procrastination patterns
-
-**Features**:
-- If task deferred 3+ times in 2 weeks → Ask: "Delete this or reschedule?"
-- If user's calendar shows overload → Auto-defer non-essential tasks
-- Learning: If user consistently defers a task type, stop suggesting it
-
-**Estimated Effort**: 5 days
-
----
-
-#### 3.5 Financial Clarity Module
-
-**Status**: Needs scoping discussion with users
-
-**Potential Features**:
-- Revenue tracking per goal/income stream
-- Expense allocation across goals
-- Monthly financial review dashboard
-- ROI calculator for business tasks
-- Cash flow forecasting
-- Invoice tracking integration (QuickBooks, FreshBooks)
-
-**Open Questions**:
-1. What's most valuable: Revenue tracking? Expense management? Both?
-2. Should this be a separate tab or integrated into Goals?
-3. Do users need budgeting tools or just tracking?
-4. Integration priorities: Which accounting tools do users use?
-
-**Estimated Effort**: TBD (pending user research)
-
----
-
-## Technical Architecture
-
-### Tech Stack
-
-**Frontend**:
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **UI Components**: Custom components + Lucide React icons
-- **State Management**: React hooks (useState, useEffect, useContext)
-- **Forms**: React Hook Form (future)
-- **Animations**: CSS keyframes, Framer Motion (future)
-
-**Backend**:
-- **Database**: PostgreSQL (via Supabase)
-- **Authentication**: Supabase Auth
-- **API**: Supabase client (REST auto-generated from schema)
-- **Edge Functions**: Supabase Edge Functions (Deno)
-- **Storage**: Supabase Storage (for future image uploads)
-
-**Infrastructure**:
-- **Hosting**: Vercel (Frontend + API routes)
-- **Database Hosting**: Supabase Cloud
-- **CDN**: Vercel Edge Network
-- **Domain**: TBD
-- **SSL**: Automatic via Vercel
-
-**DevOps**:
-- **Version Control**: Git + GitHub
-- **CI/CD**: Vercel auto-deploy on push to main
-- **Monitoring**: Vercel Analytics (future: Sentry)
-- **Logging**: Supabase logs + Vercel logs
-
----
-
-### Database Schema
-
-**Core Tables**:
-1. `profiles` - User profiles and settings
-2. `goals` - User goals (SMART framework)
-3. `tasks` - Tasks with energy/time/priority metadata
-4. `daily_responses` - Daily check-in responses
-5. `task_suggestions` - Algorithm output and user feedback
-6. `daily_summaries` - Aggregated daily metrics
-7. `habits` - Habit tracking (build/break)
-8. `habit_completions` - Habit completion log
-
-**Future Tables**:
-9. `pomodoro_sessions` - Timer tracking
-10. `weekly_plans` - Weekly planning data
-11. `calendar_connections` - OAuth tokens for calendar sync
-12. `feature_requests` - User-submitted feature ideas
-
-**Security**:
-- Row-level security (RLS) on all tables
-- Users can only access their own data
-- Server-side validation on all mutations
-- Encrypted sensitive fields (OAuth tokens)
-
----
-
-### Key Algorithms
-
-#### 1. Task Matching Algorithm (Current)
-
-```javascript
-function calculateMatchScore(task, userState) {
-  const energyMatch =
-    (task.energy_required === 'low' && userState.energy_level <= 2) ? 1.0 :
-    (task.energy_required === 'medium' && userState.energy_level === 3) ? 0.9 :
-    (task.energy_required === 'high' && userState.energy_level >= 4) ? 1.0 :
-    0.5;
-
-  const timeMatch =
-    (task.time_estimate === 'tiny' && userState.available_time >= 1) ? 1.0 :
-    (task.time_estimate === 'short' && userState.available_time >= 2) ? 0.9 :
-    (task.time_estimate === 'medium' && userState.available_time >= 3) ? 0.8 :
-    (task.time_estimate === 'long' && userState.available_time >= 4) ? 0.7 :
-    0.4;
-
-  const workTypeFit =
-    (task.work_type === 'deep_work' && userState.mental_clarity >= 4) ? 1.0 :
-    (task.work_type === 'admin' && userState.mental_clarity <= 3) ? 0.9 :
-    0.7;
-
-  const priorityWeight =
-    task.priority === 'must_do' ? 1.0 :
-    task.priority === 'should_do' ? 0.8 :
-    task.priority === 'could_do' ? 0.5 :
-    0.3;
-
-  return (
-    energyMatch * 0.3 +
-    timeMatch * 0.25 +
-    workTypeFit * 0.2 +
-    priorityWeight * 0.15 +
-    (userState.mental_clarity / 5) * 0.1
-  );
-}
-```
-
-#### 2. Future: Intensity-Based Matching
-
-```javascript
-function getRecommendedIntensity(userState) {
-  const { energy_level, mental_clarity, physical_mental_state } = userState;
-
-  // If user is affected by headache, sick, etc. → Light Lift only
-  if (physical_mental_state && physical_mental_state.length > 0) {
-    return 'light_lift';
-  }
-
-  // High energy + high clarity → Deep Work
-  if (energy_level >= 4 && mental_clarity >= 4) {
-    return 'deep_work';
-  }
-
-  // Medium state → Steady Focus
-  if (energy_level >= 3 || mental_clarity >= 3) {
-    return 'steady_focus';
-  }
-
-  // Low state → Light Lift
-  return 'light_lift';
-}
-```
-
----
-
-## User Stories
-
-### Epic 1: Onboarding & Setup
-- ✅ As a new user, I want to sign up quickly so I can start using the app
-- ✅ As a new user, I want guided onboarding so I understand how to use the app
-- ✅ As a new user, I want to set up my first goal so I have something to work towards
-
-### Epic 2: Daily Workflow
-- ✅ As a user, I want to check in daily so the app knows my current state
-- ✅ As a user, I want task recommendations that match my energy so I'm not overwhelmed
-- ✅ As a user, I want to complete tasks quickly without friction
-- ⏳ As a user, I want to indicate physical/mental blockers so I get appropriate tasks
-- ⏳ As a user, I want a reminder to plan tomorrow so I start focused
-
-### Epic 3: Task Management
-- ✅ As a user, I want to create tasks with energy/time metadata
-- ✅ As a user, I want to filter tasks by status, priority, and type
-- ✅ As a user, I want to undo completed tasks when I make mistakes
-- ⏳ As a user, I want to tag tasks by intensity level
-- ⏳ As a user, I want to see needle-moving tasks highlighted
-
-### Epic 4: Goal Tracking
-- ✅ As a user, I want to create SMART goals
-- ✅ As a user, I want to see all tasks linked to a goal
-- ✅ As a user, I want to track financial value per goal
-- ⏳ As a user, I want weekly progress reports on goals
-
-### Epic 5: Time Management
-- ⏳ As a user, I want to use a Pomodoro timer on tasks
-- ⏳ As a user, I want to timeblock tasks on my calendar
-- ⏳ As a user, I want alerts when I'm overcommitted
-
-### Epic 6: Insights & Analytics
-- ⏳ As a user, I want to see my energy patterns over time
-- ⏳ As a user, I want weekly review dashboards
-- ⏳ As a user, I want to understand which tasks move the needle most
-
----
-
-## Success Metrics
-
-### North Star Metric
-**Weekly Active Users (WAU) completing at least 3 tasks**
-
-### Product Metrics
+### 10.1 Product Metrics
 
 **Engagement**:
 - Daily active users (DAU)
 - Weekly active users (WAU)
-- DAU/MAU ratio (stickiness): Target 30%+
-- Average check-ins per week: Target 4+
-- Average tasks completed per week: Target 8+
+- DAU/MAU ratio: Target 30%+
+- Check-ins per week: Target 4+
+- Tasks completed per week: Target 8+
 
-**Feature Adoption**:
-- % users who complete onboarding: Target 85%+
-- % users who create at least 1 goal: Target 90%+
-- % users who create at least 3 tasks: Target 80%+
-- % users who complete daily check-in 3+ times/week: Target 60%+
-- % users who restore a task: <10% (low = good UX)
-
-**Retention**:
-- D1 retention: Target 60%+
-- D7 retention: Target 40%+
-- D30 retention: Target 25%+
-- 90-day retention: Target 15%+
+**Feature Adoption (Version 2.0)**:
+- % users completing check-ins: Target 80%+
+- % users creating goals: Target 90%+
+- % users accepting task suggestions: Target 70%+
+- % users who add ≥3 suggested tasks: Target 60%+
 
 **Task Matching Quality**:
-- Task acceptance rate (user starts suggested task): Target 70%+
-- Task completion rate (accepted tasks that get done): Target 65%+
-- Average match score of accepted tasks: Target 0.75+
-- Decline rate with reason "too hard": <15%
-
-**Goal Progress**:
-- % goals with at least 1 linked task: Target 85%+
-- Average tasks per goal: Target 5+
-- % goals completed within target date: Target 40%+
+- Task acceptance rate: Target 70%+
+- Task completion rate: Target 65%+
+- Average match score: Target 0.75+
 
 **User Satisfaction**:
 - NPS (Net Promoter Score): Target 40+
-- Feature satisfaction ratings: Target 4.2/5
-- Customer support tickets per 100 users: <5
+- Feature satisfaction: Target 4.2/5
+- "Tasks feel doable": 80%+ agree
+
+### 10.2 Performance Metrics
+
+**Build Performance**:
+- Routes: 17/17 compiled successfully
+- Build time: < 60 seconds
+- Bundle size: Optimized with Next.js
+
+**User Experience**:
+- First Contentful Paint: < 1.5s
+- Time to Interactive: < 3s
+- Lighthouse score: 90+ (target)
 
 ---
 
-## Implementation Timeline
+## 11. Version History
 
-### Q1 2026 (Weeks 1-12)
+### Version 2.0 (December 31, 2025) ✅ CURRENT
 
-**Weeks 1-2**: Phase 1A
-- Check-in enhancement: "Anything affecting you?"
-- Bug fixes and performance optimization
+**Major Changes**:
+- Complete UI redesign with soft sage theme
+- Single-page check-in with 5 custom visualizations
+- Task suggestions modal after goal creation
+- Responsive improvements across all pages
+- Bottom navigation bar
+- Energy-first dashboard redesign
 
-**Weeks 3-4**: Phase 1B
-- Task intensity levels
-- Evening planning reminder
+**Design System**:
+- New color palette (soft sage #88B09D + pastels)
+- Manrope display font
+- Material Symbols icon system
+- Glass panel components
+- Custom shadows and animations
 
-**Weeks 5-6**: Phase 2A
-- Pomodoro timer integration (MVP)
+**Check-in Page**:
+- Physical Battery visualization
+- Mental Clarity droplet slider
+- Inner Weather cloud-to-sun slider
+- Pressure Valve gauge
+- Creative Spark fire indicator
+- All sliders interactive with proper layering
 
-**Weeks 7-8**: Phase 2B
+**Goals System**:
+- Task suggestions modal (5 suggestions)
+- Context-aware matching (keywords + category)
+- Pre-selected suggestions for quick onboarding
+- Automatic task-to-goal linking
+- 2-column responsive layout on desktop
+
+**Technical**:
+- Updated `tailwind.config.ts` with complete color system
+- Modified `layout.tsx` for new fonts
+- Added utility classes to `globals.css`
+- Complete rewrite of check-in page
+- Enhanced goals page with modal
+
+**Files Changed**:
+- `tailwind.config.ts`
+- `src/app/layout.tsx`
+- `src/app/globals.css`
+- `src/app/(dashboard)/checkin/page.tsx`
+- `src/app/(dashboard)/goals/page.tsx`
+
+### Version 1.0 (December 28, 2025)
+
+**Features**:
+- User authentication (Supabase Auth)
+- SMART goals framework
+- Energy-aware task management
+- Multi-step check-in questionnaire
+- Habit tracking
+- Dashboard with navigation
+- Feature request form
+- Country/timezone selection
+
+---
+
+## 12. Future Roadmap
+
+### Phase 3: Intelligence (Q1 2026)
+- AI-powered insights from check-in patterns
+- Energy curve predictions
+- Smart scheduling recommendations
+- Natural language task creation
+
+### Phase 4: Integrations (Q2 2026)
+- Calendar sync (Google, Apple, Outlook)
+- Wearable data integration
+- Import from Todoist, Notion
+- Zapier automation
+
+### Phase 5: Advanced Features (Q3 2026)
+- Pomodoro timer integration
+- Weekly planning & review dashboard
 - Break time suggestions
 - Overload detection
-
-**Weeks 9-12**: Phase 2C
-- Calendar integration (Google Calendar)
-- Side-by-side view
-- Timeblocking drag-and-drop
-
-### Q2 2026 (Weeks 13-24)
-
-**Weeks 13-16**: Phase 3A
-- Weekly planning dashboard
-- Weekly review + analytics
-
-**Weeks 17-20**: Phase 3B
 - Social login (Google, Apple, Microsoft)
-- Import from Todoist, Notion
 
-**Weeks 21-24**: Phase 3C
-- Needle-moving insights
-- Smart task deferral
-- Financial clarity scoping
-
-### Q3 2026 (Weeks 25-36)
-
-**TBD based on user feedback**:
-- Financial clarity module
-- Advanced analytics
-- Mobile app (React Native PWA)
-- Team collaboration features
+### Enhancement Ideas
+- Dark mode toggle
+- Custom color themes
+- Voice note task creation
+- Weekly review summaries
+- Energy pattern visualizations
+- Habit templates library
+- Goal templates by role
+- Financial tracking module
 
 ---
 
-## Non-Functional Requirements
+## 13. Known Limitations
 
-### Performance
-- **Page Load Time**: <2 seconds on 3G
-- **Time to Interactive (TTI)**: <3 seconds
-- **Database Query Time**: <200ms for 95th percentile
-- **API Response Time**: <500ms for 95th percentile
+### Current Limitations
+- No offline mode (requires internet)
+- No dark mode (soft sage only)
+- Limited analytics dashboard
+- No mobile native apps (PWA only)
+- Task suggestions are rule-based (not ML)
 
-### Security
-- **Authentication**: Supabase Auth with JWT tokens
-- **Data Encryption**: At rest (database) and in transit (HTTPS)
-- **Row-Level Security**: Enforced on all tables
-- **OWASP Top 10**: Mitigated (XSS, CSRF, SQL injection, etc.)
-- **Password Policy**: Min 8 characters, complexity requirements
-- **Session Management**: Automatic expiry after 7 days
-
-### Accessibility
-- **WCAG 2.1 Level AA Compliance**
-- **Keyboard Navigation**: All features accessible via keyboard
-- **Screen Reader Support**: ARIA labels, semantic HTML
-- **Color Contrast**: Minimum 4.5:1 ratio for text
-- **Focus Indicators**: Visible on all interactive elements
-
-### Scalability
-- **Database**: PostgreSQL supports 100K+ users
-- **API Rate Limiting**: 100 requests/minute per user
-- **Horizontal Scaling**: Vercel auto-scales frontend
-- **Database Connection Pooling**: Supabase Pooler (max 500 connections)
-
-### Reliability
-- **Uptime Target**: 99.5% (Vercel + Supabase SLA)
-- **Backup Frequency**: Daily (Supabase automatic backups)
-- **Disaster Recovery**: Point-in-time recovery (7-day retention)
-
-### Browser Support
-- **Chrome**: Latest 2 versions
-- **Firefox**: Latest 2 versions
-- **Safari**: Latest 2 versions
-- **Edge**: Latest 2 versions
-- **Mobile**: iOS Safari 14+, Chrome Android 90+
-
-### Mobile Responsiveness
-- **Breakpoints**: Mobile (320px+), Tablet (768px+), Desktop (1024px+)
-- **Touch Targets**: Minimum 44×44px
-- **Gestures**: Swipe to complete/defer (future)
+### Technical Debt
+- Some code duplication in visualization components
+- Could benefit from shared component library
+- OG image is placeholder (needs custom design)
 
 ---
 
-## Open Questions
+## 14. Deployment Status
 
-### Product Questions
+### Production Ready ✅
+- Branch: `claude/fix-vercel-error-9H8KR`
+- All features tested manually
+- Responsive design verified
+- Build passes (17/17 routes)
+- Ready to merge to main
 
-1. **Financial Clarity Scope**:
-   - What specific features are most valuable to users?
-   - Should it be a separate module or integrated into Goals?
-   - Which accounting integrations are priority?
+### Build Status
+```
+✓ Compiled successfully
+✓ Linting and checking validity of types
+✓ Collecting page data
+✓ Generating static pages (17/17)
+✓ Collecting build traces
+✓ Finalizing page optimization
+```
 
-2. **Calendar Integration Priority**:
-   - Start with Google Calendar or support multiple providers?
-   - Should we support Outlook and Apple Calendar in Phase 1?
-
-3. **Notification Strategy**:
-   - Browser notifications only, or add email/SMS?
-   - What's the tolerance for notification frequency?
-   - Push notifications for mobile app?
-
-4. **Import Priorities**:
-   - Which task management tools do users currently use?
-   - Is one-time import sufficient or need ongoing sync?
-
-5. **Pricing Model**:
-   - Freemium? Free tier limits?
-   - Premium features: Which features should be gated?
-   - Pricing: $8/month? $12/month? Annual discount?
-
-### Technical Questions
-
-1. **Mobile Strategy**:
-   - Progressive Web App (PWA) first or native React Native?
-   - Desktop app (Electron)?
-
-2. **Real-Time Updates**:
-   - Do we need WebSocket connections for real-time task updates?
-   - Or is polling every 30 seconds sufficient?
-
-3. **Offline Support**:
-   - Should Pomodoro timer work offline?
-   - Local-first architecture with sync?
-
-4. **AI/ML Integration**:
-   - Use LLMs for smarter task suggestions?
-   - Sentiment analysis on check-in notes?
-   - Predictive modeling for task completion time?
+### Next Steps
+1. Merge feature branch to main
+2. Vercel auto-deploys to production
+3. Verify production build
+4. Monitor error logs
+5. Gather user feedback
 
 ---
 
-## Appendix
+## Appendix A: Glossary
 
-### A. Glossary
+- **Energy-Aware Matching**: Recommending tasks based on current energy state
+- **SMART Goals**: Specific, Measurable, Achievable, Relevant, Time-bound
+- **Soft Sage Theme**: Nature-inspired design with #88B09D primary color
+- **Glass Panel**: Semi-transparent component with backdrop blur
+- **Task Suggestions**: Context-aware task recommendations after goal creation
+- **Custom Visualizations**: Hand-crafted slider designs for check-ins
+- **Material Symbols**: Google's icon font system
 
-- **Energy-Aware Matching**: Algorithm that recommends tasks based on user's current energy, time, and mental state
-- **SMART Goals**: Specific, Measurable, Achievable, Relevant, Time-bound goal framework
-- **Composite Score**: Average of 5 check-in dimensions (energy, clarity, emotion, time, environment)
-- **Needle-Moving Task**: High-impact task that significantly advances a goal
-- **Light Lift**: Low cognitive load task suitable for low-energy states
-- **Deep Work**: High-focus, high-energy task requiring uninterrupted concentration
-- **Timeblocking**: Scheduling specific tasks to calendar time slots
+## Appendix B: Design Decisions
 
-### B. References
+### Why Energy-First?
+Time is not the limiting factor—energy is. By tracking and respecting energy levels, users can work sustainably and avoid burnout.
 
-- PRODUCT-ROADMAP.md - Detailed feature roadmap
-- SESSION-SUMMARY.md - Recent implementation summary
-- DATABASE-MIGRATION-INSTRUCTIONS.md - Database setup guide
-- supabase-schema.sql - Complete database schema
+### Why Single-Page Check-in?
+Multi-step flows felt tedious. Seeing all metrics at once provides better context and faster completion.
 
-### C. Change Log
+### Why Soft Sage Theme?
+Nature-inspired colors reduce stress and cognitive load. Soft sage is calming yet energizing—perfect for sustainable productivity.
 
-- **v1.0** (Dec 28, 2025): Initial PRD created
-  - Documented all completed MVP features
-  - Detailed Phase 1-3 roadmap
-  - Added technical architecture and success metrics
+### Why Material Symbols?
+Consistent, modern icon system that scales well. Lighter weight than custom SVGs. Matches minimalist aesthetic.
+
+### Why Pre-Select All Task Suggestions?
+Reduces decision fatigue during goal setup. Users can quickly accept all and start, or customize. Bias toward action.
+
+### Why Custom Visualizations?
+Generic sliders are boring and unmemorable. Custom visualizations make check-ins feel special, encouraging daily use.
 
 ---
 
-**Document Status**: ✅ Complete
-**Next Review Date**: January 15, 2026
+**Document Status**: ✅ Production Ready
+**Next Review**: Post-launch (30 days)
 **Owner**: Product Team
-**Contributors**: Development Team, User Research
 
 ---
 
