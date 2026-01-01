@@ -433,7 +433,15 @@ export default function GoalsPage() {
       {/* Task Suggestions Modal */}
       {showTaskSuggestions && newlyCreatedGoal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-8 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-8 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto relative">
+            {/* Close button */}
+            <button
+              onClick={skipTaskSuggestions}
+              className="absolute top-4 right-4 text-text-muted hover:text-text-secondary p-2 hover:bg-surface-hover rounded-lg transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
             {/* Header */}
             <div className="text-center mb-6">
               <div className={`w-16 h-16 ${getGoalIcon(newlyCreatedGoal.category, newlyCreatedGoal.title).color} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md`}>
