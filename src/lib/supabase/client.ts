@@ -13,7 +13,7 @@ export function createClient() {
             return { name, value: v.join('=') }
           })
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: { name: string; value: string; options?: any }[]) {
           cookiesToSet.forEach(({ name, value, options }) => {
             const cookieOptions = {
               ...options,
