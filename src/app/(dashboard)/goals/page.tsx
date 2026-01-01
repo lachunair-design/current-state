@@ -173,8 +173,8 @@ export default function GoalsPage() {
           // Show task suggestions modal
           setNewlyCreatedGoal(createdGoal as Goal)
           const suggestions = getSmartTaskSuggestions((createdGoal as Goal).title, (createdGoal as Goal).category)
-          // Pre-select all suggestions
-          setSelectedTaskIndices(suggestions.map((_, index) => index))
+          // Pre-select first 5 suggestions (we only display 5 in the modal)
+          setSelectedTaskIndices(suggestions.slice(0, 5).map((_, index) => index))
           setShowTaskSuggestions(true)
         }
       }
@@ -263,7 +263,7 @@ export default function GoalsPage() {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
 
-      const suggestions = getSmartTaskSuggestions(newlyCreatedGoal.title, newlyCreatedGoal.category)
+      const suggestions = getSmartTaskSuggestions(newlyCreatedGoal.title, newlyCreatedGoal.category).slice(0, 5)
       const selectedSuggestions = selectedTaskIndices.map(i => suggestions[i]).filter(Boolean)
 
       // Create tasks from selected suggestions
