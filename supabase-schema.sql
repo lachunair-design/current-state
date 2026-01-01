@@ -167,6 +167,47 @@ CREATE TABLE IF NOT EXISTS daily_reflections (
 );
 
 -- =====================================================
+-- HABITS TABLE
+-- =====================================================
+-- Stores user habits with energy-scaled versions
+
+CREATE TABLE IF NOT EXISTS habits (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  habit_type TEXT NOT NULL CHECK (habit_type IN ('performance', 'foundational', 'restorative')),
+  full_version TEXT NOT NULL,
+  scaled_version TEXT,
+  minimal_version TEXT,
+  target_frequency TEXT NOT NULL DEFAULT 'daily',
+  target_days JSONB,
+  linked_goal_id UUID REFERENCES goals(id) ON DELETE SET NULL,
+  why_this_helps TEXT,
+  best_time_of_day TEXT,
+  is_active BOOLEAN DEFAULT TRUE,
+  display_order INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- =====================================================
+-- HABIT COMPLETIONS TABLE
+-- =====================================================
+-- Tracks habit completions with energy impact data
+
+CREATE TABLE IF NOT EXISTS habit_completions (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  habit_id UUID NOT NULL REFERENCES habits(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  completed_at TIMESTAMPTZ DEFAULT NOW(),
+  version_completed TEXT NOT NULL CHECK (version_completed IN ('full', 'scaled', 'minimal')),
+  energy_level_before INTEGER CHECK (energy_level_before BETWEEN 1 AND 5),
+  energy_level_after INTEGER CHECK (energy_level_after BETWEEN 1 AND 5),
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- =====================================================
 -- INDEXES FOR PERFORMANCE
 -- =====================================================
 
@@ -202,6 +243,17 @@ CREATE INDEX IF NOT EXISTS idx_daily_summaries_user_date ON daily_summaries(user
 CREATE INDEX IF NOT EXISTS idx_daily_reflections_user_id ON daily_reflections(user_id);
 CREATE INDEX IF NOT EXISTS idx_daily_reflections_user_date ON daily_reflections(user_id, reflection_date DESC);
 
+-- Habits
+CREATE INDEX IF NOT EXISTS idx_habits_user_id ON habits(user_id);
+CREATE INDEX IF NOT EXISTS idx_habits_type ON habits(habit_type);
+CREATE INDEX IF NOT EXISTS idx_habits_active ON habits(is_active);
+CREATE INDEX IF NOT EXISTS idx_habits_goal ON habits(linked_goal_id);
+
+-- Habit Completions
+CREATE INDEX IF NOT EXISTS idx_habit_completions_habit_id ON habit_completions(habit_id);
+CREATE INDEX IF NOT EXISTS idx_habit_completions_user_id ON habit_completions(user_id);
+CREATE INDEX IF NOT EXISTS idx_habit_completions_completed_at ON habit_completions(completed_at);
+
 -- =====================================================
 -- ROW LEVEL SECURITY (RLS)
 -- =====================================================
@@ -214,6 +266,8 @@ ALTER TABLE daily_responses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE task_suggestions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE daily_summaries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE daily_reflections ENABLE ROW LEVEL SECURITY;
+ALTER TABLE habits ENABLE ROW LEVEL SECURITY;
+ALTER TABLE habit_completions ENABLE ROW LEVEL SECURITY;
 
 -- Profiles: Users can only see and update their own profile
 CREATE POLICY "Users can view own profile" ON profiles
@@ -294,6 +348,32 @@ CREATE POLICY "Users can update own reflections" ON daily_reflections
 CREATE POLICY "Users can delete own reflections" ON daily_reflections
   FOR DELETE USING (auth.uid() = user_id);
 
+-- Habits: Users can only manage their own habits
+CREATE POLICY "Users can view own habits" ON habits
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own habits" ON habits
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own habits" ON habits
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own habits" ON habits
+  FOR DELETE USING (auth.uid() = user_id);
+
+-- Habit Completions: Users can only manage their own completions
+CREATE POLICY "Users can view own habit completions" ON habit_completions
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own habit completions" ON habit_completions
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own habit completions" ON habit_completions
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own habit completions" ON habit_completions
+  FOR DELETE USING (auth.uid() = user_id);
+
 -- =====================================================
 -- TRIGGERS AND FUNCTIONS
 -- =====================================================
@@ -338,6 +418,9 @@ CREATE TRIGGER update_tasks_updated_at BEFORE UPDATE ON tasks
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_daily_reflections_updated_at BEFORE UPDATE ON daily_reflections
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_habits_updated_at BEFORE UPDATE ON habits
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- =====================================================
