@@ -37,7 +37,7 @@ export default async function DashboardPage() {
     .from('tasks')
     .select('*, goals(*)')
     .eq('user_id', user.id)
-    .eq('status', 'active')
+    .in('status', ['active', 'deferred'])
     .order('created_at', { ascending: false })
     .limit(4) as { data: any[] | null }
 
