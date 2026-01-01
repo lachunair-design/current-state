@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS tasks (
   title TEXT NOT NULL,
   description TEXT,
   energy_required TEXT NOT NULL DEFAULT 'medium' CHECK (energy_required IN ('low', 'medium', 'high')),
-  work_type TEXT NOT NULL DEFAULT 'admin' CHECK (work_type IN ('deep_work', 'creative', 'admin', 'communication', 'physical', 'learning')),
+  work_type TEXT NOT NULL DEFAULT 'admin' CHECK (work_type IN ('light_lift', 'steady_focus', 'deep_work', 'admin')),
   time_estimate TEXT NOT NULL DEFAULT 'medium' CHECK (time_estimate IN ('tiny', 'short', 'medium', 'long', 'extended')),
   priority TEXT NOT NULL DEFAULT 'should_do' CHECK (priority IN ('must_do', 'should_do', 'could_do', 'someday')),
   estimated_value NUMERIC,
