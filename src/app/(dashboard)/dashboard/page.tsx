@@ -51,6 +51,13 @@ export default async function DashboardPage() {
     .order('responded_at', { ascending: false })
     .limit(1) as { data: Array<{ energy_level: number }> | null }
 
+  // Fetch count of tasks in parking lot (active + deferred)
+  const { count: parkingLotCount } = await supabase
+    .from('tasks')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+    .in('status', ['active', 'deferred'])
+
   // Fetch completed tasks this week
   const weekAgo = new Date()
   weekAgo.setDate(weekAgo.getDate() - 7)
@@ -182,7 +189,7 @@ export default async function DashboardPage() {
             <div className="text-xs text-text-secondary font-medium mt-0.5">Done This Week</div>
           </div>
           <div className="bg-white border border-surface-border rounded-lg p-3 text-center">
-            <div className="text-2xl font-bold text-text-primary">{tasks?.length || 0}</div>
+            <div className="text-2xl font-bold text-text-primary">{parkingLotCount || 0}</div>
             <div className="text-xs text-text-secondary font-medium mt-0.5">In Parking Lot</div>
           </div>
           <div className="bg-white border border-surface-border rounded-lg p-3 text-center">
