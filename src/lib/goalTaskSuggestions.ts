@@ -277,6 +277,56 @@ export function getSmartTaskSuggestions(goalTitle: string, category: GoalCategor
     )
   }
 
+  // Social media / content creation keywords
+  if (lower.includes('social media') || lower.includes('instagram') || lower.includes('tiktok') ||
+      lower.includes('youtube') || lower.includes('twitter') || lower.includes('content') ||
+      lower.includes('audience') || lower.includes('followers') || lower.includes('grow account')) {
+    smartSuggestions.push(
+      {
+        title: 'Create content calendar for next 2 weeks',
+        energy_required: 'medium',
+        work_type: 'steady_focus',
+        time_estimate: 'medium',
+        priority: 'must_do'
+      },
+      {
+        title: 'Post 3 pieces of valuable content this week',
+        energy_required: 'medium',
+        work_type: 'steady_focus',
+        time_estimate: 'long',
+        priority: 'must_do'
+      },
+      {
+        title: 'Engage with 20 accounts in your niche daily',
+        energy_required: 'low',
+        work_type: 'light_lift',
+        time_estimate: 'short',
+        priority: 'should_do'
+      },
+      {
+        title: 'Research trending topics and hashtags',
+        energy_required: 'low',
+        work_type: 'steady_focus',
+        time_estimate: 'short',
+        priority: 'should_do'
+      },
+      {
+        title: 'Analyze top performing posts from competitors',
+        energy_required: 'medium',
+        work_type: 'steady_focus',
+        time_estimate: 'medium',
+        priority: 'could_do'
+      },
+      {
+        title: 'Set up content batching system',
+        energy_required: 'medium',
+        work_type: 'admin',
+        time_estimate: 'medium',
+        priority: 'could_do'
+      }
+    )
+  }
+
   // Business/startup keywords
   if (lower.includes('launch') || lower.includes('startup') || lower.includes('business')) {
     smartSuggestions.push(
