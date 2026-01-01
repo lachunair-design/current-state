@@ -42,7 +42,7 @@ function ReflectionModal({ completedTasks, onClose, onComplete }: ReflectionModa
         rating,
         went_well: wentWell || null,
         would_change: wouldChange || null,
-      })
+      } as never)
 
       onComplete()
       onClose()

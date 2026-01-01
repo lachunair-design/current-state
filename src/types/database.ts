@@ -179,6 +179,17 @@ export interface HabitCompletion {
   created_at: string;
 }
 
+export interface DailyReflection {
+  id: string;
+  user_id: string;
+  reflection_date: string;
+  rating: number;
+  went_well: string | null;
+  would_change: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 // Extended types with relations
 export interface TaskWithGoal extends Task {
   goal?: Goal | null;
@@ -406,6 +417,11 @@ export interface Database {
         Row: HabitCompletion;
         Insert: Omit<HabitCompletion, 'id' | 'created_at' | 'completed_at'>;
         Update: Partial<HabitCompletion>;
+      };
+      daily_reflections: {
+        Row: DailyReflection;
+        Insert: Omit<DailyReflection, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<DailyReflection>;
       };
     };
   };
