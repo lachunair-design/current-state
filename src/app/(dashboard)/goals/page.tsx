@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Plus, Loader2, X, MoreVertical, Trash2, Edit2, Rocket, Briefcase, Heart, DollarSign, Users, Home, CheckCircle2 } from 'lucide-react'
+import { Plus, Loader2, X, MoreVertical, Trash2, Edit2, Rocket, Briefcase, Heart, DollarSign, Users, Home, CheckCircle2, ListPlus } from 'lucide-react'
 import { Goal, GoalCategory, GOAL_CATEGORY_CONFIG, CreateGoalInput } from '@/types/database'
 import { getSmartTaskSuggestions, TaskSuggestion } from '@/lib/goalTaskSuggestions'
 import clsx from 'clsx'
@@ -314,6 +314,18 @@ export default function GoalsPage() {
     setShowTaskSuggestions(false)
     setNewlyCreatedGoal(null)
     setSelectedTaskIndices([])
+    router.push('/tasks')
+  }
+
+  const addTasksToGoal = (goal: Goal) => {
+    // Store goal info in sessionStorage for tasks page to read
+    sessionStorage.setItem('pendingGoalForTasks', JSON.stringify({
+      id: goal.id,
+      title: goal.title
+    }))
+
+    // Close menu and navigate to tasks page
+    setMenuOpen(null)
     router.push('/tasks')
   }
 
@@ -660,12 +672,18 @@ export default function GoalsPage() {
                     <MoreVertical className="w-5 h-5" />
                   </button>
                   {menuOpen === goal.id && (
-                    <div className="absolute right-0 top-full mt-2 bg-white border border-surface-border rounded-xl shadow-xl py-1 z-10 w-36 animate-scale-in">
+                    <div className="absolute right-0 top-full mt-2 bg-white border border-surface-border rounded-xl shadow-xl py-1 z-10 w-40 animate-scale-in">
                       <button
                         onClick={() => openEditForm(goal)}
                         className="w-full px-4 py-2.5 text-left text-sm font-medium text-text-secondary hover:bg-surface-hover flex items-center gap-2 transition-colors"
                       >
                         <Edit2 className="w-4 h-4" /> Edit
+                      </button>
+                      <button
+                        onClick={() => addTasksToGoal(goal)}
+                        className="w-full px-4 py-2.5 text-left text-sm font-medium text-text-secondary hover:bg-surface-hover flex items-center gap-2 transition-colors"
+                      >
+                        <ListPlus className="w-4 h-4" /> Add tasks
                       </button>
                       <button
                         onClick={() => promptDeleteGoal(goal)}
