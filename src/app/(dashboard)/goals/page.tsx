@@ -22,6 +22,12 @@ export default function GoalsPage() {
   const [selectedTaskIndices, setSelectedTaskIndices] = useState<number[]>([])
   const [addingTasks, setAddingTasks] = useState(false)
 
+  // Delete confirmation state
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [goalToDelete, setGoalToDelete] = useState<Goal | null>(null)
+  const [deleteStats, setDeleteStats] = useState({ tasks: 0, habits: 0 })
+  const [deleting, setDeleting] = useState(false)
+
   const supabase = createClient()
 
   // Form state
@@ -177,12 +183,68 @@ export default function GoalsPage() {
     }
   }
 
-  const deleteGoal = async (goalId: string) => {
-    if (!confirm('Delete this goal? Tasks linked to it will become unlinked.')) return
+  const promptDeleteGoal = async (goal: Goal) => {
+    // Fetch counts of linked tasks and habits
+    const { data: tasks } = await supabase
+      .from('tasks')
+      .select('id')
+      .eq('goal_id', goal.id)
+      .eq('status', 'active')
 
-    await supabase.from('goals').update({ is_active: false } as never).eq('id', goalId)
-    setGoals(goals.filter(g => g.id !== goalId))
+    const { data: habits } = await supabase
+      .from('habits')
+      .select('id')
+      .eq('linked_goal_id', goal.id)
+      .eq('is_active', true)
+
+    setDeleteStats({
+      tasks: tasks?.length || 0,
+      habits: habits?.length || 0
+    })
+    setGoalToDelete(goal)
+    setShowDeleteConfirm(true)
     setMenuOpen(null)
+  }
+
+  const confirmDeleteGoal = async () => {
+    if (!goalToDelete) return
+
+    setDeleting(true)
+    try {
+      // Delete all linked tasks
+      await supabase
+        .from('tasks')
+        .delete()
+        .eq('goal_id', goalToDelete.id)
+
+      // Delete all linked habits
+      await supabase
+        .from('habits')
+        .delete()
+        .eq('linked_goal_id', goalToDelete.id)
+
+      // Delete the goal
+      await supabase
+        .from('goals')
+        .delete()
+        .eq('id', goalToDelete.id)
+
+      // Update local state
+      setGoals(goals.filter(g => g.id !== goalToDelete.id))
+      setShowDeleteConfirm(false)
+      setGoalToDelete(null)
+    } catch (error) {
+      console.error('Error deleting goal:', error)
+      alert('Failed to delete goal. Please try again.')
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  const cancelDelete = () => {
+    setShowDeleteConfirm(false)
+    setGoalToDelete(null)
+    setDeleteStats({ tasks: 0, habits: 0 })
   }
 
   const toggleTaskSelection = (index: number) => {
@@ -452,6 +514,68 @@ export default function GoalsPage() {
         </div>
       )}
 
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && goalToDelete && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl animate-scale-in">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Trash2 className="w-8 h-8 text-red-600" />
+              </div>
+              <h2 className="text-2xl font-bold text-text-primary mb-2">Delete this goal?</h2>
+              <p className="text-text-secondary text-sm">
+                This will permanently delete <span className="font-semibold text-text-primary">"{goalToDelete.title}"</span> and everything linked to it.
+              </p>
+            </div>
+
+            {/* Warning Stats */}
+            {(deleteStats.tasks > 0 || deleteStats.habits > 0) && (
+              <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 mb-6">
+                <p className="text-sm font-semibold text-red-900 mb-2">⚠️ This will also delete:</p>
+                <div className="space-y-1">
+                  {deleteStats.tasks > 0 && (
+                    <p className="text-sm text-red-800">
+                      • <strong>{deleteStats.tasks}</strong> {deleteStats.tasks === 1 ? 'task' : 'tasks'}
+                    </p>
+                  )}
+                  {deleteStats.habits > 0 && (
+                    <p className="text-sm text-red-800">
+                      • <strong>{deleteStats.habits}</strong> {deleteStats.habits === 1 ? 'habit' : 'habits'}
+                    </p>
+                  )}
+                </div>
+                <p className="text-xs text-red-700 mt-2">This action cannot be undone.</p>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={cancelDelete}
+                disabled={deleting}
+                className="btn-secondary flex-1"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDeleteGoal}
+                disabled={deleting}
+                className="flex-1 px-6 py-3 rounded-xl font-semibold bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+              >
+                {deleting ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    <Trash2 className="w-5 h-5" />
+                    Delete Forever
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Goals List */}
       {goals.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-24">
@@ -518,7 +642,7 @@ export default function GoalsPage() {
                         <Edit2 className="w-4 h-4" /> Edit
                       </button>
                       <button
-                        onClick={() => deleteGoal(goal.id)}
+                        onClick={() => promptDeleteGoal(goal)}
                         className="w-full px-4 py-2.5 text-left text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" /> Delete
