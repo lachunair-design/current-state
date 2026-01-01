@@ -119,11 +119,11 @@ export default async function DashboardPage() {
     <div className="max-w-2xl mx-auto pb-8">
       {/* Energy-First Header */}
       <div className="mb-6 animate-fade-in">
-        <h1 className="text-3xl font-bold text-text-primary mb-2">
+        <h1 className="text-2xl sm:text-3xl font-bold text-text-primary mb-2">
           Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'}, {firstName}
         </h1>
-        <p className="text-lg text-text-secondary flex items-center gap-2">
-          <span className="text-2xl">{energyDisplay.emoji}</span>
+        <p className="text-base sm:text-lg text-text-secondary flex items-center gap-2">
+          <span className="text-xl sm:text-2xl">{energyDisplay.emoji}</span>
           <span className="font-semibold">{energyDisplay.message}</span>
         </p>
       </div>
@@ -142,10 +142,10 @@ export default async function DashboardPage() {
           </Link>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 sm:gap-6">
           <div className="flex-shrink-0">
-            <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shadow-md">
-              <span className="text-5xl">{energyDisplay.emoji}</span>
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-2xl flex items-center justify-center shadow-md">
+              <span className="text-4xl sm:text-5xl">{energyDisplay.emoji}</span>
             </div>
           </div>
           <div className="flex-1">

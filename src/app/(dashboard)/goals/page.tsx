@@ -463,30 +463,30 @@ export default function GoalsPage() {
             return (
               <div
                 key={goal.id}
-                className="bg-white rounded-2xl p-6 shadow-md hover:shadow-lg hover:scale-[1.01] transition-all animate-fade-in relative flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6"
+                className="bg-white rounded-2xl p-4 sm:p-6 shadow-md hover:shadow-lg hover:scale-[1.01] transition-all animate-fade-in relative flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 {/* Left side content */}
                 <div className="flex-1 min-w-0">
                   {/* Icon */}
-                  <div className={`w-16 h-16 ${iconConfig.color} rounded-2xl flex items-center justify-center mb-4 shadow-sm`}>
-                    <span className="text-3xl">{iconConfig.emoji}</span>
+                  <div className={`w-12 h-12 sm:w-16 sm:h-16 ${iconConfig.color} rounded-2xl flex items-center justify-center mb-3 sm:mb-4 shadow-sm`}>
+                    <span className="text-2xl sm:text-3xl">{iconConfig.emoji}</span>
                   </div>
 
                   {/* Title */}
-                  <h3 className="text-xl font-bold text-text-primary mb-2 pr-8">{goal.title}</h3>
+                  <h3 className="text-lg sm:text-xl font-bold text-text-primary mb-1 sm:mb-2 pr-8">{goal.title}</h3>
 
                   {/* Progress Text */}
-                  <p className="text-sm text-text-secondary">
+                  <p className="text-xs sm:text-sm text-text-secondary">
                     {progress.completed} of {progress.total} tasks complete
                   </p>
                 </div>
 
                 {/* Right side: Circular Progress Indicator */}
                 <div className="flex-shrink-0 self-center sm:self-auto">
-                  <div className="relative w-24 h-24">
+                  <div className="relative w-20 h-20 sm:w-24 sm:h-24">
                     <div
-                      className="w-24 h-24 rounded-full"
+                      className="w-20 h-20 sm:w-24 sm:h-24 rounded-full"
                       style={{
                         background: `conic-gradient(
                           #4FB3D4 ${percentage * 3.6}deg,
@@ -495,7 +495,7 @@ export default function GoalsPage() {
                       }}
                     >
                       <div className="absolute inset-2 bg-white rounded-full flex items-center justify-center">
-                        <span className="text-2xl font-bold text-ocean-600">{percentage}%</span>
+                        <span className="text-xl sm:text-2xl font-bold text-ocean-600">{percentage}%</span>
                       </div>
                     </div>
                   </div>
