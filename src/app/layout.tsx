@@ -11,8 +11,8 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: 'Current State - Work with your energy, not against it',
-  description: 'The productivity app for humans with fluctuating everything. Energy-aware task matching for multi-income professionals.',
-  keywords: ['productivity', 'energy management', 'task management', 'ADHD', 'focus', 'goals', 'habits', 'time management'],
+  description: 'A capacity-aware planning system that helps you work sustainably, not constantly. Plan realistically and protect your energy.',
+  keywords: ['productivity', 'energy management', 'task management', 'focus', 'goals', 'habits', 'time management', 'sustainable work', 'capacity planning'],
   authors: [{ name: 'Current State' }],
   creator: 'Current State',
   publisher: 'Current State',
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://currentstate.app',
     title: 'Current State - Work with your energy, not against it',
-    description: 'Energy-aware productivity for multi-passionate professionals. Match tasks to your current state, not your to-do list.',
+    description: 'A capacity-aware planning system. Plan realistically, protect your energy, and make progress without burnout.',
     siteName: 'Current State',
     images: [
       {
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Current State - Work with your energy, not against it',
-    description: 'Energy-aware productivity for multi-passionate professionals.',
+    description: 'A capacity-aware planning system for sustainable productivity.',
     images: ['/og-image.png'],
   },
   robots: {

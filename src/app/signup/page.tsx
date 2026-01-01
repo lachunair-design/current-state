@@ -80,7 +80,7 @@ export default function SignupPage() {
           Start working with your energy
         </h2>
         <p className="mt-2 text-center text-text-secondary">
-          Free forever. No credit card required.
+          Start your free trial. No credit card required.
         </p>
       </div>
 

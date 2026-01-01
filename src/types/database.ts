@@ -13,13 +13,11 @@ export type GoalCategory =
 
 export type EnergyLevel = 'low' | 'medium' | 'high';
 
-export type WorkType = 
+export type WorkType =
+  | 'light_lift'
+  | 'steady_focus'
   | 'deep_work'
-  | 'creative'
-  | 'admin'
-  | 'communication'
-  | 'physical'
-  | 'learning';
+  | 'admin';
 
 export type TimeEstimate = 'tiny' | 'short' | 'medium' | 'long' | 'extended';
 
@@ -268,13 +266,11 @@ export const ENERGY_LEVEL_CONFIG: Record<EnergyLevel, { label: string; color: st
   high: { label: 'High Energy', color: 'bg-green-100 text-green-800', description: 'Creative & strategic work' },
 };
 
-export const WORK_TYPE_CONFIG: Record<WorkType, { label: string; icon: string }> = {
-  deep_work: { label: 'Deep Work', icon: '🎯' },
-  creative: { label: 'Creative', icon: '🎨' },
-  admin: { label: 'Admin', icon: '📋' },
-  communication: { label: 'Communication', icon: '💬' },
-  physical: { label: 'Physical', icon: '🏃' },
-  learning: { label: 'Learning', icon: '📚' },
+export const WORK_TYPE_CONFIG: Record<WorkType, { label: string; icon: string; description: string }> = {
+  light_lift: { label: 'Light Lift', icon: '☁️', description: 'Low cognitive load, can do when tired' },
+  steady_focus: { label: 'Steady Focus', icon: '🎯', description: 'Medium intensity, sustained attention' },
+  deep_work: { label: 'Deep Work', icon: '🧠', description: 'High focus, high energy required' },
+  admin: { label: 'Admin', icon: '📋', description: 'Administrative tasks like calls, bookings, emails' },
 };
 
 export const TIME_ESTIMATE_CONFIG: Record<TimeEstimate, { label: string; minutes: number }> = {

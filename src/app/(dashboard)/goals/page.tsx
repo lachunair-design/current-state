@@ -440,13 +440,13 @@ export default function GoalsPage() {
                 disabled={addingTasks}
                 className="btn-secondary px-6"
               >
-                Skip
+                Add manually
               </button>
             </div>
 
             {/* Helper text */}
             <p className="text-xs text-text-muted text-center mt-4">
-              You can always add more tasks later from the Tasks page
+              💡 <strong>Tip:</strong> Goals work best with tasks. We recommend adding at least 2-3 to get started.
             </p>
           </div>
         </div>

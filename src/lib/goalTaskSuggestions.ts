@@ -29,7 +29,7 @@ export const GOAL_TASK_SUGGESTIONS: Record<GoalCategory, TaskSuggestion[]> = {
     {
       title: 'Research companies in target industry',
       energy_required: 'medium',
-      work_type: 'learning',
+      work_type: 'steady_focus',
       time_estimate: 'medium',
       priority: 'should_do'
     },
@@ -43,7 +43,7 @@ export const GOAL_TASK_SUGGESTIONS: Record<GoalCategory, TaskSuggestion[]> = {
     {
       title: 'Network on LinkedIn - connect with 10 people',
       energy_required: 'low',
-      work_type: 'communication',
+      work_type: 'light_lift',
       time_estimate: 'short',
       priority: 'could_do'
     },
@@ -59,7 +59,7 @@ export const GOAL_TASK_SUGGESTIONS: Record<GoalCategory, TaskSuggestion[]> = {
     {
       title: 'Research competitors and pricing',
       energy_required: 'medium',
-      work_type: 'learning',
+      work_type: 'steady_focus',
       time_estimate: 'medium',
       priority: 'must_do'
     },
@@ -73,7 +73,7 @@ export const GOAL_TASK_SUGGESTIONS: Record<GoalCategory, TaskSuggestion[]> = {
     {
       title: 'Design minimal viable product (MVP)',
       energy_required: 'high',
-      work_type: 'creative',
+      work_type: 'steady_focus',
       time_estimate: 'extended',
       priority: 'must_do'
     },
@@ -110,7 +110,7 @@ export const GOAL_TASK_SUGGESTIONS: Record<GoalCategory, TaskSuggestion[]> = {
     {
       title: 'Research high-yield savings accounts',
       energy_required: 'low',
-      work_type: 'learning',
+      work_type: 'steady_focus',
       time_estimate: 'short',
       priority: 'should_do'
     },
@@ -131,7 +131,7 @@ export const GOAL_TASK_SUGGESTIONS: Record<GoalCategory, TaskSuggestion[]> = {
     {
       title: 'Research investment options for beginners',
       energy_required: 'medium',
-      work_type: 'learning',
+      work_type: 'steady_focus',
       time_estimate: 'medium',
       priority: 'could_do'
     },
@@ -147,14 +147,14 @@ export const GOAL_TASK_SUGGESTIONS: Record<GoalCategory, TaskSuggestion[]> = {
     {
       title: 'Plan healthy meals for the week',
       energy_required: 'medium',
-      work_type: 'creative',
+      work_type: 'steady_focus',
       time_estimate: 'short',
       priority: 'should_do'
     },
     {
       title: 'Research workout routines for beginners',
       energy_required: 'low',
-      work_type: 'learning',
+      work_type: 'steady_focus',
       time_estimate: 'short',
       priority: 'could_do'
     },
@@ -168,7 +168,7 @@ export const GOAL_TASK_SUGGESTIONS: Record<GoalCategory, TaskSuggestion[]> = {
     {
       title: 'Buy healthy groceries for the week',
       energy_required: 'medium',
-      work_type: 'physical',
+      work_type: 'light_lift',
       time_estimate: 'medium',
       priority: 'should_do'
     },
@@ -177,35 +177,35 @@ export const GOAL_TASK_SUGGESTIONS: Record<GoalCategory, TaskSuggestion[]> = {
     {
       title: 'Schedule weekly quality time with partner',
       energy_required: 'low',
-      work_type: 'communication',
+      work_type: 'light_lift',
       time_estimate: 'tiny',
       priority: 'must_do'
     },
     {
       title: 'Call a friend you haven\'t talked to in a while',
       energy_required: 'medium',
-      work_type: 'communication',
+      work_type: 'light_lift',
       time_estimate: 'short',
       priority: 'should_do'
     },
     {
       title: 'Plan a date night or family outing',
       energy_required: 'medium',
-      work_type: 'creative',
+      work_type: 'steady_focus',
       time_estimate: 'short',
       priority: 'could_do'
     },
     {
       title: 'Write thank you notes to 3 people',
       energy_required: 'low',
-      work_type: 'creative',
+      work_type: 'steady_focus',
       time_estimate: 'short',
       priority: 'could_do'
     },
     {
       title: 'Join a local community group or club',
       energy_required: 'medium',
-      work_type: 'communication',
+      work_type: 'light_lift',
       time_estimate: 'short',
       priority: 'could_do'
     },
@@ -214,28 +214,28 @@ export const GOAL_TASK_SUGGESTIONS: Record<GoalCategory, TaskSuggestion[]> = {
     {
       title: 'Start a daily journaling practice',
       energy_required: 'low',
-      work_type: 'creative',
+      work_type: 'steady_focus',
       time_estimate: 'tiny',
       priority: 'could_do'
     },
     {
       title: 'Learn a new skill - choose one',
       energy_required: 'high',
-      work_type: 'learning',
+      work_type: 'steady_focus',
       time_estimate: 'extended',
       priority: 'could_do'
     },
     {
       title: 'Declutter one room or area',
       energy_required: 'medium',
-      work_type: 'physical',
+      work_type: 'light_lift',
       time_estimate: 'medium',
       priority: 'could_do'
     },
     {
       title: 'Read one book this month',
       energy_required: 'low',
-      work_type: 'learning',
+      work_type: 'steady_focus',
       time_estimate: 'tiny',
       priority: 'could_do'
     },
@@ -270,7 +270,7 @@ export function getSmartTaskSuggestions(goalTitle: string, category: GoalCategor
       {
         title: 'Reach out to 3 recruiters on LinkedIn',
         energy_required: 'medium',
-        work_type: 'communication',
+        work_type: 'light_lift',
         time_estimate: 'short',
         priority: 'should_do'
       }
@@ -283,14 +283,14 @@ export function getSmartTaskSuggestions(goalTitle: string, category: GoalCategor
       {
         title: `Validate idea - talk to 10 potential customers`,
         energy_required: 'high',
-        work_type: 'communication',
+        work_type: 'light_lift',
         time_estimate: 'extended',
         priority: 'must_do'
       },
       {
         title: 'Build landing page to collect emails',
         energy_required: 'high',
-        work_type: 'creative',
+        work_type: 'steady_focus',
         time_estimate: 'long',
         priority: 'should_do'
       }
@@ -324,7 +324,7 @@ export function getSmartTaskSuggestions(goalTitle: string, category: GoalCategor
     smartSuggestions.push({
       title: 'Research and enroll in online course',
       energy_required: 'medium',
-      work_type: 'learning',
+      work_type: 'steady_focus',
       time_estimate: 'short',
       priority: 'must_do'
     })

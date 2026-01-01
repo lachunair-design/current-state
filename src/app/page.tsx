@@ -53,7 +53,7 @@ export default function LandingPage() {
             </Link>
           </div>
           <p className="text-sm text-text-muted mt-4">
-            Set up in under 2 minutes • Free forever
+            Set up in under 2 minutes • Start free trial
           </p>
         </div>
       </section>
@@ -121,8 +121,8 @@ export default function LandingPage() {
             Because you're human, not a machine.
           </p>
           <p className="text-text-secondary">
-            Built for people with ADHD, chronic conditions, variable income,
-            and anyone who's tired of productivity apps that assume you're always at 100%.
+            Built for professionals, founders, and knowledge workers who want to work sustainably—not constantly.
+            Perfect for anyone tired of productivity apps that assume you're always at 100%.
           </p>
         </div>
       </section>
@@ -137,7 +137,7 @@ export default function LandingPage() {
             Ready to work with yourself?
           </h2>
           <p className="text-lg text-text-secondary mb-8">
-            Join multi-income professionals who've found a better way to work.
+            Join professionals who've found a better way to work.
           </p>
           <Link href="/signup" className="text-lg px-8 py-4 rounded-xl font-semibold bg-gradient-flow text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all inline-flex items-center gap-2">
             Get started free <Zap className="w-5 h-5" />
