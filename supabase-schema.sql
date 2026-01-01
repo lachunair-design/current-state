@@ -150,6 +150,23 @@ CREATE TABLE IF NOT EXISTS daily_summaries (
 );
 
 -- =====================================================
+-- DAILY REFLECTIONS TABLE
+-- =====================================================
+-- Stores evening reflections for tracking daily wins and learnings
+
+CREATE TABLE IF NOT EXISTS daily_reflections (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  reflection_date DATE NOT NULL,
+  rating INTEGER CHECK (rating >= 1 AND rating <= 5),
+  went_well TEXT,
+  would_change TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, reflection_date)
+);
+
+-- =====================================================
 -- INDEXES FOR PERFORMANCE
 -- =====================================================
 
@@ -181,6 +198,10 @@ CREATE INDEX IF NOT EXISTS idx_task_suggestions_task_id ON task_suggestions(task
 -- Daily Summaries
 CREATE INDEX IF NOT EXISTS idx_daily_summaries_user_date ON daily_summaries(user_id, summary_date DESC);
 
+-- Daily Reflections
+CREATE INDEX IF NOT EXISTS idx_daily_reflections_user_id ON daily_reflections(user_id);
+CREATE INDEX IF NOT EXISTS idx_daily_reflections_user_date ON daily_reflections(user_id, reflection_date DESC);
+
 -- =====================================================
 -- ROW LEVEL SECURITY (RLS)
 -- =====================================================
@@ -192,6 +213,7 @@ ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
 ALTER TABLE daily_responses ENABLE ROW LEVEL SECURITY;
 ALTER TABLE task_suggestions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE daily_summaries ENABLE ROW LEVEL SECURITY;
+ALTER TABLE daily_reflections ENABLE ROW LEVEL SECURITY;
 
 -- Profiles: Users can only see and update their own profile
 CREATE POLICY "Users can view own profile" ON profiles
@@ -259,6 +281,19 @@ CREATE POLICY "Users can insert own daily summaries" ON daily_summaries
 CREATE POLICY "Users can update own daily summaries" ON daily_summaries
   FOR UPDATE USING (auth.uid() = user_id);
 
+-- Daily Reflections: Users can only manage their own reflections
+CREATE POLICY "Users can view own reflections" ON daily_reflections
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own reflections" ON daily_reflections
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own reflections" ON daily_reflections
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own reflections" ON daily_reflections
+  FOR DELETE USING (auth.uid() = user_id);
+
 -- =====================================================
 -- TRIGGERS AND FUNCTIONS
 -- =====================================================
@@ -300,6 +335,9 @@ CREATE TRIGGER update_goals_updated_at BEFORE UPDATE ON goals
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_tasks_updated_at BEFORE UPDATE ON tasks
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_daily_reflections_updated_at BEFORE UPDATE ON daily_reflections
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- =====================================================

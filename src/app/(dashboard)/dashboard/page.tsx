@@ -6,6 +6,7 @@ import { GOAL_CATEGORY_CONFIG, ENERGY_LEVEL_CONFIG, TIME_ESTIMATE_CONFIG, TimeEs
 import { TodaysFocusCard } from '@/components/TodaysFocusCard'
 import { FeedbackCard } from '@/components/FeedbackCard'
 import { FeatureRequestCTA } from '@/components/FeatureRequestCTA'
+import { EveningCues } from '@/components/EveningCues'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -165,6 +166,9 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Evening Planning & Reflection Cues */}
+      <EveningCues />
 
       {/* Today's Top Task - Energy Matched */}
       {topTask && hasCheckedInToday && (
