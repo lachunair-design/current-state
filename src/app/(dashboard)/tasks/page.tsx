@@ -42,6 +42,19 @@ export default function TasksPage() {
 
   useEffect(() => {
     fetchData()
+
+    // Check if we're coming from goal creation with "Add manually"
+    const pendingGoal = sessionStorage.getItem('pendingGoalForTasks')
+    if (pendingGoal) {
+      try {
+        const goalData = JSON.parse(pendingGoal)
+        setGoalId(goalData.id)
+        setShowForm(true)
+        sessionStorage.removeItem('pendingGoalForTasks')
+      } catch (e) {
+        console.error('Failed to parse pending goal:', e)
+      }
+    }
   }, [])
 
   useEffect(() => {

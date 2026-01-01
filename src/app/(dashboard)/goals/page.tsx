@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Plus, Loader2, X, MoreVertical, Trash2, Edit2, Rocket, Briefcase, Heart, DollarSign, Users, Home, CheckCircle2 } from 'lucide-react'
 import { Goal, GoalCategory, GOAL_CATEGORY_CONFIG, CreateGoalInput } from '@/types/database'
@@ -29,6 +30,7 @@ export default function GoalsPage() {
   const [deleting, setDeleting] = useState(false)
 
   const supabase = createClient()
+  const router = useRouter()
 
   // Form state
   const [title, setTitle] = useState('')
@@ -299,6 +301,22 @@ export default function GoalsPage() {
     setSelectedTaskIndices([])
   }
 
+  const addTasksManually = () => {
+    if (!newlyCreatedGoal) return
+
+    // Store goal info in sessionStorage for tasks page to read
+    sessionStorage.setItem('pendingGoalForTasks', JSON.stringify({
+      id: newlyCreatedGoal.id,
+      title: newlyCreatedGoal.title
+    }))
+
+    // Close modal and navigate to tasks page
+    setShowTaskSuggestions(false)
+    setNewlyCreatedGoal(null)
+    setSelectedTaskIndices([])
+    router.push('/tasks')
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
@@ -506,7 +524,7 @@ export default function GoalsPage() {
                 )}
               </button>
               <button
-                onClick={skipTaskSuggestions}
+                onClick={addTasksManually}
                 disabled={addingTasks}
                 className="btn-secondary px-6"
               >
