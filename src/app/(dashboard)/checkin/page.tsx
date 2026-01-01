@@ -50,6 +50,7 @@ export default function CheckinPage() {
 
   const getEnergyLabel = (value: number): string => {
     const percentage = value * 20
+    if (percentage === 100) return '100%'
     if (percentage >= 80) return '90%'
     if (percentage >= 60) return '75%'
     if (percentage >= 40) return '50%'
