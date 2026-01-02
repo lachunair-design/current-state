@@ -94,6 +94,7 @@ export interface Task {
   status: TaskStatus;
   completed_at: string | null;
   deferred_until: string | null;
+  defer_count: number;
   is_recurring: boolean;
   recurrence_pattern: Record<string, unknown> | null;
   times_suggested: number;

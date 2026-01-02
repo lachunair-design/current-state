@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Check, Timer, Play, Pause, X } from 'lucide-react'
+import { Check, Timer, Play, Pause, X, Calendar } from 'lucide-react'
 import { Clock } from 'lucide-react'
 import { WORK_TYPE_CONFIG, TIME_ESTIMATE_CONFIG, TimeEstimate, WorkType } from '@/types/database'
 import { useCelebration } from '@/components/Celebration'
@@ -13,6 +13,8 @@ interface Task {
   title: string
   time_estimate: string
   work_type: string
+  defer_count: number
+  priority: string
   goals?: {
     title: string
   }
@@ -34,6 +36,8 @@ export function TodaysFocusCard({ task }: TodaysFocusCardProps) {
   const [timeLeft, setTimeLeft] = useState(25 * 60)
   const [isRunning, setIsRunning] = useState(false)
   const [completing, setCompleting] = useState(false)
+  const [deferring, setDeferring] = useState(false)
+  const [showDeferNudge, setShowDeferNudge] = useState(false)
   const router = useRouter()
   const supabase = createClient()
   const { celebrate, CelebrationComponent } = useCelebration()
@@ -84,6 +88,42 @@ export function TodaysFocusCard({ task }: TodaysFocusCardProps) {
     }
   }
 
+  const handleDeferTask = async () => {
+    const newDeferCount = task.defer_count + 1
+
+    // Show nudge if this is the 3rd+ defer
+    if (newDeferCount >= 3) {
+      setShowDeferNudge(true)
+      return
+    }
+
+    await deferTask(newDeferCount)
+  }
+
+  const deferTask = async (newDeferCount: number) => {
+    setDeferring(true)
+    try {
+      const tomorrow = new Date()
+      tomorrow.setDate(tomorrow.getDate() + 1)
+
+      await supabase
+        .from('tasks')
+        .update({
+          status: 'deferred',
+          deferred_until: tomorrow.toISOString().split('T')[0],
+          defer_count: newDeferCount
+        } as never)
+        .eq('id', task.id)
+
+      router.refresh()
+    } catch (error) {
+      console.error('Error deferring task:', error)
+    } finally {
+      setDeferring(false)
+      setShowDeferNudge(false)
+    }
+  }
+
   const startTimer = (minutes: number) => {
     setSelectedMinutes(minutes)
     setTimeLeft(minutes * 60)
@@ -113,9 +153,55 @@ export function TodaysFocusCard({ task }: TodaysFocusCardProps) {
 
   return (
     <>
+      {/* Defer Nudge Modal */}
+      {showDeferNudge && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl animate-scale-in">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-sunset-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-3xl">🤔</span>
+              </div>
+              <h3 className="text-xl font-bold text-text-primary mb-2">
+                You've moved this {task.defer_count + 1} times
+              </h3>
+              <p className="text-text-secondary mb-4">
+                What's actually blocking you from starting this task?
+              </p>
+              <div className="bg-ocean-50 border border-ocean-200 rounded-lg p-4 mb-4">
+                <p className="text-sm text-text-secondary">
+                  💡 <strong>Tip:</strong> Sometimes breaking it into smaller pieces or addressing the real blocker helps more than deferring again.
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeferNudge(false)}
+                className="flex-1 btn-secondary"
+              >
+                Let me reconsider
+              </button>
+              <button
+                onClick={() => deferTask(task.defer_count + 1)}
+                disabled={deferring}
+                className="flex-1 btn-primary"
+              >
+                {deferring ? 'Deferring...' : 'Defer anyway'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mb-6">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-base font-bold font-semibold text-text-primary">Today's Focus</h3>
+          <h3 className="text-base font-bold font-semibold text-text-primary">
+            Today's Focus
+            {task.priority === 'must_do' && (
+              <span className="ml-2 text-xs bg-sunset-100 text-sunset-800 px-2 py-0.5 rounded-full font-semibold">
+                MUST DO
+              </span>
+            )}
+          </h3>
         </div>
 
         <div className="rounded-xl bg-dark-card border border-dark-border shadow-sm p-4">
@@ -188,43 +274,57 @@ export function TodaysFocusCard({ task }: TodaysFocusCardProps) {
           )}
 
           {/* Action Buttons */}
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={handleCompleteTask}
-              disabled={completing}
-              className="py-2.5 bg-dark-card border border-accent-green/30 hover:bg-accent-green/10 text-accent-green font-medium rounded-lg flex items-center justify-center gap-2 transition-all text-sm"
-            >
-              <Check className="w-4 h-4" />
-              {completing ? 'Completing...' : 'Mark Done'}
-            </button>
-
-            {!showTimer ? (
-              <div className="relative group">
-                <button
-                  className="w-full py-2.5 bg-accent-green hover:bg-primary-600 text-black font-bold rounded-lg flex items-center justify-center gap-2 transition-all text-sm"
-                >
-                  <Timer className="w-4 h-4" />
-                  Start Focus
-                </button>
-                {/* Timer preset dropdown */}
-                <div className="absolute bottom-full mb-2 left-0 right-0 bg-dark-card border border-dark-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
-                  {TIMER_PRESETS.map((preset) => (
-                    <button
-                      key={preset.minutes}
-                      onClick={() => startTimer(preset.minutes)}
-                      className="w-full px-4 py-2 text-left text-sm text-text-primary hover:bg-dark-hover first:rounded-t-lg last:rounded-b-lg transition-colors"
-                    >
-                      {preset.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ) : (
+          <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-2">
               <button
-                onClick={() => setShowTimer(false)}
-                className="py-2.5 bg-dark-card border border-dark-border hover:bg-dark-hover text-text-secondary font-medium rounded-lg flex items-center justify-center gap-2 transition-all text-sm"
+                onClick={handleCompleteTask}
+                disabled={completing}
+                className="py-2.5 bg-dark-card border border-accent-green/30 hover:bg-accent-green/10 text-accent-green font-medium rounded-lg flex items-center justify-center gap-2 transition-all text-sm"
               >
-                Hide Timer
+                <Check className="w-4 h-4" />
+                {completing ? 'Completing...' : 'Mark Done'}
+              </button>
+
+              {!showTimer ? (
+                <div className="relative group">
+                  <button
+                    className="w-full py-2.5 bg-accent-green hover:bg-primary-600 text-black font-bold rounded-lg flex items-center justify-center gap-2 transition-all text-sm"
+                  >
+                    <Timer className="w-4 h-4" />
+                    Start Focus
+                  </button>
+                  {/* Timer preset dropdown */}
+                  <div className="absolute bottom-full mb-2 left-0 right-0 bg-dark-card border border-dark-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-10">
+                    {TIMER_PRESETS.map((preset) => (
+                      <button
+                        key={preset.minutes}
+                        onClick={() => startTimer(preset.minutes)}
+                        className="w-full px-4 py-2 text-left text-sm text-text-primary hover:bg-dark-hover first:rounded-t-lg last:rounded-b-lg transition-colors"
+                      >
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowTimer(false)}
+                  className="py-2.5 bg-dark-card border border-dark-border hover:bg-dark-hover text-text-secondary font-medium rounded-lg flex items-center justify-center gap-2 transition-all text-sm"
+                >
+                  Hide Timer
+                </button>
+              )}
+            </div>
+
+            {/* Defer button */}
+            {task.priority !== 'must_do' && (
+              <button
+                onClick={handleDeferTask}
+                disabled={deferring}
+                className="w-full py-2 bg-dark-card border border-dark-border hover:bg-dark-hover text-text-secondary font-medium rounded-lg flex items-center justify-center gap-2 transition-all text-sm"
+              >
+                <Calendar className="w-4 h-4" />
+                {deferring ? 'Deferring...' : task.defer_count > 0 ? `Defer (${task.defer_count} times)` : 'Defer to tomorrow'}
               </button>
             )}
           </div>

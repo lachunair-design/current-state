@@ -92,74 +92,78 @@ export default function CheckinPage() {
       state.available_time + state.environment_quality
     ) / 5
 
-    return tasks
-      .map(task => {
-        let score = 0
-        const reasons: string[] = []
+    const scoredTasks = tasks.map(task => {
+      let score = 0
+      const reasons: string[] = []
 
-        if (compositeScore < 2.5) {
-          if (task.energy_required === 'low') {
-            score += 40
-            reasons.push('Perfect for your current energy level')
-          } else if (task.energy_required === 'medium') {
-            score += 15
-          }
-        } else if (compositeScore < 4) {
-          if (task.energy_required === 'medium') {
-            score += 40
-            reasons.push('Matches your current capacity')
-          } else if (task.energy_required === 'low') {
-            score += 25
-          } else {
-            score += 15
-          }
-        } else {
-          if (task.energy_required === 'high') {
-            score += 40
-            reasons.push('Great time for challenging work')
-          } else if (task.energy_required === 'medium') {
-            score += 25
-          }
+      // Must-do tasks ALWAYS surface with massive priority boost
+      if (task.priority === 'must_do') {
+        score += 1000 // Guarantee they surface regardless of energy
+        reasons.push('Must do today — non-negotiable')
+      }
+
+      if (compositeScore < 2.5) {
+        if (task.energy_required === 'low') {
+          score += 40
+          reasons.push('Perfect for your current energy level')
+        } else if (task.energy_required === 'medium') {
+          score += 15
         }
-
-        const timeMap: Record<string, number> = { tiny: 1, short: 2, medium: 3, long: 4, extended: 5 }
-        const taskTime = timeMap[task.time_estimate] || 3
-        if (state.available_time <= 2 && taskTime <= 2) {
+      } else if (compositeScore < 4) {
+        if (task.energy_required === 'medium') {
+          score += 40
+          reasons.push('Matches your current capacity')
+        } else if (task.energy_required === 'low') {
           score += 25
-          reasons.push('Fits your available time')
-        } else if (state.available_time >= 4 && taskTime >= 3) {
-          score += 20
-          reasons.push('Good use of your time block')
-        } else if (Math.abs(state.available_time - taskTime) <= 1) {
+        } else {
           score += 15
         }
-
-        if (state.environment_quality >= 4 && task.work_type === 'deep_work') {
-          score += 15
-          reasons.push('Perfect environment for focus work')
-        } else if (state.environment_quality <= 2 && task.work_type === 'admin') {
-          score += 15
-          reasons.push('Good for a distracting environment')
+      } else {
+        if (task.energy_required === 'high') {
+          score += 40
+          reasons.push('Great time for challenging work')
+        } else if (task.energy_required === 'medium') {
+          score += 25
         }
+      }
 
-        if (task.priority === 'must_do') {
-          score += 10
-          reasons.push('High priority task')
-        } else if (task.priority === 'should_do') {
-          score += 5
-        }
+      const timeMap: Record<string, number> = { tiny: 1, short: 2, medium: 3, long: 4, extended: 5 }
+      const taskTime = timeMap[task.time_estimate] || 3
+      if (state.available_time <= 2 && taskTime <= 2) {
+        score += 25
+        reasons.push('Fits your available time')
+      } else if (state.available_time >= 4 && taskTime >= 3) {
+        score += 20
+        reasons.push('Good use of your time block')
+      } else if (Math.abs(state.available_time - taskTime) <= 1) {
+        score += 15
+      }
 
-        if (task.times_accepted > task.times_declined) {
-          score += 10
-        }
+      if (state.environment_quality >= 4 && task.work_type === 'deep_work') {
+        score += 15
+        reasons.push('Perfect environment for focus work')
+      } else if (state.environment_quality <= 2 && task.work_type === 'admin') {
+        score += 15
+        reasons.push('Good for a distracting environment')
+      }
 
-        if (task.estimated_value && task.estimated_value > 0) {
-          score += 5
-          reasons.push(`Worth $${task.estimated_value}`)
-        }
+      if (task.priority === 'should_do') {
+        score += 5
+      }
 
-        return { task, score, reasons }
-      })
+      if (task.times_accepted > task.times_declined) {
+        score += 10
+      }
+
+      if (task.estimated_value && task.estimated_value > 0) {
+        score += 5
+        reasons.push(`Worth $${task.estimated_value}`)
+      }
+
+      return { task, score, reasons }
+    })
+
+    return scoredTasks
       .sort((a, b) => b.score - a.score)
       .slice(0, 3)
   }
@@ -272,6 +276,9 @@ export default function CheckinPage() {
               How is your energy <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-pastel-blue-dark">unfolding</span> today?
             </h1>
+            <p className="text-text-secondary text-sm mt-3 leading-relaxed">
+              This isn't permission to skip—it's information to plan better. Low energy? That means light tasks, not no tasks.
+            </p>
           </div>
 
           {/* Metrics */}

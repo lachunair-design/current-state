@@ -77,6 +77,7 @@ CREATE TABLE IF NOT EXISTS tasks (
   status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'in_progress', 'completed', 'deferred', 'archived')),
   completed_at TIMESTAMPTZ,
   deferred_until DATE,
+  defer_count INTEGER DEFAULT 0,
   is_recurring BOOLEAN DEFAULT FALSE,
   recurrence_pattern JSONB,
   times_suggested INTEGER DEFAULT 0,
