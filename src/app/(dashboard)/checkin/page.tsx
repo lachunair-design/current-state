@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { ArrowRight, ArrowLeft, Check, Loader2, CheckSquare } from 'lucide-react'
+import { ArrowRight, ArrowLeft, Check, Loader2, CheckSquare, Sparkles } from 'lucide-react'
 import {
   QUESTIONNAIRE_QUESTIONS,
   Task,
@@ -40,6 +40,7 @@ export default function CheckinPage() {
   const [loading, setLoading] = useState(false)
   const [matchedTasks, setMatchedTasks] = useState<MatchedTask[]>([])
   const [submitting, setSubmitting] = useState<string | null>(null)
+  const [committing, setCommitting] = useState(false)
   const router = useRouter()
   const supabase = createClient()
   const { celebrate, CelebrationComponent } = useCelebration()
@@ -235,6 +236,43 @@ export default function CheckinPage() {
       environment_quality: 3,
     })
     setMatchedTasks([])
+  }
+
+  const handleCommitToFocus = async () => {
+    setCommitting(true)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+
+      const today = new Date().toISOString().split('T')[0]
+
+      // Create commitments for all matched tasks
+      const commitments = matchedTasks.map(({ task }) => ({
+        user_id: user.id,
+        task_id: task.id,
+        commitment_date: today,
+      }))
+
+      const { error } = await supabase
+        .from('daily_commitments')
+        .upsert(commitments as never)
+
+      if (error) {
+        console.error('Error creating commitments:', error)
+        return
+      }
+
+      celebrate(`Committed to ${matchedTasks.length} task${matchedTasks.length > 1 ? 's' : ''} for today! Let's make it happen! 🎯`)
+
+      // Navigate to dashboard
+      setTimeout(() => {
+        router.push('/dashboard')
+      }, 1000)
+    } catch (error) {
+      console.error('Error committing to focus:', error)
+    } finally {
+      setCommitting(false)
+    }
   }
 
   if (step === 0) {
@@ -549,6 +587,32 @@ export default function CheckinPage() {
           <ArrowLeft className="w-4 h-4" /> Redo
         </button>
       </div>
+
+      {matchedTasks.length > 0 && (
+        <div className="mb-6 animate-slide-in">
+          <button
+            onClick={handleCommitToFocus}
+            disabled={committing}
+            className="w-full bg-gradient-to-r from-primary to-pastel-blue-dark hover:from-primary/90 hover:to-pastel-blue-dark/90 text-white font-bold py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 group"
+          >
+            {committing ? (
+              <>
+                <Loader2 className="w-6 h-6 animate-spin" />
+                <span>Committing to your focus...</span>
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-6 h-6 group-hover:scale-110 transition-transform" />
+                <span>Commit to Today's Focus</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </>
+            )}
+          </button>
+          <p className="text-center text-sm text-text-muted mt-2">
+            Make this your plan for today—track progress on your dashboard
+          </p>
+        </div>
+      )}
 
       {matchedTasks.length > 0 ? (
         <div className="space-y-5">

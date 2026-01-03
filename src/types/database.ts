@@ -191,9 +191,31 @@ export interface DailyReflection {
   updated_at: string;
 }
 
+export interface DailyCommitment {
+  id: string;
+  user_id: string;
+  task_id: string;
+  commitment_date: string;
+  committed_at: string;
+  completed: boolean;
+  completed_at: string | null;
+  abandoned: boolean;
+  abandoned_reason: string | null;
+  created_at: string;
+}
+
 // Extended types with relations
 export interface TaskWithGoal extends Task {
   goal?: Goal | null;
+}
+
+export interface TaskWithCommitment extends Task {
+  commitment?: DailyCommitment | null;
+  goal?: Goal | null;
+}
+
+export interface DailyCommitmentWithTask extends DailyCommitment {
+  task?: Task;
 }
 
 export interface GoalWithTasks extends Goal {
@@ -260,6 +282,18 @@ export interface CreateHabitCompletionInput {
   energy_level_before?: number;
   energy_level_after?: number;
   notes?: string;
+}
+
+export interface CreateCommitmentInput {
+  task_id: string;
+  commitment_date: string;
+}
+
+export interface UpdateCommitmentInput {
+  completed?: boolean;
+  completed_at?: string;
+  abandoned?: boolean;
+  abandoned_reason?: string;
 }
 
 // UI Config
@@ -423,6 +457,11 @@ export interface Database {
         Row: DailyReflection;
         Insert: Omit<DailyReflection, 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<DailyReflection>;
+      };
+      daily_commitments: {
+        Row: DailyCommitment;
+        Insert: Omit<DailyCommitment, 'id' | 'created_at' | 'committed_at'>;
+        Update: Partial<DailyCommitment>;
       };
     };
   };

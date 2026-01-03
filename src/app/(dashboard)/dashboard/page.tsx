@@ -7,6 +7,7 @@ import { TodaysFocusCard } from '@/components/TodaysFocusCard'
 import { FeedbackCard } from '@/components/FeedbackCard'
 import { FeatureRequestCTA } from '@/components/FeatureRequestCTA'
 import { EveningCues } from '@/components/EveningCues'
+import { CommittedTasksCard } from '@/components/CommittedTasksCard'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -51,6 +52,21 @@ export default async function DashboardPage() {
     .gte('responded_at', `${today}T00:00:00`)
     .order('responded_at', { ascending: false })
     .limit(1) as { data: Array<{ energy_level: number }> | null }
+
+  // Fetch today's committed tasks
+  const { data: committedTasks } = await supabase
+    .from('daily_commitments')
+    .select(`
+      *,
+      tasks:task_id (
+        *,
+        goals (*)
+      )
+    `)
+    .eq('user_id', user.id)
+    .eq('commitment_date', today)
+    .eq('completed', false)
+    .eq('abandoned', false) as { data: any[] | null }
 
   // Fetch count of tasks in parking lot (active + deferred)
   const { count: parkingLotCount } = await supabase
@@ -170,8 +186,11 @@ export default async function DashboardPage() {
       {/* Evening Planning & Reflection Cues */}
       <EveningCues />
 
+      {/* Today's Committed Tasks */}
+      <CommittedTasksCard commitments={committedTasks || []} />
+
       {/* Today's Top Task - Energy Matched */}
-      {topTask && hasCheckedInToday && (
+      {topTask && hasCheckedInToday && !committedTasks?.length && (
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-3">
             <CheckSquare className="w-5 h-5 text-ocean-600" />

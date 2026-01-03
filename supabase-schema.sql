@@ -209,6 +209,25 @@ CREATE TABLE IF NOT EXISTS habit_completions (
 );
 
 -- =====================================================
+-- DAILY COMMITMENTS TABLE
+-- =====================================================
+-- Tracks when users commit to tasks as their daily focus
+
+CREATE TABLE IF NOT EXISTS daily_commitments (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  task_id UUID NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+  commitment_date DATE NOT NULL,
+  committed_at TIMESTAMPTZ DEFAULT NOW(),
+  completed BOOLEAN DEFAULT FALSE,
+  completed_at TIMESTAMPTZ,
+  abandoned BOOLEAN DEFAULT FALSE,
+  abandoned_reason TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, task_id, commitment_date)
+);
+
+-- =====================================================
 -- INDEXES FOR PERFORMANCE
 -- =====================================================
 
@@ -255,6 +274,12 @@ CREATE INDEX IF NOT EXISTS idx_habit_completions_habit_id ON habit_completions(h
 CREATE INDEX IF NOT EXISTS idx_habit_completions_user_id ON habit_completions(user_id);
 CREATE INDEX IF NOT EXISTS idx_habit_completions_completed_at ON habit_completions(completed_at);
 
+-- Daily Commitments
+CREATE INDEX IF NOT EXISTS idx_daily_commitments_user_id ON daily_commitments(user_id);
+CREATE INDEX IF NOT EXISTS idx_daily_commitments_task_id ON daily_commitments(task_id);
+CREATE INDEX IF NOT EXISTS idx_daily_commitments_date ON daily_commitments(commitment_date);
+CREATE INDEX IF NOT EXISTS idx_daily_commitments_completed ON daily_commitments(completed);
+
 -- =====================================================
 -- ROW LEVEL SECURITY (RLS)
 -- =====================================================
@@ -269,6 +294,7 @@ ALTER TABLE daily_summaries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE daily_reflections ENABLE ROW LEVEL SECURITY;
 ALTER TABLE habits ENABLE ROW LEVEL SECURITY;
 ALTER TABLE habit_completions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE daily_commitments ENABLE ROW LEVEL SECURITY;
 
 -- Profiles: Users can only see and update their own profile
 CREATE POLICY "Users can view own profile" ON profiles
@@ -373,6 +399,19 @@ CREATE POLICY "Users can update own habit completions" ON habit_completions
   FOR UPDATE USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can delete own habit completions" ON habit_completions
+  FOR DELETE USING (auth.uid() = user_id);
+
+-- Daily Commitments: Users can only manage their own commitments
+CREATE POLICY "Users can view own commitments" ON daily_commitments
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own commitments" ON daily_commitments
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own commitments" ON daily_commitments
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own commitments" ON daily_commitments
   FOR DELETE USING (auth.uid() = user_id);
 
 -- =====================================================
