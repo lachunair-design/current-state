@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Moon, Sunrise, X, Sparkles } from 'lucide-react'
+import { PlanTomorrowModal } from './PlanTomorrowModal'
 
 interface ReflectionModalProps {
   completedTasks: any[]
@@ -162,6 +163,7 @@ function ReflectionModal({ completedTasks, onClose, onComplete }: ReflectionModa
 export function EveningCues() {
   const [showPlanningCue, setShowPlanningCue] = useState(false)
   const [showReflectionCue, setShowReflectionCue] = useState(false)
+  const [showPlanningModal, setShowPlanningModal] = useState(false)
   const [showReflectionModal, setShowReflectionModal] = useState(false)
   const [completedTasksToday, setCompletedTasksToday] = useState<any[]>([])
   const router = useRouter()
@@ -218,8 +220,12 @@ export function EveningCues() {
   }
 
   const handlePlanningClick = () => {
+    setShowPlanningModal(true)
+  }
+
+  const handlePlanningComplete = () => {
     dismissPlanningCue()
-    router.push('/tasks')
+    setShowPlanningModal(false)
   }
 
   const handleReflectionClick = () => {
@@ -315,6 +321,13 @@ export function EveningCues() {
           </div>
         )}
       </div>
+
+      {/* Planning Modal */}
+      {showPlanningModal && (
+        <PlanTomorrowModal
+          onClose={handlePlanningComplete}
+        />
+      )}
 
       {/* Reflection Modal */}
       {showReflectionModal && (

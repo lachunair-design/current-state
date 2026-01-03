@@ -69,7 +69,10 @@ export function PlanningForm({ goals, tasks, existingPlan, weekStart, weekEnd }:
     setSaving(true)
     try {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+      if (!user) {
+        alert('You must be logged in to save a plan')
+        return
+      }
 
       const planData = {
         user_id: user.id,
@@ -86,6 +89,7 @@ export function PlanningForm({ goals, tasks, existingPlan, weekStart, weekEnd }:
 
       if (error) {
         console.error('Error saving weekly plan:', error)
+        alert(`Error saving plan: ${error.message}. Make sure you've run the migration-add-weekly-planning.sql migration.`)
         return
       }
 
@@ -93,6 +97,7 @@ export function PlanningForm({ goals, tasks, existingPlan, weekStart, weekEnd }:
       router.refresh()
     } catch (error) {
       console.error('Error saving plan:', error)
+      alert('Failed to save plan. Please try again.')
     } finally {
       setSaving(false)
     }
