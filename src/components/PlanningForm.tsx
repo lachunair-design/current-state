@@ -66,11 +66,15 @@ export function PlanningForm({ goals, tasks, existingPlan, weekStart, weekEnd }:
   const isOverloaded = relevantTasks.length > capacity
 
   const handleSave = async () => {
+    console.log('Starting save...')
     setSaving(true)
     try {
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { user }, error: userError } = await supabase.auth.getUser()
+      console.log('User:', user, 'Error:', userError)
+
       if (!user) {
         alert('You must be logged in to save a plan')
+        setSaving(false)
         return
       }
 
@@ -83,22 +87,28 @@ export function PlanningForm({ goals, tasks, existingPlan, weekStart, weekEnd }:
         estimated_capacity: capacity,
       }
 
-      const { error } = await supabase
+      console.log('Saving plan data:', planData)
+
+      const { data, error } = await supabase
         .from('weekly_plans')
-        .upsert(planData as never)
+        .upsert(planData)
+        .select()
+
+      console.log('Save result - Data:', data, 'Error:', error)
 
       if (error) {
         console.error('Error saving weekly plan:', error)
-        alert(`Error saving plan: ${error.message}. Make sure you've run the migration-add-weekly-planning.sql migration.`)
+        alert(`Error saving plan: ${error.message}\n\nDetails: ${JSON.stringify(error, null, 2)}`)
+        setSaving(false)
         return
       }
 
+      console.log('Plan saved successfully, navigating to dashboard')
       router.push('/dashboard')
       router.refresh()
-    } catch (error) {
-      console.error('Error saving plan:', error)
-      alert('Failed to save plan. Please try again.')
-    } finally {
+    } catch (error: any) {
+      console.error('Caught error saving plan:', error)
+      alert(`Failed to save plan: ${error?.message || 'Unknown error'}`)
       setSaving(false)
     }
   }
