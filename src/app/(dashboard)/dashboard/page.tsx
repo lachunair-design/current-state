@@ -8,6 +8,7 @@ import { FeedbackCard } from '@/components/FeedbackCard'
 import { FeatureRequestCTA } from '@/components/FeatureRequestCTA'
 import { EveningCues } from '@/components/EveningCues'
 import { CommittedTasksCard } from '@/components/CommittedTasksCard'
+import { WeeklyPlanningCue } from '@/components/WeeklyPlanningCue'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -84,6 +85,21 @@ export default async function DashboardPage() {
     .eq('user_id', user.id)
     .eq('status', 'completed')
     .gte('completed_at', weekAgo.toISOString())
+
+  // Check if user has planned this week
+  const now = new Date()
+  const dayOfWeek = now.getDay()
+  const monday = new Date(now)
+  const diff = monday.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)
+  monday.setDate(diff)
+  const weekStart = monday.toISOString().split('T')[0]
+
+  const { data: weeklyPlan } = await supabase
+    .from('weekly_plans')
+    .select('*')
+    .eq('user_id', user.id)
+    .eq('week_start_date', weekStart)
+    .single() as { data: any | null }
 
   const firstName = profile?.full_name?.split(' ')[0] || 'there'
   const hasCheckedInToday = todayCheckins && todayCheckins.length > 0
@@ -182,6 +198,9 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Weekly Planning Cue */}
+      <WeeklyPlanningCue hasPlanThisWeek={!!weeklyPlan} />
 
       {/* Evening Planning & Reflection Cues */}
       <EveningCues />

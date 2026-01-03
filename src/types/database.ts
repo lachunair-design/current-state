@@ -204,6 +204,20 @@ export interface DailyCommitment {
   created_at: string;
 }
 
+export interface WeeklyPlan {
+  id: string;
+  user_id: string;
+  week_start_date: string;
+  week_end_date: string;
+  planned_at: string;
+  focus_goal_ids: string[];
+  notes: string | null;
+  estimated_capacity: number | null;
+  actual_completed: number;
+  created_at: string;
+  updated_at: string;
+}
+
 // Extended types with relations
 export interface TaskWithGoal extends Task {
   goal?: Goal | null;
@@ -216,6 +230,10 @@ export interface TaskWithCommitment extends Task {
 
 export interface DailyCommitmentWithTask extends DailyCommitment {
   task?: Task;
+}
+
+export interface WeeklyPlanWithGoals extends WeeklyPlan {
+  goals?: Goal[];
 }
 
 export interface GoalWithTasks extends Goal {
@@ -294,6 +312,21 @@ export interface UpdateCommitmentInput {
   completed_at?: string;
   abandoned?: boolean;
   abandoned_reason?: string;
+}
+
+export interface CreateWeeklyPlanInput {
+  week_start_date: string;
+  week_end_date: string;
+  focus_goal_ids?: string[];
+  notes?: string;
+  estimated_capacity?: number;
+}
+
+export interface UpdateWeeklyPlanInput {
+  focus_goal_ids?: string[];
+  notes?: string;
+  estimated_capacity?: number;
+  actual_completed?: number;
 }
 
 // UI Config
@@ -462,6 +495,11 @@ export interface Database {
         Row: DailyCommitment;
         Insert: Omit<DailyCommitment, 'id' | 'created_at' | 'committed_at'>;
         Update: Partial<DailyCommitment>;
+      };
+      weekly_plans: {
+        Row: WeeklyPlan;
+        Insert: Omit<WeeklyPlan, 'id' | 'created_at' | 'updated_at' | 'planned_at'>;
+        Update: Partial<WeeklyPlan>;
       };
     };
   };

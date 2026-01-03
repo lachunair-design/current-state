@@ -228,6 +228,26 @@ CREATE TABLE IF NOT EXISTS daily_commitments (
 );
 
 -- =====================================================
+-- WEEKLY PLANS TABLE
+-- =====================================================
+-- Tracks weekly planning completion and capacity
+
+CREATE TABLE IF NOT EXISTS weekly_plans (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  week_start_date DATE NOT NULL,
+  week_end_date DATE NOT NULL,
+  planned_at TIMESTAMPTZ DEFAULT NOW(),
+  focus_goal_ids UUID[] DEFAULT '{}',
+  notes TEXT,
+  estimated_capacity INTEGER,
+  actual_completed INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, week_start_date)
+);
+
+-- =====================================================
 -- INDEXES FOR PERFORMANCE
 -- =====================================================
 
@@ -280,6 +300,11 @@ CREATE INDEX IF NOT EXISTS idx_daily_commitments_task_id ON daily_commitments(ta
 CREATE INDEX IF NOT EXISTS idx_daily_commitments_date ON daily_commitments(commitment_date);
 CREATE INDEX IF NOT EXISTS idx_daily_commitments_completed ON daily_commitments(completed);
 
+-- Weekly Plans
+CREATE INDEX IF NOT EXISTS idx_weekly_plans_user_id ON weekly_plans(user_id);
+CREATE INDEX IF NOT EXISTS idx_weekly_plans_week_start ON weekly_plans(week_start_date);
+CREATE INDEX IF NOT EXISTS idx_weekly_plans_user_week ON weekly_plans(user_id, week_start_date DESC);
+
 -- =====================================================
 -- ROW LEVEL SECURITY (RLS)
 -- =====================================================
@@ -295,6 +320,7 @@ ALTER TABLE daily_reflections ENABLE ROW LEVEL SECURITY;
 ALTER TABLE habits ENABLE ROW LEVEL SECURITY;
 ALTER TABLE habit_completions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE daily_commitments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE weekly_plans ENABLE ROW LEVEL SECURITY;
 
 -- Profiles: Users can only see and update their own profile
 CREATE POLICY "Users can view own profile" ON profiles
@@ -412,6 +438,19 @@ CREATE POLICY "Users can update own commitments" ON daily_commitments
   FOR UPDATE USING (auth.uid() = user_id);
 
 CREATE POLICY "Users can delete own commitments" ON daily_commitments
+  FOR DELETE USING (auth.uid() = user_id);
+
+-- Weekly Plans: Users can only manage their own weekly plans
+CREATE POLICY "Users can view own weekly plans" ON weekly_plans
+  FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own weekly plans" ON weekly_plans
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own weekly plans" ON weekly_plans
+  FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own weekly plans" ON weekly_plans
   FOR DELETE USING (auth.uid() = user_id);
 
 -- =====================================================
