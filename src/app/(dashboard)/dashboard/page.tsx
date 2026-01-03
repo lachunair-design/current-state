@@ -9,6 +9,7 @@ import { FeatureRequestCTA } from '@/components/FeatureRequestCTA'
 import { EveningCues } from '@/components/EveningCues'
 import { CommittedTasksCard } from '@/components/CommittedTasksCard'
 import { WeeklyPlanningCue } from '@/components/WeeklyPlanningCue'
+import { WeeklyReviewCue } from '@/components/WeeklyReviewCue'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -201,6 +202,9 @@ export default async function DashboardPage() {
 
       {/* Weekly Planning Cue */}
       <WeeklyPlanningCue hasPlanThisWeek={!!weeklyPlan} />
+
+      {/* Weekly Review Cue */}
+      <WeeklyReviewCue />
 
       {/* Evening Planning & Reflection Cues */}
       <EveningCues />
