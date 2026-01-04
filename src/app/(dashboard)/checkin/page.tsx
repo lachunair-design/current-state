@@ -3,9 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { ArrowRight, ArrowLeft, Check, Loader2, CheckSquare, Sparkles } from 'lucide-react'
+import { ArrowRight, ArrowLeft, Check, Loader2, Sparkles } from 'lucide-react'
 import {
-  QUESTIONNAIRE_QUESTIONS,
   Task,
   Goal,
   ENERGY_LEVEL_CONFIG,
@@ -28,6 +27,50 @@ interface MatchedTask {
 
 type MetricKey = 'energy_level' | 'mental_clarity' | 'emotional_state' | 'available_time' | 'environment_quality'
 
+const METRICS = [
+  {
+    key: 'energy_level' as MetricKey,
+    label: 'Physical Battery',
+    icon: 'battery_charging_full',
+    color: 'text-emerald-600 dark:text-emerald-400',
+    lowLabel: 'Depleted',
+    highLabel: 'Charged',
+  },
+  {
+    key: 'mental_clarity' as MetricKey,
+    label: 'Mental Clarity',
+    icon: 'wb_sunny',
+    color: 'text-cyan-600 dark:text-cyan-400',
+    lowLabel: 'Foggy',
+    highLabel: 'Finding Focus',
+  },
+  {
+    key: 'emotional_state' as MetricKey,
+    label: 'Emotional State',
+    icon: 'balance',
+    color: 'text-rose-500 dark:text-rose-400',
+    lowLabel: 'Low',
+    midLabel: 'Balanced',
+    highLabel: 'High',
+  },
+  {
+    key: 'available_time' as MetricKey,
+    label: 'Creative Spark',
+    icon: 'lightbulb',
+    color: 'text-amber-500 dark:text-amber-400',
+    lowLabel: 'Dull',
+    highLabel: 'Blazing',
+  },
+  {
+    key: 'environment_quality' as MetricKey,
+    label: 'Pressure Valve',
+    icon: 'compress',
+    color: 'text-indigo-500 dark:text-indigo-400',
+    lowLabel: 'Calm',
+    highLabel: 'Overload',
+  },
+]
+
 export default function CheckinPage() {
   const [step, setStep] = useState(0)
   const [responses, setResponses] = useState<Record<MetricKey, number>>({
@@ -49,42 +92,8 @@ export default function CheckinPage() {
     setResponses({ ...responses, [key]: value })
   }
 
-  const getEnergyLabel = (value: number): string => {
-    const percentage = value * 20
-    if (percentage === 100) return '100%'
-    if (percentage >= 80) return '90%'
-    if (percentage >= 60) return '75%'
-    if (percentage >= 40) return '50%'
-    if (percentage >= 20) return '25%'
-    return '10%'
-  }
-
-  const getClarityLabel = (value: number): string => {
-    if (value >= 4) return 'Sharp'
-    if (value >= 3) return 'Finding Focus'
-    if (value === 2) return 'Hazy'
-    return 'Foggy'
-  }
-
-  const getWeatherLabel = (value: number): string => {
-    if (value >= 4) return 'Bright & Clear'
-    if (value >= 3) return 'Clearing Up'
-    if (value === 2) return 'Partly Cloudy'
-    return 'Stormy'
-  }
-
-  const getStressLabel = (value: number): string => {
-    if (value <= 2) return 'Zen'
-    if (value === 3) return 'Manageable'
-    if (value === 4) return 'Elevated'
-    return 'Overload'
-  }
-
-  const getSparkLabel = (value: number): string => {
-    if (value >= 4) return 'Blazing'
-    if (value >= 3) return 'Ignited'
-    if (value === 2) return 'Warming'
-    return 'Dull'
+  const getPercentage = (value: number): number => {
+    return value * 20
   }
 
   const matchTasks = (tasks: TaskWithGoal[], state: Record<string, number>): MatchedTask[] => {
@@ -97,105 +106,100 @@ export default function CheckinPage() {
       let score = 0
       const reasons: string[] = []
 
-      // Must-do tasks ALWAYS surface with massive priority boost
       if (task.priority === 'must_do') {
-        score += 1000 // Guarantee they surface regardless of energy
+        score += 1000
         reasons.push('Must do today — non-negotiable')
       }
 
-      if (compositeScore < 2.5) {
-        if (task.energy_required === 'low') {
-          score += 40
-          reasons.push('Perfect for your current energy level')
-        } else if (task.energy_required === 'medium') {
-          score += 15
-        }
-      } else if (compositeScore < 4) {
-        if (task.energy_required === 'medium') {
-          score += 40
-          reasons.push('Matches your current capacity')
-        } else if (task.energy_required === 'low') {
-          score += 25
-        } else {
-          score += 15
-        }
-      } else {
-        if (task.energy_required === 'high') {
-          score += 40
-          reasons.push('Great time for challenging work')
-        } else if (task.energy_required === 'medium') {
-          score += 25
-        }
+      const energyMatch = {
+        low: state.energy_level <= 2,
+        medium: state.energy_level === 3,
+        high: state.energy_level >= 4,
       }
 
-      const timeMap: Record<string, number> = { tiny: 1, short: 2, medium: 3, long: 4, extended: 5 }
-      const taskTime = timeMap[task.time_estimate] || 3
-      if (state.available_time <= 2 && taskTime <= 2) {
+      if (task.energy_required === 'low' && energyMatch.low) {
+        score += 30
+        reasons.push('Low energy task, perfect for right now')
+      } else if (task.energy_required === 'medium' && energyMatch.medium) {
         score += 25
-        reasons.push('Fits your available time')
-      } else if (state.available_time >= 4 && taskTime >= 3) {
+        reasons.push('Medium energy match')
+      } else if (task.energy_required === 'high' && energyMatch.high) {
+        score += 30
+        reasons.push('High energy match — ride this wave')
+      }
+
+      const timeMatch = {
+        tiny: state.available_time <= 2,
+        short: state.available_time === 3,
+        medium: state.available_time === 4,
+        long: state.available_time >= 4,
+      }
+
+      if (task.time_estimate === 'tiny' && timeMatch.tiny) {
         score += 20
-        reasons.push('Good use of your time block')
-      } else if (Math.abs(state.available_time - taskTime) <= 1) {
+        reasons.push('Quick win available')
+      } else if (task.time_estimate === 'short' && (timeMatch.short || timeMatch.medium)) {
+        score += 15
+      } else if (task.time_estimate === 'medium' && timeMatch.long) {
         score += 15
       }
 
-      if (state.environment_quality >= 4 && task.work_type === 'deep_work') {
+      if (state.mental_clarity >= 4 && task.work_type === 'deep_work') {
+        score += 25
+        reasons.push('Sharp focus for deep work')
+      } else if (state.mental_clarity <= 2 && task.work_type === 'light_lift') {
+        score += 20
+        reasons.push('Light task for current mental state')
+      }
+
+      if (task.priority === 'should_do') score += 10
+      if (task.priority === 'could_do') score += 5
+
+      if (task.estimated_value && task.estimated_value > 100) {
         score += 15
-        reasons.push('Perfect environment for focus work')
-      } else if (state.environment_quality <= 2 && task.work_type === 'admin') {
-        score += 15
-        reasons.push('Good for a distracting environment')
-      }
-
-      if (task.priority === 'should_do') {
-        score += 5
-      }
-
-      if (task.times_accepted > task.times_declined) {
-        score += 10
-      }
-
-      if (task.estimated_value && task.estimated_value > 0) {
-        score += 5
-        reasons.push(`Worth $${task.estimated_value}`)
+        reasons.push(`High value: $${task.estimated_value}`)
       }
 
       return { task, score, reasons }
     })
 
-    return scoredTasks
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 3)
+    return scoredTasks.sort((a, b) => b.score - a.score).slice(0, 3)
   }
 
-  const submitCheckin = async () => {
+  const handleSubmit = async () => {
     setLoading(true)
     try {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('Not authenticated')
+      if (!user) return
 
-      await supabase.from('daily_responses').insert({
+      const compositeScore = (
+        responses.energy_level + responses.mental_clarity + responses.emotional_state +
+        responses.available_time + responses.environment_quality
+      ) / 5
+
+      const { error: responseError } = await supabase.from('daily_responses').insert({
         user_id: user.id,
         energy_level: responses.energy_level,
         mental_clarity: responses.mental_clarity,
         emotional_state: responses.emotional_state,
         available_time: responses.available_time,
         environment_quality: responses.environment_quality,
+        composite_score: compositeScore,
       } as never)
+
+      if (responseError) throw responseError
 
       const { data: tasks } = await supabase
         .from('tasks')
         .select('*, goals(*)')
         .eq('user_id', user.id)
-        .eq('status', 'active')
+        .in('status', ['active', 'deferred'])
 
-      const matched = matchTasks(tasks || [], responses)
-      setMatchedTasks(matched)
+      if (tasks && tasks.length > 0) {
+        const matched = matchTasks(tasks as TaskWithGoal[], responses)
+        setMatchedTasks(matched)
+      }
 
-      await supabase.from('profiles').update({
-        last_active_at: new Date().toISOString()
-      } as never).eq('id', user.id)
       setStep(1)
     } catch (err) {
       console.error('Check-in error:', err)
@@ -226,18 +230,6 @@ export default function CheckinPage() {
     }
   }
 
-  const resetCheckin = () => {
-    setStep(0)
-    setResponses({
-      energy_level: 3,
-      mental_clarity: 3,
-      emotional_state: 3,
-      available_time: 3,
-      environment_quality: 3,
-    })
-    setMatchedTasks([])
-  }
-
   const handleCommitToFocus = async () => {
     setCommitting(true)
     try {
@@ -246,7 +238,6 @@ export default function CheckinPage() {
 
       const today = new Date().toISOString().split('T')[0]
 
-      // Create commitments for all matched tasks
       const commitments = matchedTasks.map(({ task }) => ({
         user_id: user.id,
         task_id: task.id,
@@ -264,7 +255,6 @@ export default function CheckinPage() {
 
       celebrate(`Committed to ${matchedTasks.length} task${matchedTasks.length > 1 ? 's' : ''} for today! Let's make it happen! 🎯`)
 
-      // Navigate to dashboard
       setTimeout(() => {
         router.push('/dashboard')
       }, 1000)
@@ -275,280 +265,132 @@ export default function CheckinPage() {
     }
   }
 
+  const resetCheckin = () => {
+    setStep(0)
+    setResponses({
+      energy_level: 3,
+      mental_clarity: 3,
+      emotional_state: 3,
+      available_time: 3,
+      environment_quality: 3,
+    })
+    setMatchedTasks([])
+  }
+
   if (step === 0) {
-    const currentDate = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })
-
     return (
-      <div className="relative min-h-screen bg-bg-cream font-display text-text-main w-full lg:max-w-2xl mx-auto">
-        {/* Background Gradients */}
-        <div className="fixed inset-0 pointer-events-none z-0">
-          <div className="absolute top-[-10%] left-[-10%] w-[120%] h-[500px] bg-gradient-to-br from-pastel-peach/20 via-bg-cream to-transparent opacity-60 blur-3xl rounded-full"></div>
-          <div className="absolute bottom-[-10%] right-[-10%] w-[120%] h-[500px] bg-gradient-to-tl from-pastel-blue/10 via-pastel-sage/10 to-transparent opacity-60 blur-3xl rounded-full"></div>
+      <div className="min-h-screen flex flex-col items-center justify-center py-12 px-4 sm:px-6 bg-[#faf9f6] dark:bg-zinc-900 transition-colors duration-500">
+        {/* Background blur effects */}
+        <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-0 opacity-50 dark:opacity-20 overflow-hidden">
+          <div className="absolute top-[-10%] left-[20%] w-[600px] h-[600px] bg-stone-200 dark:bg-stone-800 rounded-full blur-[120px] mix-blend-multiply dark:mix-blend-screen"></div>
+          <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-slate-200 dark:bg-slate-800 rounded-full blur-[100px] mix-blend-multiply dark:mix-blend-screen"></div>
         </div>
 
-        {/* Header */}
-        <div className="relative z-10 flex items-center p-6 pb-2 justify-between">
-          <button
-            onClick={() => router.back()}
-            className="text-text-main flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-stone-100 transition-colors"
-          >
-            <span className="material-symbols-outlined text-[24px]">arrow_back</span>
-          </button>
-          <h2 className="text-text-main text-lg font-bold leading-tight tracking-[-0.015em] opacity-80">Daily Rhythm</h2>
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="flex h-10 px-3 items-center justify-center rounded-full hover:bg-stone-100 transition-colors"
-          >
-            <p className="text-text-muted text-sm font-bold leading-normal tracking-[0.015em]">Skip</p>
-          </button>
-        </div>
+        <div className="w-full max-w-[680px] bg-white dark:bg-zinc-800/40 p-8 md:p-14 rounded-[2rem] shadow-sm border border-stone-100 dark:border-stone-800 relative overflow-hidden backdrop-blur-sm z-10">
+          {/* Top right blur */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-stone-100 dark:bg-stone-800 rounded-full blur-[80px] -z-10 opacity-60 pointer-events-none"></div>
 
-        {/* Main Content */}
-        <div className="relative z-10 flex-1 overflow-y-auto no-scrollbar pb-32">
-          <div className="px-6 pt-4 pb-6">
-            <p className="text-primary text-sm font-bold tracking-wide uppercase mb-2 flex items-center gap-2 bg-primary/10 w-fit px-3 py-1 rounded-full">
-              <span className="material-symbols-outlined text-[16px]">spa</span>
-              {currentDate}
-            </p>
-            <h1 className="text-text-main text-3xl md:text-4xl font-bold leading-[1.2] tracking-tight">
-              How is your energy <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-pastel-blue-dark">unfolding</span> today?
+          {/* Header */}
+          <header className="flex justify-between items-center mb-12 md:mb-16">
+            <button
+              onClick={() => router.back()}
+              className="group flex items-center justify-center w-10 h-10 -ml-2 text-gray-500 dark:text-gray-400 hover:text-[#1c1c1e] dark:hover:text-white transition-colors rounded-full hover:bg-stone-100 dark:hover:bg-white/5"
+            >
+              <span className="material-symbols-outlined group-hover:-translate-x-0.5 transition-transform">arrow_back</span>
+            </button>
+            <span className="text-[10px] font-bold tracking-[0.2em] uppercase text-gray-500 dark:text-gray-400 opacity-70">
+              Daily Check-in
+            </span>
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-[#1c1c1e] dark:hover:text-white transition-colors px-4 py-2 rounded-full hover:bg-stone-100 dark:hover:bg-white/5"
+            >
+              Skip
+            </button>
+          </header>
+
+          {/* Title */}
+          <div className="text-center mb-14 md:mb-20">
+            <h1 className="font-serif text-4xl md:text-5xl font-medium leading-[1.15] text-[#1c1c1e] dark:text-white mb-6">
+              How is your energy <br className="hidden md:block" />
+              <span className="italic font-normal text-stone-500 dark:text-stone-400">unfolding</span> today?
             </h1>
-            <p className="text-text-secondary text-sm mt-3 leading-relaxed">
-              This isn't permission to skip—it's information to plan better. Low energy? That means light tasks, not no tasks.
+            <p className="text-gray-500 dark:text-gray-400 text-sm md:text-[15px] max-w-md mx-auto leading-relaxed opacity-80">
+              Take a moment to tune in. Use the sliders below to capture your current state.
             </p>
           </div>
 
-          {/* Metrics */}
-          <div className="flex flex-col gap-5 px-6">
-            {/* Physical Battery */}
-            <div className="group glass-panel p-5 rounded-3xl transition-all duration-300 hover:shadow-md hover:border-primary/20 border border-transparent relative">
-              <div className="flex justify-between items-end mb-4">
-                <div className="flex flex-col gap-1">
-                  <span className="text-text-muted text-xs font-bold uppercase tracking-wider opacity-70">Body</span>
-                  <span className="text-text-main text-lg font-semibold flex items-center gap-2">
-                    <span className="material-symbols-outlined text-pastel-blue-dark">battery_charging_80</span>
-                    Physical Battery
-                  </span>
-                </div>
-                <span className="text-pastel-blue-dark font-bold text-xl">{getEnergyLabel(responses.energy_level)}</span>
-              </div>
-              <div className="relative h-12 w-full rounded-2xl bg-stone-100 border border-stone-200 p-1 flex items-center shadow-inner cursor-pointer">
-                <div className="absolute -right-[8px] top-1/2 -translate-y-1/2 w-1.5 h-4 bg-stone-300 rounded-r-md pointer-events-none"></div>
-                <div
-                  className="h-full bg-gradient-to-r from-pastel-blue/60 to-pastel-blue rounded-xl shadow-sm transition-all duration-500 relative overflow-hidden pointer-events-none"
-                  style={{ width: `${responses.energy_level * 20}%` }}
-                >
-                  <div className="absolute top-0 left-0 right-0 h-[40%] bg-white/30 rounded-t-xl"></div>
-                  <div className="absolute bottom-2 right-4 w-1.5 h-1.5 bg-white/60 rounded-full animate-pulse"></div>
-                  <div className="absolute top-3 right-8 w-1 h-1 bg-white/50 rounded-full"></div>
+          {/* Sliders */}
+          <form className="space-y-14 md:space-y-16">
+            {METRICS.map((metric) => (
+              <div key={metric.key} className="relative group">
+                <div className="flex justify-between items-end mb-5 px-1">
+                  <label className="flex items-center gap-3 text-lg font-medium text-gray-900 dark:text-gray-100 font-serif">
+                    <span className={`material-symbols-outlined text-[22px] ${metric.color} opacity-90`}>
+                      {metric.icon}
+                    </span>
+                    {metric.label}
+                  </label>
+                  {metric.key === 'energy_level' && (
+                    <span className="text-xl font-serif font-medium text-emerald-700 dark:text-emerald-400 tabular-nums">
+                      {getPercentage(responses[metric.key])}%
+                    </span>
+                  )}
                 </div>
                 <input
                   type="range"
                   min="1"
                   max="5"
-                  value={responses.energy_level}
-                  onChange={(e) => handleResponse('energy_level', parseInt(e.target.value))}
-                  className="absolute inset-0 w-full h-full bg-transparent appearance-none cursor-pointer z-10 opacity-0"
-                  style={{ margin: 0 }}
-                  aria-label="Physical Battery Level"
+                  value={responses[metric.key]}
+                  onChange={(e) => handleResponse(metric.key, parseInt(e.target.value))}
+                  className={`w-full h-1 rounded-full appearance-none cursor-pointer ${metric.color.replace('text-', 'accent-')}`}
+                  style={{
+                    background: `linear-gradient(to right, currentColor 0%, currentColor ${(responses[metric.key] - 1) * 25}%, #e5e7eb ${(responses[metric.key] - 1) * 25}%, #e5e7eb 100%)`
+                  }}
                 />
+                <div className={`flex justify-between mt-3 text-[11px] font-bold tracking-widest uppercase text-gray-500 dark:text-gray-400 opacity-50 px-1 ${metric.midLabel ? 'relative' : ''}`}>
+                  <span>{metric.lowLabel}</span>
+                  {metric.midLabel && (
+                    <span className="absolute left-1/2 -translate-x-1/2">{metric.midLabel}</span>
+                  )}
+                  <span>{metric.highLabel}</span>
+                </div>
               </div>
+            ))}
+
+            {/* Submit Button */}
+            <div className="pt-10 md:pt-14">
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={loading}
+                className="w-full bg-[#1c1c1e] text-white hover:bg-black dark:hover:bg-stone-200 dark:hover:text-[#1c1c1e] transition-all duration-300 py-4 md:py-5 rounded-xl font-medium text-lg shadow-xl shadow-stone-200/50 dark:shadow-none flex items-center justify-center gap-3 group relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="relative z-10">Log Check-in</span>
+                    <span className="material-symbols-outlined text-xl relative z-10 group-hover:translate-x-1 transition-transform">
+                      arrow_forward
+                    </span>
+                    <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+                  </>
+                )}
+              </button>
             </div>
-
-            {/* Mental Clarity */}
-            <div className="group glass-panel p-5 rounded-3xl transition-all duration-300 hover:shadow-md border border-transparent">
-              <div className="flex justify-between items-end mb-4">
-                <div className="flex flex-col gap-1">
-                  <span className="text-text-muted text-xs font-bold uppercase tracking-wider opacity-70">Mind</span>
-                  <span className="text-text-main text-lg font-semibold flex items-center gap-2">
-                    <span className="material-symbols-outlined text-pastel-lavender">water_drop</span>
-                    Mental Clarity
-                  </span>
-                </div>
-                <span className="text-text-muted text-sm font-medium">{getClarityLabel(responses.mental_clarity)}</span>
-              </div>
-              <div className="relative h-10 flex items-center cursor-pointer">
-                <div className="absolute inset-0 h-3 my-auto rounded-full bg-gradient-to-r from-stone-200 via-pastel-lavender to-pastel-blue-dark opacity-40 pointer-events-none"></div>
-                <input
-                  type="range"
-                  min="1"
-                  max="5"
-                  value={responses.mental_clarity}
-                  onChange={(e) => handleResponse('mental_clarity', parseInt(e.target.value))}
-                  className="absolute inset-0 w-full h-full bg-transparent appearance-none cursor-pointer z-20 opacity-0"
-                  style={{ margin: 0 }}
-                  aria-label="Mental Clarity Level"
-                />
-                <div
-                  className="absolute -ml-3 flex flex-col items-center group-hover:scale-105 transition-transform pointer-events-none"
-                  style={{ left: `${(responses.mental_clarity - 1) * 25}%` }}
-                >
-                  <div className="w-8 h-8 bg-white rounded-full border border-stone-100 shadow-md flex items-center justify-center">
-                    <div className="w-3 h-3 bg-pastel-blue-dark rounded-full opacity-80"></div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex justify-between mt-2 text-xs text-text-muted font-medium px-1">
-                <span>Foggy</span>
-                <span>Sharp</span>
-              </div>
-            </div>
-
-            {/* Inner Weather */}
-            <div className="group glass-panel p-5 rounded-3xl transition-all duration-300 hover:shadow-md border border-transparent">
-              <div className="flex justify-between items-end mb-4">
-                <div className="flex flex-col gap-1">
-                  <span className="text-text-muted text-xs font-bold uppercase tracking-wider opacity-70">Emotion</span>
-                  <span className="text-text-main text-lg font-semibold flex items-center gap-2">
-                    <span className="material-symbols-outlined text-pastel-peach">wb_sunny</span>
-                    Inner Weather
-                  </span>
-                </div>
-                <span className="text-text-muted text-sm font-medium">{getWeatherLabel(responses.emotional_state)}</span>
-              </div>
-              <div className="relative w-full h-14 flex items-center justify-between gap-3 bg-stone-50 rounded-full px-2 border border-stone-100/50 shadow-soft-inner cursor-pointer">
-                <span className="material-symbols-outlined text-stone-300 text-[20px] ml-2 pointer-events-none">cloud</span>
-                <div className="relative flex-1 h-2 bg-stone-200 rounded-full overflow-hidden pointer-events-none">
-                  <div
-                    className="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-stone-300 via-pastel-peach to-pastel-yellow opacity-80 transition-all duration-300"
-                    style={{ width: `${(responses.emotional_state - 1) * 25}%` }}
-                  ></div>
-                </div>
-                <input
-                  type="range"
-                  min="1"
-                  max="5"
-                  value={responses.emotional_state}
-                  onChange={(e) => handleResponse('emotional_state', parseInt(e.target.value))}
-                  className="absolute inset-0 w-full h-full bg-transparent appearance-none cursor-pointer z-20 opacity-0"
-                  style={{ margin: 0 }}
-                  aria-label="Emotional State"
-                />
-                <div
-                  className="absolute top-1/2 -translate-y-1/2 -ml-5 w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center border border-stone-50 pointer-events-none"
-                  style={{ left: `${(responses.emotional_state - 1) * 25}%` }}
-                >
-                  <span className="material-symbols-outlined text-[20px] text-orange-300">sunny</span>
-                </div>
-                <span className="material-symbols-outlined text-orange-300 text-[20px] mr-2 pointer-events-none">sunny</span>
-              </div>
-            </div>
-
-            {/* Pressure Valve */}
-            <div className="group glass-panel p-5 rounded-3xl transition-all duration-300 hover:shadow-md border border-transparent">
-              <div className="flex justify-between items-end mb-4">
-                <div className="flex flex-col gap-1">
-                  <span className="text-text-muted text-xs font-bold uppercase tracking-wider opacity-70">Stress</span>
-                  <span className="text-text-main text-lg font-semibold flex items-center gap-2">
-                    <span className="material-symbols-outlined text-pastel-sage">filter_vintage</span>
-                    Pressure Valve
-                  </span>
-                </div>
-                <span className="text-text-muted text-sm font-medium">{getStressLabel(responses.available_time)}</span>
-              </div>
-              <div className="relative pt-4 pb-2 px-1 cursor-pointer">
-                <div className="h-3 w-full bg-gradient-to-r from-pastel-sage via-stone-200 to-pastel-rose rounded-full opacity-60 pointer-events-none"></div>
-                <div className="flex justify-between mt-2 px-1 opacity-40 pointer-events-none">
-                  <div className="w-px h-2 bg-text-main"></div>
-                  <div className="w-px h-2 bg-text-main"></div>
-                  <div className="w-px h-2 bg-text-main"></div>
-                  <div className="w-px h-2 bg-text-main"></div>
-                  <div className="w-px h-2 bg-text-main"></div>
-                </div>
-                <input
-                  type="range"
-                  min="1"
-                  max="5"
-                  value={responses.available_time}
-                  onChange={(e) => handleResponse('available_time', parseInt(e.target.value))}
-                  className="absolute inset-0 w-full h-full bg-transparent appearance-none cursor-pointer z-20 opacity-0"
-                  style={{ margin: 0 }}
-                  aria-label="Available Time"
-                />
-                <div
-                  className="absolute top-2 -ml-3 w-7 h-7 bg-white border border-stone-100 rounded-full shadow-md flex items-center justify-center z-10 pointer-events-none"
-                  style={{ left: `${(responses.available_time - 1) * 25}%` }}
-                >
-                  <div className="w-2.5 h-2.5 bg-pastel-sage rounded-full"></div>
-                </div>
-              </div>
-              <div className="flex justify-between mt-2 text-xs text-text-muted font-medium px-1">
-                <span>Zen</span>
-                <span>Overload</span>
-              </div>
-            </div>
-
-            {/* Creative Spark */}
-            <div className="group glass-panel p-5 rounded-3xl transition-all duration-300 hover:shadow-md border border-transparent">
-              <div className="flex justify-between items-end mb-4">
-                <div className="flex flex-col gap-1">
-                  <span className="text-text-muted text-xs font-bold uppercase tracking-wider opacity-70">Drive</span>
-                  <span className="text-text-main text-lg font-semibold flex items-center gap-2">
-                    <span className="material-symbols-outlined text-orange-300">lightbulb</span>
-                    Creative Spark
-                  </span>
-                </div>
-                <span className="text-text-muted text-sm font-medium">{getSparkLabel(responses.environment_quality)}</span>
-              </div>
-              <div className="relative h-12 flex items-center cursor-pointer">
-                <div className="w-full h-2 bg-stone-100 rounded-full overflow-hidden shadow-inner pointer-events-none">
-                  <div
-                    className="h-full bg-gradient-to-r from-stone-200 to-orange-300 opacity-70 transition-all duration-300"
-                    style={{ width: `${responses.environment_quality * 20}%` }}
-                  ></div>
-                </div>
-                <input
-                  type="range"
-                  min="1"
-                  max="5"
-                  value={responses.environment_quality}
-                  onChange={(e) => handleResponse('environment_quality', parseInt(e.target.value))}
-                  className="absolute inset-0 w-full h-full bg-transparent appearance-none cursor-pointer z-20 opacity-0"
-                  style={{ margin: 0 }}
-                  aria-label="Environment Quality"
-                />
-                <div
-                  className="absolute -ml-6 w-12 h-12 bg-gradient-to-br from-orange-100 to-white rounded-full shadow-md flex items-center justify-center text-orange-400 border border-white pointer-events-none"
-                  style={{ left: `${responses.environment_quality * 20}%` }}
-                >
-                  <span className="material-symbols-outlined text-[24px]">local_fire_department</span>
-                </div>
-              </div>
-              <div className="flex justify-between mt-0 text-xs text-text-muted font-medium px-1">
-                <span>Dull</span>
-                <span>Blazing</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="h-8"></div>
-        </div>
-
-        {/* Submit Button */}
-        <div className="absolute bottom-0 w-full p-6 bg-gradient-to-t from-bg-cream via-bg-cream/90 to-transparent pt-12 z-20 backdrop-blur-[2px]">
-          <button
-            onClick={submitCheckin}
-            disabled={loading}
-            className="w-full h-14 bg-primary hover:bg-primary-hover active:scale-[0.98] transition-all duration-200 rounded-2xl flex items-center justify-center gap-3 shadow-glow-soft group text-white disabled:opacity-50"
-          >
-            {loading ? (
-              <Loader2 className="w-6 h-6 animate-spin" />
-            ) : (
-              <>
-                <span className="text-lg font-bold tracking-wide">Log Check-In</span>
-                <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
-              </>
-            )}
-          </button>
+          </form>
         </div>
       </div>
     )
   }
 
-  // Results page (unchanged functionality)
+  // Results page (keeping existing logic but could be redesigned too)
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-2xl mx-auto p-6">
       <div className="text-center mb-6 animate-fade-in">
         <div className="w-16 h-16 bg-gradient-to-br bg-accent-ocean/10 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
           <Check className="w-8 h-8 text-accent-ocean" />
@@ -735,14 +577,16 @@ export default function CheckinPage() {
             onClick={() => router.push('/tasks')}
             className="btn-primary inline-flex items-center gap-2 shadow-lg"
           >
-            <CheckSquare className="w-5 h-5" />
+            <span className="material-symbols-outlined">checklist</span>
             Add some tasks
           </button>
         </div>
       )}
 
       <div className="mt-8 text-center">
-        <button onClick={() => router.push('/dashboard')} className="text-text-muted hover:text-text-secondary">Back to dashboard</button>
+        <button onClick={() => router.push('/dashboard')} className="text-text-muted hover:text-text-secondary">
+          Back to dashboard
+        </button>
       </div>
 
       {CelebrationComponent}
