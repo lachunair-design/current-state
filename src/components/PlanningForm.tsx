@@ -91,7 +91,7 @@ export function PlanningForm({ goals, tasks, existingPlan, weekStart, weekEnd }:
 
       const { data, error } = await supabase
         .from('weekly_plans')
-        .upsert(planData)
+        .upsert(planData as any)
         .select()
 
       console.log('Save result - Data:', data, 'Error:', error)
