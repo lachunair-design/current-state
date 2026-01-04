@@ -39,11 +39,11 @@ const getGoalIconAndColor = (category: GoalCategory, title: string) => {
   // Fallback based on category
   const categoryMap: Record<GoalCategory, any> = {
     career: { icon: 'work_outline', bgColor: 'bg-amber-100 dark:bg-amber-900/30', textColor: 'text-amber-600 dark:text-amber-400' },
+    business: { icon: 'rocket_launch', bgColor: 'bg-indigo-100 dark:bg-indigo-900/30', textColor: 'text-indigo-600 dark:text-indigo-400' },
+    finance: { icon: 'savings', bgColor: 'bg-teal-100 dark:bg-teal-900/30', textColor: 'text-teal-600 dark:text-teal-400' },
     health: { icon: 'favorite', bgColor: 'bg-rose-100 dark:bg-rose-900/30', textColor: 'text-rose-600 dark:text-rose-400' },
-    financial: { icon: 'savings', bgColor: 'bg-teal-100 dark:bg-teal-900/30', textColor: 'text-teal-600 dark:text-teal-400' },
-    personal: { icon: 'spa', bgColor: 'bg-purple-100 dark:bg-purple-900/30', textColor: 'text-purple-600 dark:text-purple-400' },
     relationships: { icon: 'favorite', bgColor: 'bg-pink-100 dark:bg-pink-900/30', textColor: 'text-pink-600 dark:text-pink-400' },
-    learning: { icon: 'school', bgColor: 'bg-blue-100 dark:bg-blue-900/30', textColor: 'text-blue-600 dark:text-blue-400' },
+    personal: { icon: 'spa', bgColor: 'bg-purple-100 dark:bg-purple-900/30', textColor: 'text-purple-600 dark:text-purple-400' },
   }
 
   return categoryMap[category] || { icon: 'flag', bgColor: 'bg-stone-100 dark:bg-stone-800', textColor: 'text-stone-600 dark:text-stone-400' }
