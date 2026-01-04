@@ -3,10 +3,51 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Plus, Loader2, X, MoreVertical, Trash2, Edit2, Rocket, Briefcase, Heart, DollarSign, Users, Home, CheckCircle2, ListPlus } from 'lucide-react'
+import { Loader2, X } from 'lucide-react'
 import { Goal, GoalCategory, GOAL_CATEGORY_CONFIG, CreateGoalInput } from '@/types/database'
 import { getSmartTaskSuggestions, TaskSuggestion } from '@/lib/goalTaskSuggestions'
 import clsx from 'clsx'
+import Link from 'next/link'
+
+interface Task {
+  id: string
+  title: string
+  status: string
+  goal_id: string | null
+}
+
+// Icon and color mapping for goal categories
+const getGoalIconAndColor = (category: GoalCategory, title: string) => {
+  const lowerTitle = title.toLowerCase()
+
+  if (lowerTitle.includes('launch') || lowerTitle.includes('start') || lowerTitle.includes('hustle')) {
+    return { icon: 'rocket_launch', bgColor: 'bg-emerald-100 dark:bg-emerald-900/30', textColor: 'text-emerald-600 dark:text-emerald-400' }
+  }
+  if (lowerTitle.includes('promotion') || lowerTitle.includes('job') || lowerTitle.includes('career')) {
+    return { icon: 'work_outline', bgColor: 'bg-amber-100 dark:bg-amber-900/30', textColor: 'text-amber-600 dark:text-amber-400' }
+  }
+  if (lowerTitle.includes('health') || lowerTitle.includes('fitness') || lowerTitle.includes('marathon') || lowerTitle.includes('training')) {
+    return { icon: 'favorite', bgColor: 'bg-rose-100 dark:bg-rose-900/30', textColor: 'text-rose-600 dark:text-rose-400' }
+  }
+  if (lowerTitle.includes('save') || lowerTitle.includes('$') || lowerTitle.includes('money') || lowerTitle.includes('earn')) {
+    return { icon: 'savings', bgColor: 'bg-teal-100 dark:bg-teal-900/30', textColor: 'text-teal-600 dark:text-teal-400' }
+  }
+  if (lowerTitle.includes('family') || lowerTitle.includes('trip') || lowerTitle.includes('vacation')) {
+    return { icon: 'flight', bgColor: 'bg-blue-100 dark:bg-blue-900/30', textColor: 'text-blue-600 dark:text-blue-400' }
+  }
+
+  // Fallback based on category
+  const categoryMap: Record<GoalCategory, any> = {
+    career: { icon: 'work_outline', bgColor: 'bg-amber-100 dark:bg-amber-900/30', textColor: 'text-amber-600 dark:text-amber-400' },
+    health: { icon: 'favorite', bgColor: 'bg-rose-100 dark:bg-rose-900/30', textColor: 'text-rose-600 dark:text-rose-400' },
+    financial: { icon: 'savings', bgColor: 'bg-teal-100 dark:bg-teal-900/30', textColor: 'text-teal-600 dark:text-teal-400' },
+    personal: { icon: 'spa', bgColor: 'bg-purple-100 dark:bg-purple-900/30', textColor: 'text-purple-600 dark:text-purple-400' },
+    relationships: { icon: 'favorite', bgColor: 'bg-pink-100 dark:bg-pink-900/30', textColor: 'text-pink-600 dark:text-pink-400' },
+    learning: { icon: 'school', bgColor: 'bg-blue-100 dark:bg-blue-900/30', textColor: 'text-blue-600 dark:text-blue-400' },
+  }
+
+  return categoryMap[category] || { icon: 'flag', bgColor: 'bg-stone-100 dark:bg-stone-800', textColor: 'text-stone-600 dark:text-stone-400' }
+}
 
 export default function GoalsPage() {
   const [goals, setGoals] = useState<Goal[]>([])
@@ -14,20 +55,16 @@ export default function GoalsPage() {
   const [showForm, setShowForm] = useState(false)
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null)
   const [saving, setSaving] = useState(false)
-  const [menuOpen, setMenuOpen] = useState<string | null>(null)
   const [goalProgress, setGoalProgress] = useState<Record<string, { completed: number, total: number }>>({})
+  const [goalTasks, setGoalTasks] = useState<Record<string, Task[]>>({})
+  const [expandedGoals, setExpandedGoals] = useState<string[]>([])
+  const [filterTab, setFilterTab] = useState<'active' | 'completed' | 'paused'>('active')
 
   // Task suggestions modal state
   const [showTaskSuggestions, setShowTaskSuggestions] = useState(false)
   const [newlyCreatedGoal, setNewlyCreatedGoal] = useState<Goal | null>(null)
   const [selectedTaskIndices, setSelectedTaskIndices] = useState<number[]>([])
   const [addingTasks, setAddingTasks] = useState(false)
-
-  // Delete confirmation state
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  const [goalToDelete, setGoalToDelete] = useState<Goal | null>(null)
-  const [deleteStats, setDeleteStats] = useState({ tasks: 0, habits: 0 })
-  const [deleting, setDeleting] = useState(false)
 
   const supabase = createClient()
   const router = useRouter()
@@ -39,37 +76,6 @@ export default function GoalsPage() {
   const [successMetric, setSuccessMetric] = useState('')
   const [incomeStream, setIncomeStream] = useState('')
   const [targetDate, setTargetDate] = useState('')
-
-  // Icon mapping for different goal types
-  const getGoalIcon = (category: GoalCategory, title: string) => {
-    // Check title for keywords first
-    const lowerTitle = title.toLowerCase()
-
-    if (lowerTitle.includes('launch') || lowerTitle.includes('start') || lowerTitle.includes('hustle')) {
-      return { icon: Rocket, color: 'bg-gradient-sunset', emoji: '🚀' }
-    }
-    if (lowerTitle.includes('promotion') || lowerTitle.includes('job') || lowerTitle.includes('career')) {
-      return { icon: Briefcase, color: 'bg-gradient-ocean', emoji: '💼' }
-    }
-    if (lowerTitle.includes('health') || lowerTitle.includes('fitness') || lowerTitle.includes('marathon') || lowerTitle.includes('training')) {
-      return { icon: Heart, color: 'bg-red-100', emoji: '❤️', textColor: 'text-red-600' }
-    }
-    if (lowerTitle.includes('save') || lowerTitle.includes('$') || lowerTitle.includes('money') || lowerTitle.includes('earn')) {
-      return { icon: DollarSign, color: 'bg-emerald-100', emoji: '💰', textColor: 'text-emerald-600' }
-    }
-    if (lowerTitle.includes('family') || lowerTitle.includes('trip') || lowerTitle.includes('vacation')) {
-      return { icon: Users, color: 'bg-orange-100', emoji: '👨‍👩‍👧‍👦', textColor: 'text-orange-600' }
-    }
-
-    // Fallback to category
-    const config = GOAL_CATEGORY_CONFIG[category]
-    return {
-      icon: Home,
-      color: config.color,
-      emoji: config.icon,
-      textColor: 'text-ocean-600'
-    }
-  }
 
   useEffect(() => {
     fetchGoals()
@@ -88,7 +94,6 @@ export default function GoalsPage() {
 
     if (data) {
       setGoals(data)
-      // Fetch progress for each goal
       await fetchAllGoalProgress(data, user.id)
     }
     setLoading(false)
@@ -96,21 +101,25 @@ export default function GoalsPage() {
 
   const fetchAllGoalProgress = async (goals: Goal[], userId: string) => {
     const progressData: Record<string, { completed: number, total: number }> = {}
+    const tasksData: Record<string, Task[]> = {}
 
     for (const goal of goals) {
       const { data: tasks } = await supabase
         .from('tasks')
-        .select('id, status')
+        .select('id, title, status, goal_id')
         .eq('user_id', userId)
         .eq('goal_id', goal.id)
-        .in('status', ['active', 'completed'])
+        .in('status', ['active', 'completed', 'deferred'])
+        .order('created_at', { ascending: true })
 
       const total = tasks?.length || 0
       const completed = tasks?.filter((t: any) => t.status === 'completed').length || 0
       progressData[goal.id] = { completed, total }
+      tasksData[goal.id] = tasks || []
     }
 
     setGoalProgress(progressData)
+    setGoalTasks(tasksData)
   }
 
   const resetForm = () => {
@@ -122,18 +131,6 @@ export default function GoalsPage() {
     setTargetDate('')
     setShowForm(false)
     setEditingGoal(null)
-  }
-
-  const openEditForm = (goal: Goal) => {
-    setEditingGoal(goal)
-    setTitle(goal.title)
-    setCategory(goal.category)
-    setDescription(goal.description || '')
-    setSuccessMetric(goal.success_metric || '')
-    setIncomeStream(goal.income_stream_name || '')
-    setTargetDate(goal.target_date || '')
-    setShowForm(true)
-    setMenuOpen(null)
   }
 
   const saveGoal = async () => {
@@ -161,7 +158,6 @@ export default function GoalsPage() {
         await fetchGoals()
         resetForm()
       } else {
-        // Insert new goal and get the created goal back
         const { data: createdGoal, error } = await supabase
           .from('goals')
           .insert({ ...goalData, user_id: user.id, display_order: goals.length } as never)
@@ -172,10 +168,8 @@ export default function GoalsPage() {
           await fetchGoals()
           resetForm()
 
-          // Show task suggestions modal
           setNewlyCreatedGoal(createdGoal as Goal)
           const suggestions = getSmartTaskSuggestions((createdGoal as Goal).title, (createdGoal as Goal).category)
-          // Pre-select first 5 suggestions (we only display 5 in the modal)
           setSelectedTaskIndices(suggestions.slice(0, 5).map((_, index) => index))
           setShowTaskSuggestions(true)
         }
@@ -185,68 +179,27 @@ export default function GoalsPage() {
     }
   }
 
-  const promptDeleteGoal = async (goal: Goal) => {
-    // Fetch counts of linked tasks and habits
-    const { data: tasks } = await supabase
+  const toggleGoalExpanded = (goalId: string) => {
+    setExpandedGoals(prev =>
+      prev.includes(goalId)
+        ? prev.filter(id => id !== goalId)
+        : [...prev, goalId]
+    )
+  }
+
+  const toggleTaskCompletion = async (task: Task) => {
+    const newStatus = task.status === 'completed' ? 'active' : 'completed'
+    const completedAt = newStatus === 'completed' ? new Date().toISOString() : null
+
+    await supabase
       .from('tasks')
-      .select('id')
-      .eq('goal_id', goal.id)
-      .eq('status', 'active')
+      .update({
+        status: newStatus,
+        completed_at: completedAt
+      } as never)
+      .eq('id', task.id)
 
-    const { data: habits } = await supabase
-      .from('habits')
-      .select('id')
-      .eq('linked_goal_id', goal.id)
-      .eq('is_active', true)
-
-    setDeleteStats({
-      tasks: tasks?.length || 0,
-      habits: habits?.length || 0
-    })
-    setGoalToDelete(goal)
-    setShowDeleteConfirm(true)
-    setMenuOpen(null)
-  }
-
-  const confirmDeleteGoal = async () => {
-    if (!goalToDelete) return
-
-    setDeleting(true)
-    try {
-      // Delete all linked tasks
-      await supabase
-        .from('tasks')
-        .delete()
-        .eq('goal_id', goalToDelete.id)
-
-      // Delete all linked habits
-      await supabase
-        .from('habits')
-        .delete()
-        .eq('linked_goal_id', goalToDelete.id)
-
-      // Delete the goal
-      await supabase
-        .from('goals')
-        .delete()
-        .eq('id', goalToDelete.id)
-
-      // Update local state
-      setGoals(goals.filter(g => g.id !== goalToDelete.id))
-      setShowDeleteConfirm(false)
-      setGoalToDelete(null)
-    } catch (error) {
-      console.error('Error deleting goal:', error)
-      alert('Failed to delete goal. Please try again.')
-    } finally {
-      setDeleting(false)
-    }
-  }
-
-  const cancelDelete = () => {
-    setShowDeleteConfirm(false)
-    setGoalToDelete(null)
-    setDeleteStats({ tasks: 0, habits: 0 })
+    await fetchGoals()
   }
 
   const toggleTaskSelection = (index: number) => {
@@ -268,7 +221,6 @@ export default function GoalsPage() {
       const suggestions = getSmartTaskSuggestions(newlyCreatedGoal.title, newlyCreatedGoal.category).slice(0, 5)
       const selectedSuggestions = selectedTaskIndices.map(i => suggestions[i]).filter(Boolean)
 
-      // Create tasks from selected suggestions
       const tasksToInsert = selectedSuggestions.map((suggestion: TaskSuggestion) => ({
         user_id: user.id,
         goal_id: newlyCreatedGoal.id,
@@ -282,11 +234,8 @@ export default function GoalsPage() {
       }))
 
       await supabase.from('tasks').insert(tasksToInsert as never)
-
-      // Refresh goals to update progress
       await fetchGoals()
 
-      // Close modal
       setShowTaskSuggestions(false)
       setNewlyCreatedGoal(null)
       setSelectedTaskIndices([])
@@ -304,64 +253,242 @@ export default function GoalsPage() {
   const addTasksManually = () => {
     if (!newlyCreatedGoal) return
 
-    // Store goal info in sessionStorage for tasks page to read
     sessionStorage.setItem('pendingGoalForTasks', JSON.stringify({
       id: newlyCreatedGoal.id,
       title: newlyCreatedGoal.title
     }))
 
-    // Close modal and navigate to tasks page
     setShowTaskSuggestions(false)
     setNewlyCreatedGoal(null)
     setSelectedTaskIndices([])
     router.push('/tasks')
   }
 
-  const addTasksToGoal = (goal: Goal) => {
-    // Store goal info in sessionStorage for tasks page to read
-    sessionStorage.setItem('pendingGoalForTasks', JSON.stringify({
-      id: goal.id,
-      title: goal.title
-    }))
-
-    // Close menu and navigate to tasks page
-    setMenuOpen(null)
-    router.push('/tasks')
-  }
-
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="w-8 h-8 animate-spin text-ocean-600" />
+      <div className="flex items-center justify-center py-20 bg-[#fafaf9] dark:bg-[#1c1917] min-h-screen">
+        <Loader2 className="w-8 h-8 animate-spin text-stone-600 dark:text-stone-400" />
       </div>
     )
   }
 
+  const filteredGoals = goals.filter(g => {
+    if (filterTab === 'active') return g.is_active
+    if (filterTab === 'completed') return !g.is_active && g.completed_at
+    if (filterTab === 'paused') return !g.is_active && !g.completed_at
+    return true
+  })
+
   return (
-    <div className="max-w-2xl mx-auto px-4">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-8 animate-fade-in">
-        <div>
-          <h1 className="text-3xl font-bold text-text-primary mb-1">Your Goals</h1>
-          <p className="text-sm text-text-secondary">Stay in your rhythm</p>
+    <div className="min-h-screen bg-[#fafaf9] dark:bg-[#1c1917] transition-colors duration-300 antialiased">
+      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+      <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+
+      <div className="max-w-5xl mx-auto px-6 py-10 md:py-14">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+          <div>
+            <h1 className="font-['Playfair_Display'] text-4xl text-stone-900 dark:text-white mb-2">Your Goals</h1>
+            <p className="text-stone-500 dark:text-stone-400 text-lg">Stay in your rhythm and focus on what matters.</p>
+          </div>
+          <button
+            onClick={() => setShowForm(true)}
+            className="inline-flex items-center justify-center gap-2 bg-stone-900 hover:bg-stone-800 dark:bg-stone-100 dark:hover:bg-white dark:text-stone-900 text-white px-5 py-3 rounded-full font-medium shadow-lg hover:shadow-xl transition-all active:scale-95"
+          >
+            <span className="material-symbols-rounded text-xl">add</span>
+            <span>New Goal</span>
+          </button>
         </div>
-        <button
-          onClick={() => setShowForm(true)}
-          className="w-12 h-12 bg-gradient-ocean text-white rounded-full flex items-center justify-center hover:shadow-lg hover:scale-105 transition-all shadow-md"
-        >
-          <Plus className="w-6 h-6" />
-        </button>
+
+        {/* Filter Tabs */}
+        <div className="flex gap-6 mb-8 overflow-x-auto pb-2">
+          <button
+            onClick={() => setFilterTab('active')}
+            className={clsx(
+              'whitespace-nowrap px-4 py-2 rounded-full font-medium text-sm transition-colors',
+              filterTab === 'active'
+                ? 'bg-stone-200 dark:bg-stone-800 text-stone-900 dark:text-white'
+                : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'
+            )}
+          >
+            Active ({goals.filter(g => g.is_active).length})
+          </button>
+          <button
+            onClick={() => setFilterTab('completed')}
+            className={clsx(
+              'whitespace-nowrap px-4 py-2 rounded-full font-medium text-sm transition-colors',
+              filterTab === 'completed'
+                ? 'bg-stone-200 dark:bg-stone-800 text-stone-900 dark:text-white'
+                : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'
+            )}
+          >
+            Completed ({goals.filter(g => !g.is_active && g.completed_at).length})
+          </button>
+          <button
+            onClick={() => setFilterTab('paused')}
+            className={clsx(
+              'whitespace-nowrap px-4 py-2 rounded-full font-medium text-sm transition-colors',
+              filterTab === 'paused'
+                ? 'bg-stone-200 dark:bg-stone-800 text-stone-900 dark:text-white'
+                : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'
+            )}
+          >
+            Paused ({goals.filter(g => !g.is_active && !g.completed_at).length})
+          </button>
+        </div>
+
+        {/* Goals Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {filteredGoals.map((goal) => {
+            const progress = goalProgress[goal.id] || { completed: 0, total: 0 }
+            const percentage = progress.total > 0 ? Math.round((progress.completed / progress.total) * 100) : 0
+            const iconConfig = getGoalIconAndColor(goal.category, goal.title)
+            const isExpanded = expandedGoals.includes(goal.id)
+            const tasks = goalTasks[goal.id] || []
+            const strokeDashoffset = 100 - percentage
+
+            return (
+              <div
+                key={goal.id}
+                className="bg-white dark:bg-[#292524] border border-stone-200 dark:border-stone-700 rounded-3xl p-1 shadow-sm hover:shadow-md transition-shadow"
+              >
+                <div>
+                  <button
+                    onClick={() => toggleGoalExpanded(goal.id)}
+                    className="cursor-pointer p-5 flex items-center justify-between w-full text-left"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className={`w-12 h-12 rounded-2xl ${iconConfig.bgColor} ${iconConfig.textColor} flex items-center justify-center shrink-0`}>
+                        <span className="material-symbols-rounded text-2xl">{iconConfig.icon}</span>
+                      </div>
+                      <div>
+                        <h3 className="font-['Playfair_Display'] font-semibold text-lg text-stone-900 dark:text-white">{goal.title}</h3>
+                        <p className="text-sm text-stone-500 dark:text-stone-400">
+                          {GOAL_CATEGORY_CONFIG[goal.category].label} • {progress.completed} of {progress.total} tasks
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-1">
+                      <div className="relative w-10 h-10 flex items-center justify-center">
+                        <svg className="transform -rotate-90 w-10 h-10">
+                          <circle
+                            className="text-stone-200 dark:text-stone-700"
+                            cx="20"
+                            cy="20"
+                            fill="transparent"
+                            r="16"
+                            stroke="currentColor"
+                            strokeWidth="3"
+                          />
+                          <circle
+                            className={iconConfig.textColor}
+                            cx="20"
+                            cy="20"
+                            fill="transparent"
+                            r="16"
+                            stroke="currentColor"
+                            strokeDasharray="100"
+                            strokeDashoffset={strokeDashoffset}
+                            strokeWidth="3"
+                          />
+                        </svg>
+                        <span
+                          className={clsx(
+                            "material-symbols-rounded absolute text-stone-400 dark:text-stone-500 transition-transform text-xl",
+                            isExpanded && "rotate-180"
+                          )}
+                        >
+                          expand_more
+                        </span>
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* Expanded Task List */}
+                  {isExpanded && (
+                    <div className="px-5 pb-5 pt-2 border-t border-stone-100 dark:border-stone-700/50 animate-sweep">
+                      <div className="mt-4 mb-2 flex justify-between items-end">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-stone-400 dark:text-stone-500">Next Steps</span>
+                        <span className={clsx("text-xs font-medium", iconConfig.textColor)}>
+                          {progress.completed} of {progress.total} complete
+                        </span>
+                      </div>
+
+                      {tasks.length > 0 ? (
+                        <ul className="space-y-3">
+                          {tasks.map((task) => (
+                            <li key={task.id} className="flex items-start gap-3 group/item">
+                              <div className="mt-0.5 relative flex items-center justify-center w-5 h-5">
+                                <input
+                                  type="checkbox"
+                                  checked={task.status === 'completed'}
+                                  onChange={() => toggleTaskCompletion(task)}
+                                  className="peer appearance-none w-5 h-5 border-2 border-stone-300 dark:border-stone-600 rounded-full checked:bg-emerald-500 checked:border-emerald-500 cursor-pointer transition-colors"
+                                />
+                                <span className="material-symbols-rounded text-white text-[14px] absolute pointer-events-none opacity-0 peer-checked:opacity-100">
+                                  check
+                                </span>
+                              </div>
+                              <span
+                                className={clsx(
+                                  'text-sm',
+                                  task.status === 'completed'
+                                    ? 'text-stone-400 dark:text-stone-500 line-through decoration-stone-400'
+                                    : 'text-stone-700 dark:text-stone-300 group-hover/item:text-stone-900 dark:group-hover/item:text-white transition-colors'
+                                )}
+                              >
+                                {task.title}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-sm text-stone-500">No tasks yet</p>
+                      )}
+
+                      <button
+                        onClick={() => {
+                          sessionStorage.setItem('pendingGoalForTasks', JSON.stringify({
+                            id: goal.id,
+                            title: goal.title
+                          }))
+                          router.push('/tasks')
+                        }}
+                        className="mt-4 w-full py-2 text-xs font-medium text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300 border border-dashed border-stone-300 dark:border-stone-700 rounded-lg hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors"
+                      >
+                        + Add another task
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+
+          {/* Add New Goal Card */}
+          <div
+            onClick={() => setShowForm(true)}
+            className="border-2 border-dashed border-stone-200 dark:border-stone-700 rounded-3xl p-6 flex flex-col items-center justify-center text-center hover:bg-stone-50 dark:hover:bg-stone-800/50 transition-colors cursor-pointer min-h-[120px]"
+          >
+            <div className="w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-800 flex items-center justify-center mb-3 hover:bg-stone-200 dark:hover:bg-stone-700 transition-colors">
+              <span className="material-symbols-rounded text-stone-400 dark:text-stone-500 text-2xl">add</span>
+            </div>
+            <span className="font-medium text-stone-500 dark:text-stone-400">Add a new goal</span>
+          </div>
+        </div>
       </div>
 
-      {/* Form Modal */}
+      {/* Add/Edit Goal Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-8 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+          <div className="bg-white dark:bg-[#292524] rounded-2xl max-w-lg w-full p-8 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold text-text-primary">{editingGoal ? 'Edit Goal' : 'Add New Goal'}</h2>
+              <h2 className="font-['Playfair_Display'] text-2xl font-bold text-stone-900 dark:text-white">
+                {editingGoal ? 'Edit Goal' : 'Add New Goal'}
+              </h2>
               <button
                 onClick={resetForm}
-                className="text-text-muted hover:text-text-secondary p-2 hover:bg-surface-hover rounded-lg transition-colors"
+                className="text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300 p-2 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -369,19 +496,19 @@ export default function GoalsPage() {
 
             <div className="space-y-4">
               <div>
-                <label className="label">Goal title</label>
+                <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">Goal title</label>
                 <input
                   type="text"
                   value={title}
                   onChange={e => setTitle(e.target.value)}
-                  className="input"
+                  className="w-full px-4 py-2.5 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-xl text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-600 transition-colors"
                   placeholder="e.g., Launch Side Hustle, Get Promoted"
                   autoFocus
                 />
               </div>
 
               <div>
-                <label className="label">Category</label>
+                <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">Category</label>
                 <div className="grid grid-cols-3 gap-2">
                   {(Object.keys(GOAL_CATEGORY_CONFIG) as GoalCategory[]).map((cat) => {
                     const config = GOAL_CATEGORY_CONFIG[cat]
@@ -392,11 +519,13 @@ export default function GoalsPage() {
                         onClick={() => setCategory(cat)}
                         className={clsx(
                           'p-3 rounded-lg border text-center transition-all',
-                          category === cat ? `${config.color} border-current` : 'border-surface-border hover:border-surface-border'
+                          category === cat
+                            ? 'border-stone-900 dark:border-stone-100 bg-stone-100 dark:bg-stone-800'
+                            : 'border-stone-200 dark:border-stone-700 hover:border-stone-400 dark:hover:border-stone-500'
                         )}
                       >
                         <span className="text-xl">{config.icon}</span>
-                        <span className="block text-xs mt-1">{config.label}</span>
+                        <span className="block text-xs mt-1 text-stone-700 dark:text-stone-300">{config.label}</span>
                       </button>
                     )
                   })}
@@ -404,56 +533,30 @@ export default function GoalsPage() {
               </div>
 
               <div>
-                <label className="label">How will you measure success?</label>
+                <label className="block text-sm font-medium text-stone-700 dark:text-stone-300 mb-2">How will you measure success?</label>
                 <input
                   type="text"
                   value={successMetric}
                   onChange={e => setSuccessMetric(e.target.value)}
-                  className="input"
+                  className="w-full px-4 py-2.5 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-700 rounded-xl text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-stone-500 focus:outline-none focus:ring-2 focus:ring-stone-400 dark:focus:ring-stone-600 transition-colors"
                   placeholder="e.g., Get promoted, Earn $50k, Lose 20 lbs"
                 />
-                <p className="text-xs text-text-muted mt-1">What does "done" look like?</p>
-              </div>
-
-              <div>
-                <label className="label">Why does this matter? (optional)</label>
-                <input
-                  type="text"
-                  value={description}
-                  onChange={e => setDescription(e.target.value)}
-                  className="input"
-                  placeholder="e.g., Financial freedom, career growth"
-                />
-              </div>
-
-              <div>
-                <label className="label">Income stream name (optional)</label>
-                <input
-                  type="text"
-                  value={incomeStream}
-                  onChange={e => setIncomeStream(e.target.value)}
-                  className="input"
-                  placeholder="e.g., Freelance clients, Consulting"
-                />
-                <p className="text-xs text-text-muted mt-1">Add this if this goal generates income</p>
-              </div>
-
-              <div>
-                <label className="label">Target date (optional)</label>
-                <input
-                  type="date"
-                  value={targetDate}
-                  onChange={e => setTargetDate(e.target.value)}
-                  className="input"
-                />
-                <p className="text-xs text-text-muted mt-1">When do you want to achieve this goal?</p>
               </div>
 
               <div className="flex gap-2 pt-4">
-                <button onClick={saveGoal} disabled={saving || !title.trim()} className="btn-primary flex-1">
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : (editingGoal ? 'Save Changes' : 'Add Goal')}
+                <button
+                  onClick={saveGoal}
+                  disabled={saving || !title.trim()}
+                  className="flex-1 bg-stone-900 hover:bg-stone-800 dark:bg-stone-100 dark:hover:bg-white dark:text-stone-900 text-white px-5 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {saving ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : (editingGoal ? 'Save Changes' : 'Add Goal')}
                 </button>
-                <button onClick={resetForm} className="btn-secondary">Cancel</button>
+                <button
+                  onClick={resetForm}
+                  className="px-5 py-3 border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 rounded-xl font-medium hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors"
+                >
+                  Cancel
+                </button>
               </div>
             </div>
           </div>
@@ -463,27 +566,26 @@ export default function GoalsPage() {
       {/* Task Suggestions Modal */}
       {showTaskSuggestions && newlyCreatedGoal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-8 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto relative">
-            {/* Close button */}
+          <div className="bg-white dark:bg-[#292524] rounded-2xl max-w-lg w-full p-8 shadow-2xl animate-scale-in max-h-[90vh] overflow-y-auto relative">
             <button
               onClick={skipTaskSuggestions}
-              className="absolute top-4 right-4 text-text-muted hover:text-text-secondary p-2 hover:bg-surface-hover rounded-lg transition-colors"
+              className="absolute top-4 right-4 text-stone-400 hover:text-stone-600 dark:text-stone-500 dark:hover:text-stone-300 p-2 hover:bg-stone-100 dark:hover:bg-stone-800 rounded-lg transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
 
-            {/* Header */}
             <div className="text-center mb-6">
-              <div className={`w-16 h-16 ${getGoalIcon(newlyCreatedGoal.category, newlyCreatedGoal.title).color} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md`}>
-                <span className="text-3xl">{getGoalIcon(newlyCreatedGoal.category, newlyCreatedGoal.title).emoji}</span>
+              <div className={`w-16 h-16 ${getGoalIconAndColor(newlyCreatedGoal.category, newlyCreatedGoal.title).bgColor} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md`}>
+                <span className={`material-symbols-rounded text-3xl ${getGoalIconAndColor(newlyCreatedGoal.category, newlyCreatedGoal.title).textColor}`}>
+                  {getGoalIconAndColor(newlyCreatedGoal.category, newlyCreatedGoal.title).icon}
+                </span>
               </div>
-              <h2 className="text-2xl font-bold text-text-primary mb-2">Great! Let's break this down</h2>
-              <p className="text-text-secondary text-sm">
-                Here are some tasks to help you achieve <span className="font-semibold text-text-primary">"{newlyCreatedGoal.title}"</span>
+              <h2 className="font-['Playfair_Display'] text-2xl font-bold text-stone-900 dark:text-white mb-2">Great! Let's break this down</h2>
+              <p className="text-stone-500 dark:text-stone-400 text-sm">
+                Here are some tasks to help you achieve <span className="font-semibold text-stone-900 dark:text-white">"{newlyCreatedGoal.title}"</span>
               </p>
             </div>
 
-            {/* Task Suggestions List */}
             <div className="space-y-3 mb-6">
               {getSmartTaskSuggestions(newlyCreatedGoal.title, newlyCreatedGoal.category).slice(0, 5).map((suggestion, index) => (
                 <label
@@ -491,230 +593,59 @@ export default function GoalsPage() {
                   className={clsx(
                     'flex items-start gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all hover:shadow-md',
                     selectedTaskIndices.includes(index)
-                      ? 'border-primary bg-primary-50'
-                      : 'border-surface-border bg-white hover:border-primary-200'
+                      ? 'border-stone-900 dark:border-stone-100 bg-stone-50 dark:bg-stone-800'
+                      : 'border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 hover:border-stone-400 dark:hover:border-stone-500'
                   )}
                 >
                   <input
                     type="checkbox"
                     checked={selectedTaskIndices.includes(index)}
                     onChange={() => toggleTaskSelection(index)}
-                    className="mt-1 w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary cursor-pointer"
+                    className="mt-1 w-5 h-5 rounded border-stone-300 text-stone-900 focus:ring-stone-400 cursor-pointer"
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-text-primary text-sm leading-snug">{suggestion.title}</p>
+                    <p className="font-medium text-stone-900 dark:text-white text-sm leading-snug">{suggestion.title}</p>
                     {suggestion.description && (
-                      <p className="text-xs text-text-muted mt-1">{suggestion.description}</p>
+                      <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">{suggestion.description}</p>
                     )}
-                    <div className="flex gap-2 mt-2 flex-wrap">
-                      <span className="text-xs px-2 py-0.5 bg-ocean-100 text-ocean-700 rounded-full">
-                        {suggestion.energy_required}
-                      </span>
-                      <span className="text-xs px-2 py-0.5 bg-surface-hover text-text-secondary rounded-full">
-                        {suggestion.time_estimate}
-                      </span>
-                    </div>
                   </div>
                 </label>
               ))}
             </div>
 
-            {/* Action Buttons */}
             <div className="flex gap-3">
               <button
                 onClick={addTasksFromSuggestions}
                 disabled={addingTasks || selectedTaskIndices.length === 0}
-                className="btn-primary flex-1 flex items-center justify-center gap-2"
+                className="flex-1 bg-stone-900 hover:bg-stone-800 dark:bg-stone-100 dark:hover:bg-white dark:text-stone-900 text-white px-5 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {addingTasks ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
                 ) : (
-                  <>
-                    <CheckCircle2 className="w-5 h-5" />
-                    Add {selectedTaskIndices.length} {selectedTaskIndices.length === 1 ? 'Task' : 'Tasks'}
-                  </>
+                  <>Add {selectedTaskIndices.length} {selectedTaskIndices.length === 1 ? 'Task' : 'Tasks'}</>
                 )}
               </button>
               <button
                 onClick={addTasksManually}
                 disabled={addingTasks}
-                className="btn-secondary px-6"
+                className="px-5 py-3 border border-stone-200 dark:border-stone-700 text-stone-700 dark:text-stone-300 rounded-xl font-medium hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors"
               >
                 Add manually
               </button>
             </div>
-
-            {/* Helper text */}
-            <p className="text-xs text-text-muted text-center mt-4">
-              💡 <strong>Tip:</strong> Goals work best with tasks. We recommend adding at least 2-3 to get started.
-            </p>
           </div>
         </div>
       )}
 
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && goalToDelete && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl animate-scale-in">
-            <div className="text-center mb-6">
-              <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Trash2 className="w-8 h-8 text-red-600" />
-              </div>
-              <h2 className="text-2xl font-bold text-text-primary mb-2">Delete this goal?</h2>
-              <p className="text-text-secondary text-sm">
-                This will permanently delete <span className="font-semibold text-text-primary">"{goalToDelete.title}"</span> and everything linked to it.
-              </p>
-            </div>
-
-            {/* Warning Stats */}
-            {(deleteStats.tasks > 0 || deleteStats.habits > 0) && (
-              <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 mb-6">
-                <p className="text-sm font-semibold text-red-900 mb-2">⚠️ This will also delete:</p>
-                <div className="space-y-1">
-                  {deleteStats.tasks > 0 && (
-                    <p className="text-sm text-red-800">
-                      • <strong>{deleteStats.tasks}</strong> {deleteStats.tasks === 1 ? 'task' : 'tasks'}
-                    </p>
-                  )}
-                  {deleteStats.habits > 0 && (
-                    <p className="text-sm text-red-800">
-                      • <strong>{deleteStats.habits}</strong> {deleteStats.habits === 1 ? 'habit' : 'habits'}
-                    </p>
-                  )}
-                </div>
-                <p className="text-xs text-red-700 mt-2">This action cannot be undone.</p>
-              </div>
-            )}
-
-            {/* Action Buttons */}
-            <div className="flex gap-3">
-              <button
-                onClick={cancelDelete}
-                disabled={deleting}
-                className="btn-secondary flex-1"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmDeleteGoal}
-                disabled={deleting}
-                className="flex-1 px-6 py-3 rounded-xl font-semibold bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
-              >
-                {deleting ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <>
-                    <Trash2 className="w-5 h-5" />
-                    Delete Forever
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Goals List */}
-      {goals.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-24">
-          {goals.map((goal, index) => {
-            const progress = goalProgress[goal.id] || { completed: 0, total: 0 }
-            const percentage = progress.total > 0 ? Math.round((progress.completed / progress.total) * 100) : 0
-            const iconConfig = getGoalIcon(goal.category, goal.title)
-
-            return (
-              <div
-                key={goal.id}
-                className="bg-white rounded-2xl p-4 sm:p-6 shadow-md hover:shadow-lg hover:scale-[1.01] transition-all animate-fade-in relative flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6"
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                {/* Left side content */}
-                <div className="flex-1 min-w-0">
-                  {/* Icon */}
-                  <div className={`w-12 h-12 sm:w-16 sm:h-16 ${iconConfig.color} rounded-2xl flex items-center justify-center mb-3 sm:mb-4 shadow-sm`}>
-                    <span className="text-2xl sm:text-3xl">{iconConfig.emoji}</span>
-                  </div>
-
-                  {/* Title */}
-                  <h3 className="text-lg sm:text-xl font-bold text-text-primary mb-1 sm:mb-2 pr-8">{goal.title}</h3>
-
-                  {/* Progress Text */}
-                  <p className="text-xs sm:text-sm text-text-secondary">
-                    {progress.completed} of {progress.total} tasks complete
-                  </p>
-                </div>
-
-                {/* Right side: Circular Progress Indicator */}
-                <div className="flex-shrink-0 self-center sm:self-auto">
-                  <div className="relative w-20 h-20 sm:w-24 sm:h-24">
-                    <div
-                      className="w-20 h-20 sm:w-24 sm:h-24 rounded-full"
-                      style={{
-                        background: `conic-gradient(
-                          #4FB3D4 ${percentage * 3.6}deg,
-                          #E8E5E0 ${percentage * 3.6}deg
-                        )`
-                      }}
-                    >
-                      <div className="absolute inset-2 bg-white rounded-full flex items-center justify-center">
-                        <span className="text-xl sm:text-2xl font-bold text-ocean-600">{percentage}%</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Menu button */}
-                <div className="absolute top-4 right-4">
-                  <button
-                    onClick={() => setMenuOpen(menuOpen === goal.id ? null : goal.id)}
-                    className="p-2 text-text-muted hover:text-text-secondary rounded-lg hover:bg-surface-hover transition-colors"
-                  >
-                    <MoreVertical className="w-5 h-5" />
-                  </button>
-                  {menuOpen === goal.id && (
-                    <div className="absolute right-0 top-full mt-2 bg-white border border-surface-border rounded-xl shadow-xl py-1 z-10 w-40 animate-scale-in">
-                      <button
-                        onClick={() => openEditForm(goal)}
-                        className="w-full px-4 py-2.5 text-left text-sm font-medium text-text-secondary hover:bg-surface-hover flex items-center gap-2 transition-colors"
-                      >
-                        <Edit2 className="w-4 h-4" /> Edit
-                      </button>
-                      <button
-                        onClick={() => addTasksToGoal(goal)}
-                        className="w-full px-4 py-2.5 text-left text-sm font-medium text-text-secondary hover:bg-surface-hover flex items-center gap-2 transition-colors"
-                      >
-                        <ListPlus className="w-4 h-4" /> Add tasks
-                      </button>
-                      <button
-                        onClick={() => promptDeleteGoal(goal)}
-                        className="w-full px-4 py-2.5 text-left text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" /> Delete
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      ) : (
-        <div className="bg-white rounded-2xl p-12 text-center shadow-md">
-          <div className="w-20 h-20 bg-gradient-ocean rounded-full flex items-center justify-center mx-auto mb-6">
-            <Plus className="w-10 h-10 text-white" />
-          </div>
-          <h3 className="text-2xl font-bold text-text-primary mb-3">No goals yet</h3>
-          <p className="text-text-secondary mb-8 text-base max-w-sm mx-auto">
-            Goals give your tasks meaning. Add your first goal to get started.
-          </p>
-          <button
-            onClick={() => setShowForm(true)}
-            className="btn-primary inline-flex items-center gap-2 shadow-lg hover:shadow-xl"
-          >
-            <Plus className="w-5 h-5" /> Add your first goal
-          </button>
-        </div>
-      )}
+      <style jsx global>{`
+        @keyframes sweep {
+          0% { opacity: 0; transform: translateY(-10px); }
+          100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-sweep {
+          animation: sweep 0.3s ease-in-out;
+        }
+      `}</style>
     </div>
   )
 }
